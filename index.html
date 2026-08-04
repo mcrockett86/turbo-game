@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turbo: Lost & Found</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Dog Selection Screen -->
+    <div id="dog-select" class="screen active">
+      <div class="select-content">
+        <h1 class="game-title">🐾 Turbo: Lost & Found</h1>
+        <p class="subtitle">Choose your dog. Find your way home.</p>
+        <div class="dog-grid" id="dog-grid"></div>
+      </div>
+    </div>
+
+    <!-- First-Person View -->
+    <div id="fp-view" class="screen">
+      <canvas id="fp-canvas"></canvas>
+      <div id="fp-overlay">
+        <div id="dialog-box" class="hidden">
+          <div id="dialog-text"></div>
+          <div id="dialog-speaker"></div>
+        </div>
+        <div id="manga-cutaway" class="hidden">
+          <canvas id="manga-canvas"></canvas>
+          <div id="manga-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Third-Person Adventure Zone -->
+    <div id="tp-view" class="screen">
+      <canvas id="tp-canvas"></canvas>
+    </div>
+
+    <!-- Human Search Interlude -->
+    <div id="human-view" class="screen">
+      <canvas id="human-canvas"></canvas>
+      <div id="human-ui">
+        <p>Leave a scent trail for Turbo! Click to drop clues.</p>
+      </div>
+    </div>
+
+    <!-- Inventory -->
+    <div id="inventory-panel" class="hidden">
+      <h3>🎒 Bag</h3>
+      <div id="inventory-grid" class="grid-4x4"></div>
+      <button id="close-inv">Close</button>
+    </div>
+
+    <!-- Companion Panel -->
+    <div id="companion-panel" class="hidden">
+      <h3>🐕 Pack</h3>
+      <div id="companion-list"></div>
+    </div>
+
+    <!-- Hint Map -->
+    <div id="hint-panel" class="hidden">
+      <h3>🗺️ Route Home</h3>
+      <div id="hint-list"></div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div id="hud-left">
+        <span id="dog-name"></span>
+        <div id="happiness-bar"><div id="happiness-fill"></div></div>
+      </div>
+      <div id="hud-right">
+        <button id="inv-btn">🎒</button>
+        <button id="comp-btn">🐕</button>
+        <button id="hint-btn">🗺️</button>
+      </div>
+    </div>
+
+    <!-- Zone Transition -->
+    <div id="zone-transition" class="hidden">
+      <div class="transition-content">
+        <h2 id="zone-name"></h2>
+        <p id="zone-desc"></p>
+      </div>
+    </div>
+  </div>
+  <script src="js/main.js"></script>
+</body>
+</html>
