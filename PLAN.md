@@ -82,7 +82,7 @@ Route game zones to their correct renderers based on `zone.type`.
 - Canvas visibility toggling per zone type
 
 **Next priorities:**
-1. Phase 2: Add remaining zone data (neighborhood, home) — dog_park ✅, apartment ✅, shelter ✅ done
+1. Phase 2: Add remaining zone data (home) — dog_park ✅, apartment ✅, shelter ✅, neighborhood ✅ done
 2. Phase 3: Polish (SFX, particles, save/load fixes, difficulty scaling)
 
 ---
@@ -493,7 +493,7 @@ All engine files are written. The gap is **main.ts wiring**. Here's the priority
 | 2.1 | Add `dog_park` zone (TP) with NPCs, obstacles, scent trail | Companion meeting | ✅ |
 | 2.2 | Add `apartment` zone (FP) with TV, food, toy features | Item collection | ✅ |
 | 2.3 | Add `shelter` zone (FP) with kennels, friend meeting | Companion system | ✅ |
-| 2.4 | Add `neighborhood` zone (FP) with final approach, home gate | Win condition | |
+| 2.4 | Add `neighborhood` zone (FP) with final approach, home gate | Win condition | ✅ |
 | 2.5 | Add `home` zone (FP) with golden gate, celebration | Endgame trigger | |
 
 ### Phase 3: Polish

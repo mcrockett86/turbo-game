@@ -209,7 +209,8 @@ export const ZONES: Record<string, Zone> = {
     type: 'fp',
     rooms: [
       { id: 'shelter_lobby', name: 'Lobby', w: 200, h: 100, d: 150, color: '#8a8a9a', exits: ['shelter_kennels', 'shelter_office', 'shelter_exit'] },
-      { id: 'shelter_exit', name: 'Exit Door', w: 80, h: 60, d: 80, color: '#6a6a7a', exits: ['shelter_lobby'] },
+      { id: 'shelter_exit', name: 'Exit Door', w: 80, h: 60, d: 80, color: '#6a6a7a', exits: ['shelter_lobby', 'shelter_to_neighborhood'] },
+      { id: 'shelter_to_neighborhood', name: 'Side Gate', w: 60, h: 50, d: 60, color: '#5a5a6a', exits: ['shelter_lobby'] },
       { id: 'shelter_kennels', name: 'Kennels', w: 300, h: 120, d: 200, color: '#7a7a8a', exits: ['shelter_lobby'], features: [{type:'dog_friend', x:150, y:60, w:50, h:40, label:'🐕 New Friend', item:'friend'}] },
       { id: 'shelter_office', name: 'Office', w: 120, h: 80, d: 100, color: '#6a6a7a', exits: ['shelter_lobby'], features: [{type:'hint', x:60, y:40, w:40, h:30, label:'📋 Poster', item:'map_fragment'}] }
     ],
@@ -222,7 +223,8 @@ export const ZONES: Record<string, Zone> = {
     desc: 'The streets feel familiar. You\'re close. You can feel it.',
     type: 'fp',
     rooms: [
-      { id: 'neighborhood_start', name: 'Street Corner', w: 250, h: 120, d: 200, color: '#5a8a5a', exits: ['neighborhood_main', 'neighborhood_park'] },
+      { id: 'neighborhood_entrance', name: 'Side Gate', w: 80, h: 60, d: 80, color: '#5a5a5a', exits: ['neighborhood_start'], isEntrance: true, entranceZone: 'shelter' },
+      { id: 'neighborhood_start', name: 'Street Corner', w: 250, h: 120, d: 200, color: '#5a8a5a', exits: ['neighborhood_main', 'neighborhood_park', 'neighborhood_entrance'] },
       { id: 'neighborhood_main', name: 'Main Street', w: 350, h: 140, d: 300, color: '#6a6a6a', exits: ['neighborhood_start', 'neighborhood_home'], features: [{type:'person', x:175, y:70, w:40, h:60, label:'👤 "Have you seen a dog like him?"'}] },
       { id: 'neighborhood_park', name: 'Local Park', w: 200, h: 100, d: 180, color: '#4a7a3a', exits: ['neighborhood_start'], features: [{type:'hint', x:100, y:50, w:60, h:30, label:'🌳 Old Tree', item:'tree_clue'}] },
       { id: 'neighborhood_home', name: 'The House', w: 180, h: 100, d: 150, color: '#8a7a5a', exits: ['neighborhood_main'], isHome: true, features: [{type:'home', x:90, y:50, w:60, h:60, label:'🏠 Home'}] }
