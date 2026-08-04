@@ -68,14 +68,22 @@
 > 5. ✅ Write data validation tests for `data.ts` (zone layouts, item references, threat types, dog fields, config bounds)
 > 6. ✅ All 187 tests passing
 
-## Next: Phase 1 — Zone Type Routing
+## ✅ Phase 1 — Zone Type Routing (COMPLETE)
 
-> Route game zones to their correct renderers based on `zone.type`.
->
-> **Priority order:**
-> 1. Phase 1: Zone type routing (FP → TP → Search)
-> 2. Phase 2: Add remaining zone data (dog_park, apartment, shelter, neighborhood, home)
-> 3. Phase 3: Polish (SFX, particles, save/load fixes, difficulty scaling)
+Route game zones to their correct renderers based on `zone.type`.
+
+**Implemented:**
+- `transitionToZone()` now dispatches to FP/TP/Search based on `zone.type`
+- `startTPView()` — initializes TpEngine with feature/NPC callbacks
+- `startSearchView()` — initializes SearchRenderer with home-found callback
+- `renderOverlays()` calls `tpEngine.update()` and `searchRenderer.update()` when active
+- Keyboard input routed to active renderer
+- Proper cleanup: dispose inactive renderers on zone transition
+- Canvas visibility toggling per zone type
+
+**Next priorities:**
+1. Phase 2: Add remaining zone data (dog_park, apartment, shelter, neighborhood, home)
+2. Phase 3: Polish (SFX, particles, save/load fixes, difficulty scaling)
 
 ---
 
