@@ -125,7 +125,8 @@ export const ZONES: Record<string, Zone> = {
       { id: 'street_south', name: 'South Avenue', w: 350, h: 120, d: 300, color: '#6a6a6a', exits: ['intersection'], features: [{type:'door', x:175, y:60, w:40, h:50, label:'🚪 Door', locked:true, item:'key'}]},
       { id: 'alley', name: 'Back Alley', w: 180, h: 100, d: 300, color: '#3a3a4a', exits: ['intersection', 'shelter_entrance'], features: [{type:'cat', x:90, y:50, w:40, h:30, label:'🐱 Mean Cat'}] },
       { id: 'dog_park_gate', name: 'Dog Park Gate', w: 100, h: 80, d: 100, color: '#5a9a5a', exits: ['street_east'], isEntrance: true, entranceZone: 'dog_park' },
-      { id: 'shelter_entrance', name: 'Shelter Door', w: 120, h: 100, d: 120, color: '#4a4a6a', exits: ['alley'], isEntrance: true, entranceZone: 'shelter' }
+      { id: 'shelter_entrance', name: 'Shelter Door', w: 120, h: 100, d: 120, color: '#4a4a6a', exits: ['alley'], isEntrance: true, entranceZone: 'shelter' },
+      { id: 'apt_gate', name: 'Apartment Gate', w: 100, h: 80, d: 100, color: '#7a6a5a', exits: ['street_south'], isEntrance: true, entranceZone: 'apartment' }
     ],
     music: 'suburban',
     hint: 'You see a squirrel. It reminds you of... something. A yard? With squirrels?'
@@ -193,7 +194,7 @@ export const ZONES: Record<string, Zone> = {
     desc: 'You found the door open. Inside: smells, sounds, and a TV that barks back.',
     type: 'fp',
     rooms: [
-      { id: 'apt_entrance', name: 'Entryway', w: 120, h: 80, d: 150, color: '#8a7a6a', exits: ['apt_living', 'apt_kitchen'] },
+      { id: 'apt_entrance', name: 'Entryway', w: 120, h: 80, d: 150, color: '#8a7a6a', exits: ['apt_living', 'apt_kitchen'], isEntrance: true, entranceZone: 'suburban_streets' },
       { id: 'apt_living', name: 'Living Room', w: 200, h: 100, d: 180, color: '#7a6a5a', exits: ['apt_entrance', 'apt_bedroom'], features: [{type:'tv', x:100, y:50, w:60, h:40, label:'📺 TV (barks back)'}] },
       { id: 'apt_kitchen', name: 'Kitchen', w: 150, h: 90, d: 120, color: '#9a8a7a', exits: ['apt_entrance'], features: [{type:'food', x:75, y:45, w:40, h:30, label:'🍖 Food', item:'treat'}] },
       { id: 'apt_bedroom', name: 'Bedroom', w: 160, h: 90, d: 140, color: '#6a5a7a', exits: ['apt_living'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🧸 Toy', item:'toy'}] }
