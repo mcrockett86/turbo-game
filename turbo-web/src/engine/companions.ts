@@ -152,3 +152,182 @@ export class CompanionManager {
     this.onCompanionDialogue = fn;
   }
 }
+
+// ---- Companion Renderer ----
+export class CompanionRenderer {
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
+  private companions: Companion[] = [];
+  private activeCompanion: Companion | null = null;
+  private isVisible: boolean;
+  private animFrame: number | null = null;
+  private lastTime: number;
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d')!;
+    this.isVisible = false;
+    this.lastTime = 0;
+  }
+
+  /** Set companion data from manager */
+  setCompanions(companions: Companion[], active: Companion | null): void {
+    this.companions = companions;
+    this.activeCompanion = active;
+  }
+
+  /** Toggle visibility */
+  toggle(): void {
+    this.isVisible = !this.isVisible;
+    if (this.isVisible) {
+      this.lastTime = performance.now();
+      this.startRenderLoop();
+    } else {
+      if (this.animFrame) {
+        cancelAnimationFrame(this.animFrame);
+        this.animFrame = null;
+      }
+    }
+  }
+
+  /** Show */
+  show(): void {
+    this.isVisible = true;
+    this.lastTime = performance.now();
+    this.startRenderLoop();
+  }
+
+  /** Hide */
+  hide(): void {
+    this.isVisible = false;
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = null;
+    }
+  }
+
+  /** Main render loop */
+  private startRenderLoop(): void {
+    const loop = (time: number) => {
+      if (!this.isVisible) return;
+      const delta = (time - this.lastTime) / 1000;
+      this.lastTime = time;
+      this.render(delta);
+      this.animFrame = requestAnimationFrame(loop);
+    };
+    this.animFrame = requestAnimationFrame(loop);
+  }
+
+  /** Render companion panel */
+  private render(_delta: number): void {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+
+    // Background overlay
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, w, h);
+
+    // Panel
+    const panelW = Math.min(350, w * 0.7);
+    const panelH = Math.min(450, h * 0.7);
+    const panelX = (w - panelW) / 2;
+    const panelY = (h - panelH) / 2;
+
+    ctx.fillStyle = '#1a1a2a';
+    ctx.fillRect(panelX, panelY, panelW, panelH);
+    ctx.strokeStyle = '#444466';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(panelX, panelY, panelW, panelH);
+
+    // Title
+    ctx.fillStyle = '#ffcc00';
+    ctx.font = 'bold 20px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('🐕 COMPANIONS', w / 2, panelY + 15);
+
+    // Active companion highlight
+    if (this.activeCompanion) {
+      const activeY = panelY + 50;
+      ctx.fillStyle = '#0a2a0a';
+      ctx.fillRect(panelX + 15, activeY, panelW - 30, 80);
+      ctx.strokeStyle = '#44aa44';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(panelX + 15, activeY, panelW - 30, 80);
+
+      ctx.fillStyle = '#88ff88';
+      ctx.font = 'bold 14px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('★ ACTIVE', panelX + 20, activeY + 8);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px monospace';
+      ctx.fillText(this.activeCompanion.name, panelX + 20, activeY + 30);
+
+      ctx.fillStyle = '#aaaaaa';
+      ctx.font = '13px monospace';
+      ctx.fillText(`${this.activeCompanion.breed} — ${this.activeCompanion.trait}`, panelX + 20, activeY + 55);
+    }
+
+    // Companion list
+    let y = this.activeCompanion ? panelY + 145 : panelY + 55;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('PACK', panelX + 15, y);
+    y += 25;
+
+    // Divider
+    ctx.strokeStyle = '#333344';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(panelX + 15, y);
+    ctx.lineTo(panelX + panelW - 15, y);
+    ctx.stroke();
+    y += 10;
+
+    for (const comp of this.companions) {
+      const isActive = this.activeCompanion?.id === comp.id;
+      ctx.fillStyle = isActive ? '#0a2a0a' : '#0a0a1a';
+      ctx.fillRect(panelX + 15, y, panelW - 30, 50);
+
+      if (isActive) {
+        ctx.strokeStyle = '#44aa44';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(panelX + 15, y, panelW - 30, 50);
+      }
+
+      ctx.fillStyle = isActive ? '#88ff88' : '#ffffff';
+      ctx.font = 'bold 13px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${comp.met ? '✓' : '○'} ${comp.name}`, panelX + 20, y + 8);
+
+      ctx.fillStyle = '#aaaaaa';
+      ctx.font = '11px monospace';
+      ctx.fillText(`${comp.breed} — ${comp.trait}`, panelX + 20, y + 28);
+
+      y += 60;
+    }
+
+    // Close hint
+    ctx.fillStyle = '#888888';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('Press C to close', w / 2, panelY + panelH - 10);
+  }
+
+  /** Resize */
+  resize(w: number, h: number): void {
+    this.canvas.width = w;
+    this.canvas.height = h;
+  }
+
+  /** Dispose */
+  dispose(): void {
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+    }
+  }
+}

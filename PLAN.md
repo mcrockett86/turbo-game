@@ -34,6 +34,15 @@
 | 4.3 | Visual effects | ✅ DONE | Particles, screen shake, lighting |
 | 4.4 | Endgame (win/lose) | ✅ DONE | Celebration, found by shelter, restart |
 | 5.1 | Unit testing framework | ✅ DONE | vitest + jsdom, 7 test files, 187 tests passing |
+| 0.1 | HUD wiring | ✅ DONE | HUDRenderer auto-synced from State | 
+| 0.2 | Dialogue wiring | ✅ DONE | DialogueRenderer with typewriter + SPACE advance |
+| 0.3 | Inventory panel | ✅ DONE | InventoryRenderer canvas overlay |
+| 0.4 | Companion panel | ✅ DONE | CompanionRenderer canvas overlay |
+| 0.5 | Hint panel | ✅ DONE | HintRouteRenderer canvas overlay |
+| 0.6 | Threat system | ✅ DONE | ThreatManager + SPACE mini-game input |
+| 0.7 | Manga combat | ✅ DONE | MangaCombatRenderer overlay |
+| 0.8 | Visual effects | ✅ DONE | VisualEffectsRenderer particles/shake |
+| 0.9 | Endgame | ✅ DONE | EndgameRenderer win/lose screens |
 
 ## ✅ Unit Testing Framework — COMPLETE
 
@@ -59,15 +68,14 @@
 > 5. ✅ Write data validation tests for `data.ts` (zone layouts, item references, threat types, dog fields, config bounds)
 > 6. ✅ All 187 tests passing
 
-## Next: Wire Up All Disconnected Components
+## Next: Phase 1 — Zone Type Routing
 
-> After tests are in place, wire all 17 engine components into `main.ts` so the game is playable end-to-end.
+> Route game zones to their correct renderers based on `zone.type`.
 >
 > **Priority order:**
-> 1. Phase 0: Wire HUD, dialogue, inventory/companion/hint panels, threats, manga combat, effects, endgame
-> 2. Phase 1: Zone type routing (FP → TP → Search)
-> 3. Phase 2: Add remaining zone data (dog_park, apartment, shelter, neighborhood, home)
-> 4. Phase 3: Polish (SFX, particles, save/load fixes, difficulty scaling)
+> 1. Phase 1: Zone type routing (FP → TP → Search)
+> 2. Phase 2: Add remaining zone data (dog_park, apartment, shelter, neighborhood, home)
+> 3. Phase 3: Polish (SFX, particles, save/load fixes, difficulty scaling)
 
 ---
 
@@ -314,7 +322,7 @@ turbo-game/
 
 ## Current Status (updated 2026-08-04)
 
-All 17 components fully implemented (~5,050 lines of code).
+All 17 components fully implemented + Phase 0 wiring complete (~5,500 lines of code).
 
 | Phase | Component | Lines | Status |
 |-------|-----------|-------|--------|
@@ -337,6 +345,35 @@ All 17 components fully implemented (~5,050 lines of code).
 | 4 | Endgame (win/lose) | 280 | ✅ DONE |
 
 ---
+
+## ✅ Phase 0: Wire Up All Disconnected Components — COMPLETE
+
+> All 17 engine components wired into `main.ts` with event-driven overlay updates.
+>
+> ### Tasks Completed:
+> 1. ✅ **0.1 HUD** — `HUDRenderer` instantiated, auto-synced from State every frame
+> 2. ✅ **0.2 Dialogue** — `DialogueRenderer` with typewriter, SPACE advance, auto-hide
+> 3. ✅ **0.3 Inventory** — `InventoryRenderer` panel with [I] toggle, mouse hover/click, USE button
+> 4. ✅ **0.4 Companion** — `CompanionRenderer` panel with [C] toggle, active highlight, pack list
+> 5. ✅ **0.5 Hint** — `HintRouteRenderer` panel with [H] toggle, unlocked hints, revealed routes
+> 6. ✅ **0.6 Threat** — `ThreatManager` wired to State events, SPACE input for mini-games
+> 7. ✅ **0.7 Manga Combat** — `MangaCombatRenderer` overlay for cat/bully threats
+> 8. ✅ **0.8 Visual Effects** — `VisualEffectsRenderer` particles, shake, light pulses
+> 9. ✅ **0.9 Endgame** — `EndgameRenderer` win/lose screens with score, PLAY AGAIN button
+>
+> ### Architecture:
+> - **Unified render loop** — single `requestAnimationFrame` drives all overlay canvases
+> - **Event-driven wiring** — `State.on()` subscriptions auto-update overlays on game events
+> - **Keyboard input** — SPACE advances dialogue / triggers threat mini-games, I/C/H toggles panels
+> - **Canvas cleanup** — removed duplicate canvas elements from index.html
+> - **CompanionRenderer** — added new canvas overlay class to `companions.ts`
+>
+> ### Files Modified:
+> - `turbo-web/src/main.ts` — Full rewrite: 220+ lines of overlay wiring
+> - `turbo-web/src/engine/companions.ts` — Added `CompanionRenderer` class (~150 lines)
+> - `turbo-web/index.html` — Removed duplicate canvas elements
+>
+> ### Test Results: 187/187 passing ✅
 
 ## Unit Testing — Framework Investigation
 
