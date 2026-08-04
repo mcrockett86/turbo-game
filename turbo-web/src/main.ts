@@ -6,6 +6,8 @@ import { State } from '@/engine/state';
 import { Audio } from '@/engine/audio';
 import { CONFIG } from '@/config';
 import { FpRoomRenderer } from '@/engine/render/fp-renderer';
+import { TpEngine } from '@/engine/render/tp-renderer';
+import { SearchRenderer } from '@/engine/render/search-renderer';
 import { HUDRenderer } from '@/engine/hud';
 import { DialogueRenderer } from '@/engine/dialogue';
 import { InventoryRenderer } from '@/engine/inventory';
@@ -15,10 +17,15 @@ import { VisualEffectsRenderer } from '@/engine/effects';
 import { EndgameRenderer } from '@/engine/endgame';
 import { MangaCombatRenderer } from '@/engine/render/manga-combat';
 import { ThreatManager } from '@/engine/threats';
-import type { GameState, GameEvent, Dog, Zone, Room, RoomFeature, Companion } from '@/types';
+import type { GameState, GameEvent, Dog, Zone, Room, RoomFeature, Companion, NPC } from '@/types';
 
-// ---- FP Renderer Instance ----
+// ---- Active renderer instances ----
 let fpRenderer: FpRoomRenderer | null = null;
+let tpEngine: TpEngine | null = null;
+let searchRenderer: SearchRenderer | null = null;
+
+// ---- Active zone type tracking ----
+let activeZoneType: 'fp' | 'tp' | 'search' | null = null;
 
 // ---- Canvas Overlay Instances ----
 let hudRenderer: HUDRenderer | null = null;
@@ -98,6 +105,17 @@ function renderOverlays(_time: number): void {
       ? met.find(c => c.id === State.state.activeCompanion) || null
       : null;
     companionRenderer.setCompanions(met, active);
+  }
+
+  // Update TP engine if active
+  if (tpEngine && activeZoneType === 'tp') {
+    const delta = 1 / 60; // ~60fps
+    tpEngine.update(delta, time);
+  }
+
+  // Update search renderer if active
+  if (searchRenderer && activeZoneType === 'search') {
+    searchRenderer.update(1 / 60);
   }
 
   // Effects overlay
@@ -768,29 +786,139 @@ function handleExitClick(exitRoomId: string): void {
   State.showDialogue('You enter: ' + targetRoom.name, 'Turbo');
 }
 
-// ---- Zone Transition ----
+// ---- Zone Type Routing (Phase 1) ----
 function transitionToZone(zoneId: string): void {
   const zoneData = ZONES[zoneId as keyof typeof ZONES];
   if (!zoneData) return;
 
+  const zoneType = zoneData.type;
   const zoneWithRooms = zoneData as Zone & { rooms: Room[] };
-  if (!zoneWithRooms.rooms || zoneWithRooms.rooms.length === 0) return;
 
-  fpRenderer?.dispose();
-  fpRenderer = null;
+  // Dispose inactive renderers
+  if (zoneType !== 'fp') {
+    fpRenderer?.dispose();
+    fpRenderer = null;
+  }
+  if (zoneType !== 'tp') {
+    tpEngine?.dispose();
+    tpEngine = null;
+  }
+  if (zoneType !== 'search') {
+    if (searchRenderer) {
+      searchRenderer.stop();
+      searchRenderer.dispose();
+      searchRenderer = null;
+    }
+  }
+
+  // Hide TP/search canvases, show relevant one
+  const tpCanvas = document.getElementById('tp-canvas');
+  const fpCanvas = document.getElementById('fp-canvas');
+  const humanCanvas = document.getElementById('human-canvas');
+
+  if (tpCanvas instanceof HTMLCanvasElement) tpCanvas.style.display = 'none';
+  if (fpCanvas instanceof HTMLCanvasElement) fpCanvas.style.display = 'none';
+  if (humanCanvas instanceof HTMLCanvasElement) humanCanvas.style.display = 'none';
 
   State.startTransition(zoneWithRooms.name, zoneWithRooms.desc);
   Audio.playMusic(zoneId);
   showZoneTransition(zoneWithRooms.name, zoneWithRooms.desc);
 
   setTimeout(() => {
-    State.enterZone(zoneId, zoneWithRooms);
+    State.enterZone(zoneId, zoneData);
     State.endTransition();
+    activeZoneType = zoneType;
 
-    if (zoneWithRooms.type === 'fp' && zoneWithRooms.rooms.length > 0) {
-      startFPView();
+    switch (zoneType) {
+      case 'fp':
+        if (zoneWithRooms.rooms && zoneWithRooms.rooms.length > 0) {
+          startFPView();
+        }
+        break;
+
+      case 'tp':
+        startTPView(zoneId, zoneData);
+        break;
+
+      case 'human':
+        startSearchView(zoneId, zoneData);
+        break;
     }
   }, 2500);
+}
+
+// ---- TP View (Phase 1) ----
+function startTPView(zoneId: string, zoneData: Zone): void {
+  console.log('[Turbo] Starting TP view for zone:', zoneId);
+  const canvasEl = document.getElementById('tp-canvas');
+  if (!canvasEl || !(canvasEl instanceof HTMLCanvasElement)) return;
+  const canvas = canvasEl;
+
+  canvas.style.display = 'block';
+
+  // Dispose previous engine
+  tpEngine?.dispose();
+
+  // Initialize engine
+  tpEngine = new TpEngine(canvas);
+  tpEngine.init(zoneId, zoneData);
+
+  // Wire up callbacks
+  tpEngine.setOnFeatureClick((type: string, data: any) => {
+    console.log('[Turbo] TP feature clicked:', type, data);
+    if (type === 'treasure' || type === 'scent_post') {
+      State.collectItem('treasure', 'Scent Clue');
+      Audio.playSFX('item_pickup');
+      State.showDialogue('Found a scent clue! This leads somewhere familiar.', 'Turbo');
+    }
+  });
+
+  tpEngine.setOnNpcClick((npc: NPC) => {
+    console.log('[Turbo] NPC clicked:', npc.name);
+    if (npc.dialogue && npc.dialogue.length > 0) {
+      State.showDialogue(npc.dialogue[0], npc.name);
+    }
+  });
+
+  // Show HUD
+  document.getElementById('hud')!.classList.remove('hidden');
+}
+
+// ---- Search View (Phase 1) ----
+function startSearchView(zoneId: string, zoneData: Zone): void {
+  console.log('[Turbo] Starting search view for zone:', zoneId);
+  const canvasEl = document.getElementById('human-canvas');
+  if (!canvasEl || !(canvasEl instanceof HTMLCanvasElement)) return;
+  const canvas = canvasEl;
+
+  canvas.style.display = 'block';
+
+  // Dispose previous renderer
+  if (searchRenderer) {
+    searchRenderer.stop();
+    searchRenderer.dispose();
+  }
+
+  // Initialize renderer
+  searchRenderer = new SearchRenderer(canvas);
+
+  // Default home location (can be overridden by zone data)
+  const homeX = (zoneData as any).homeX || 0;
+  const homeY = (zoneData as any).homeY || -15;
+  searchRenderer.init(homeX, homeY);
+
+  // Wire up home found callback
+  searchRenderer.setOnHomeFound(() => {
+    console.log('[Turbo] Home found in search view!');
+    State.gameWin();
+    State.showDialogue('Home. Sweet home. *happy tail wags*', 'Turbo');
+  });
+
+  // Start render loop
+  searchRenderer.start();
+
+  // Show HUD
+  document.getElementById('hud')!.classList.remove('hidden');
 }
 
 // ---- Zone Type Guard ----
@@ -987,15 +1115,24 @@ function handleKeyDown(e: KeyboardEvent): void {
     return;
   }
 
-  // Pass to FP renderer for WASD
-  if (fpRenderer && 'handleKeyDown' in fpRenderer && typeof (fpRenderer as any).handleKeyDown === 'function') {
-    (fpRenderer as any).handleKeyDown(e);
+  // Route to active renderer
+  if (activeZoneType === 'fp' && fpRenderer) {
+    if ('handleKeyDown' in fpRenderer && typeof (fpRenderer as any).handleKeyDown === 'function') {
+      (fpRenderer as any).handleKeyDown(e);
+    }
+  } else if (activeZoneType === 'tp' && tpEngine) {
+    tpEngine.onKeyDown(e.key.toLowerCase());
   }
+  // Search view doesn't need keyboard input (mouse-driven)
 }
 
 function handleKeyUp(e: KeyboardEvent): void {
-  if (fpRenderer && 'handleKeyUp' in fpRenderer && typeof (fpRenderer as any).handleKeyUp === 'function') {
-    (fpRenderer as any).handleKeyUp(e);
+  if (activeZoneType === 'fp' && fpRenderer) {
+    if ('handleKeyUp' in fpRenderer && typeof (fpRenderer as any).handleKeyUp === 'function') {
+      (fpRenderer as any).handleKeyUp(e);
+    }
+  } else if (activeZoneType === 'tp' && tpEngine) {
+    tpEngine.onKeyUp(e.key.toLowerCase());
   }
 }
 
