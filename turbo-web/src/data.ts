@@ -1,5 +1,5 @@
 // ===== Shared types for data module =====
-import type { Zone, Room, Item, Threat, Dog } from '@/types';
+import type { Zone, Room, Item, Threat, Dog, Companion } from '@/types';
 
 // ===== DOG DATA =====
 export const DOGS: Record<string, Dog> = {
@@ -90,6 +90,26 @@ export const DOGS: Record<string, Dog> = {
   }
 };
 
+// ===== COMPANIONS =====
+export const COMPANIONS: Record<string, Companion> = {
+  stray_buddy: {
+    id: 'stray_buddy',
+    name: 'Buddy',
+    breed: 'Golden Retriever',
+    trait: '🐾 Friendly',
+    dialogue: [
+      'Woof! Welcome to the park!',
+      'Home is where the fence is. Which fence?',
+      'I used to live near the big oak tree!',
+      'Follow the scent posts — they lead somewhere!',
+    ],
+    color: '#DAA520',
+    accentColor: '#FFD700',
+    met: false,
+    active: false,
+  },
+};
+
 // ===== ZONES =====
 export const ZONES: Record<string, Zone> = {
   suburban_streets: {
@@ -114,10 +134,58 @@ export const ZONES: Record<string, Zone> = {
     id: 'dog_park',
     name: '🌳 Dog Park',
     desc: 'A bright, open space. Other dogs are everywhere!',
-    type: 'tp', // third-person adventure zone
+    type: 'tp',
     music: 'dog_park',
+    skyColor: '#87CEEB',
+    groundColor: '#4a7c3f',
+    dogColor: '#d4a574',
+    accentColor: '#ff6b35',
     companions: ['stray_buddy'],
-    hint: 'A big dog says "Home is where the fence is." Fences are everywhere... but which fence?'
+    obstacles: [
+      { type: 'fence', x: -8, z: -6, width: 6, height: 1.2, color: '#8B4513' },
+      { type: 'fence', x: 8, z: 6, width: 5, height: 1.2, color: '#8B4513', rotation: Math.PI / 4 },
+      { type: 'tree', x: -4, z: 3, height: 3, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: 5, z: -4, height: 2.5, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bench', x: 3, z: 5, width: 2, color: '#8B6914' },
+      { type: 'bush', x: -6, z: -3, color: '#2d6a1e' },
+      { type: 'bush', x: 7, z: -1, color: '#3a8a2e' },
+    ],
+    npcs: [
+      {
+        id: 'golden_retriever',
+        name: 'Buddy',
+        color: '#DAA520',
+        accentColor: '#FFD700',
+        x: 2,
+        z: -3,
+        dialogue: [
+          'Woof! Welcome to the park!',
+          'Home is where the fence is. Which fence?',
+          'I used to live near the big oak tree!',
+          'Follow the scent posts — they lead somewhere!',
+        ],
+      },
+      {
+        id: 'dog_walker',
+        name: 'Sarah',
+        color: '#5a7a9a',
+        accentColor: '#4a9eff',
+        x: -3,
+        z: 4,
+        dialogue: [
+          'Hi there, sweetie! Are you lost?',
+          'Have you seen a husky around here?',
+          'The shelter is this way! *points*',
+        ],
+      },
+    ],
+    features: [
+      { type: 'water_bowl', x: 6, z: 3, id: 'water_bowl', label: '💧 Water Bowl' },
+      { type: 'fire_hydrant', x: -5, z: -2, id: 'fire_hydrant', label: '🚒 Fire Hydrant' },
+      { type: 'scent_post', x: 0, z: 7, id: 'scent_post', label: '🐾 Scent Post' },
+      { type: 'treasure', x: -7, z: 5, id: 'treasure_1', label: '✨ Scent Clue' },
+    ],
+    hint: 'A big dog says "Home is where the fence is." Fences are everywhere... but which fence?',
   },
   apartment: {
     id: 'apartment',
