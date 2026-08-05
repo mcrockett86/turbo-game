@@ -256,21 +256,84 @@ function buildExitMarker(
 
 // ---- Lighting Controller ----
 
-function setupLighting(scene: Scene, room: Room): Group {
+interface ZoneLighting {
+  ambientColor: string;
+  ambientIntensity: number;
+  directionalColor: string;
+  directionalIntensity: number;
+  fogColor: string;
+  fogNear: number;
+  fogFar: number;
+  timeOfDay: number; // 0-1 where 0=midnight, 0.5=noon
+}
+
+const ZONE_LIGHTING: Record<string, ZoneLighting> = {
+  apartment: {
+    ambientColor: '#2a2a4a',
+    ambientIntensity: 0.4,
+    directionalColor: '#4466aa',
+    directionalIntensity: 0.6,
+    fogColor: '#1a1a2e',
+    fogNear: 8,
+    fogFar: 25,
+    timeOfDay: 0.2, // Night
+  },
+  shelter: {
+    ambientColor: '#3a3a2a',
+    ambientIntensity: 0.5,
+    directionalColor: '#aa8844',
+    directionalIntensity: 0.7,
+    fogColor: '#2a2a1a',
+    fogNear: 10,
+    fogFar: 30,
+    timeOfDay: 0.6, // Morning
+  },
+  home: {
+    ambientColor: '#4a3a2a',
+    ambientIntensity: 0.6,
+    directionalColor: '#ffcc88',
+    directionalIntensity: 0.8,
+    fogColor: '#3a2a1a',
+    fogNear: 12,
+    fogFar: 35,
+    timeOfDay: 0.75, // Afternoon
+  },
+  default: {
+    ambientColor: '#3a3a5a',
+    ambientIntensity: 0.45,
+    directionalColor: '#8888aa',
+    directionalIntensity: 0.65,
+    fogColor: '#1a1a2e',
+    fogNear: 10,
+    fogFar: 28,
+    timeOfDay: 0.4,
+  },
+};
+
+function setupLighting(scene: Scene, room: Room, zoneId: string = 'default'): Group {
   const lightGroup = new Group();
   lightGroup.name = 'lights';
 
-  // Ambient light
-  const ambient = new AmbientLight(0xffffff, CONFIG.ambientIntensity);
+  const lighting = ZONE_LIGHTING[zoneId] || ZONE_LIGHTING.default;
+
+  // Ambient light (colored per zone)
+  const ambient = new AmbientLight(
+    new Color(lighting.ambientColor),
+    lighting.ambientIntensity,
+  );
   lightGroup.add(ambient);
 
-  // Directional light (simulates a window/door)
-  const dirLight = new DirectionalLight(0xffeedd, CONFIG.directionalIntensity);
-  dirLight.position.set(room.w / 3, room.h, -room.d / 3);
+  // Directional light (simulates a window/door, color shifts with time-of-day)
+  const tod = lighting.timeOfDay;
+  const sunIntensity = Math.sin(tod * Math.PI);
+  const dirColor = new Color(lighting.directionalColor).multiplyScalar(0.5 + sunIntensity * 0.5);
+  const dirLight = new DirectionalLight(dirColor, CONFIG.directionalIntensity * sunIntensity + 0.2);
+  dirLight.position.set(room.w / 3, room.h * sunIntensity + 2, -room.d / 3);
   lightGroup.add(dirLight);
 
-  // Point light near center (warm glow)
-  const pointLight = new PointLight(0xf0c040, 0.5, room.w * 0.8);
+  // Point light near center (warm glow, intensity varies)
+  const pointIntensity = 0.3 + sunIntensity * 0.4;
+  const pointLight = new PointLight(0xf0c040, pointIntensity, room.w * 0.8);
   pointLight.position.set(0, room.h - 2, 0);
   lightGroup.add(pointLight);
 
@@ -280,8 +343,9 @@ function setupLighting(scene: Scene, room: Room): Group {
 
 // ---- Fog Setup ----
 
-function setupFog(scene: Scene, near: number, far: number): void {
-  scene.fog = new Fog(0x1a1a2e, near, far);
+function setupFog(scene: Scene, zoneId: string = 'default'): void {
+  const lighting = ZONE_LIGHTING[zoneId] || ZONE_LIGHTING.default;
+  scene.fog = new Fog(new Color(lighting.fogColor), lighting.fogNear, lighting.fogFar);
 }
 
 // ---- Camera Controller ----
@@ -445,10 +509,10 @@ export class FpRoomRenderer {
     this.scene.add(this.roomGroup);
 
     // Lighting
-    this.lightGroup = setupLighting(this.scene, this.room);
+    this.lightGroup = setupLighting(this.scene, this.room, this.zoneId);
 
     // Fog
-    setupFog(this.scene, CONFIG.fpFogNear, CONFIG.fpFogFar);
+    setupFog(this.scene, this.zoneId);
 
     // Features
     const features = this.room.features || [];

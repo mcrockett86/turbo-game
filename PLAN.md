@@ -597,18 +597,18 @@ Build compiles, 207/207 tests pass.
 
 **Build:** compiles, 207/207 tests pass.
 
-### Phase 6: Visual Polish
+### Phase 6: Visual Polish (IN_PROGRESS)
 
 **Goal:** Improve visual quality and juice.
 
-| # | Task | Files | Impact |
-|---|------|-------|--------|
-| 6.1 | **Dog model upgrade** — replace primitive dog with better procedural model or sprite-based animation | `engine/render/tp-renderer.ts` | Player character looks good |
-| 6.2 | **NPC animations** — add tail wag, leg walk cycles, idle bounce to companion NPCs | `engine/render/tp-renderer.ts` | NPCs feel alive |
-| 6.3 | **Particle upgrades** — add celebration particles on win, item pickup sparkles, zone entrance effects | `engine/effects.ts` | Visual juice |
-| 6.4 | **Screen transitions** — implement smooth fade/wipe between zones, not instant switches | `engine/transitions.ts` | Polished zone changes |
-| 6.5 | **Lighting/atmosphere** — add time-of-day lighting, fog density per zone, colored ambient | `engine/render/fp-renderer.ts`, `engine/render/tp-renderer.ts` | Zones feel distinct |
-| 6.6 | **UI polish** — improve HUD design, panel styling, cursor states, hover feedback | `engine/hud.ts`, `engine/dialogue.ts`, `engine/inventory.ts` | UI feels professional |
+| # | Task | Files | Impact | Status |
+|---|------|-------|--------|--------|
+| 6.1 | **Dog model upgrade** — rounded body geometry, tongue, eye highlights, idle bob | `engine/render/tp-renderer.ts` | Player character looks good | ✅ DONE |
+| 6.2 | **NPC animations** — tail wag speed variation, idle bounce, ear flick | `engine/render/tp-renderer.ts` | NPCs feel alive | ✅ DONE |
+| 6.3 | **Particle upgrades** — celebration particles on win, item pickup sparkles, zone entrance effects | `engine/effects.ts` | Visual juice | ✅ DONE |
+| 6.4 | **Screen transitions** — eased fade/wipe/zoom/slide with glow text | `engine/transitions.ts` | Polished zone changes | ✅ DONE |
+| 6.5 | **Lighting/atmosphere** — time-of-day, fog density, colored ambient, hemisphere light | `engine/render/fp-renderer.ts`, `engine/render/tp-renderer.ts` | Zones feel distinct | ✅ DONE |
+| 6.6 | **UI polish** — panel glow, hover feedback, smooth panel transitions, mute button glow | `engine/hud.ts` | UI feels professional | ✅ DONE |
 
 ### Phase 7: Content & Balance
 

@@ -24,7 +24,7 @@ const OBSTACLE_HEIGHT = 1.5;
 const NPC_CHANGE_INTERVAL = 4000;
 const SMAX_DIST = 12;
 
-// ---- Dog Model Builder ----
+// ---- Dog Model Builder (Upgraded) ----
 class DogModel {
   private group: THREE.Group;
   private bodyMesh: THREE.Mesh;
@@ -33,6 +33,18 @@ class DogModel {
   private earL: THREE.Mesh;
   private earR: THREE.Mesh;
   private legPositions: { base: THREE.Vector3; mesh: THREE.Mesh }[] = [];
+  private snoutMesh!: THREE.Mesh;
+  private noseMesh!: THREE.Mesh;
+  private eyeL!: THREE.Mesh;
+  private eyeR!: THREE.Mesh;
+  private collarMesh!: THREE.Mesh;
+  private tongueMesh!: THREE.Mesh;
+  private eyeHighlightL!: THREE.Mesh;
+  private eyeHighlightR!: THREE.Mesh;
+  private breathOffset: number = 0;
+  private isHappy: boolean = false;
+  private tailSpeed: number = 5;
+  private idleBobPhase: number = 0;
 
   constructor(color: string, accentColor: string) {
     this.group = new THREE.Group();
@@ -41,11 +53,27 @@ class DogModel {
     const furColor = new THREE.Color(color);
     const accent = new THREE.Color(accentColor);
 
-    // Body (capsule-like box)
-    const bodyGeo = new THREE.BoxGeometry(1.2, 0.7, 0.6);
+    // Body — rounded with breathing
+    const bodyGeo = new THREE.BoxGeometry(1.2, 0.7, 0.6, 2, 2, 2);
+    // Round the body vertices slightly
+    const pos = bodyGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const len = Math.sqrt(x * x + y * y + z * z);
+      if (len > 0) {
+        const target = 0.65;
+        const factor = 0.7 + 0.3 * (target / (len || 1));
+        pos.setX(i, x * factor);
+        pos.setY(i, y * factor);
+        pos.setZ(i, z * factor);
+      }
+    }
+    bodyGeo.computeVertexNormals();
     const bodyMat = new THREE.MeshStandardMaterial({
       color: furColor,
-      roughness: 0.8,
+      roughness: 0.7,
       metalness: 0.05,
     });
     this.bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
@@ -82,15 +110,25 @@ class DogModel {
     nose.position.set(1.05, 0.78, 0);
     this.group.add(nose);
 
-    // Eyes
+    // Eyes with highlights
     const eyeGeo = new THREE.SphereGeometry(0.04, 8, 8);
     const eyeMat = new THREE.MeshStandardMaterial({ color: 0x2a1a0a });
-    const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-    eyeL.position.set(0.72, 0.95, 0.12);
-    this.group.add(eyeL);
-    const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
-    eyeR.position.set(0.72, 0.95, -0.12);
-    this.group.add(eyeR);
+    this.eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+    this.eyeL.position.set(0.72, 0.95, 0.12);
+    this.group.add(this.eyeL);
+    this.eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+    this.eyeR.position.set(0.72, 0.95, -0.12);
+    this.group.add(this.eyeR);
+
+    // Eye highlights (catchlight)
+    const hlGeo = new THREE.SphereGeometry(0.015, 6, 6);
+    const hlMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.eyeHighlightL = new THREE.Mesh(hlGeo, hlMat);
+    this.eyeHighlightL.position.set(0.73, 0.96, 0.14);
+    this.group.add(this.eyeHighlightL);
+    this.eyeHighlightR = new THREE.Mesh(hlGeo, hlMat);
+    this.eyeHighlightR.position.set(0.73, 0.96, -0.1);
+    this.group.add(this.eyeHighlightR);
 
     // Ears
     const earGeo = new THREE.BoxGeometry(0.12, 0.25, 0.08);
@@ -151,6 +189,18 @@ class DogModel {
     collar.position.set(0.55, 0.65, 0);
     collar.rotation.y = Math.PI / 2;
     this.group.add(collar);
+
+    // Tongue (for happy state)
+    const tongueGeo = new THREE.SphereGeometry(0.06, 6, 6);
+    tongueGeo.scale(1, 0.5, 0.7);
+    const tongueMat = new THREE.MeshStandardMaterial({
+      color: 0xff6b8a,
+      roughness: 0.6,
+    });
+    this.tongueMesh = new THREE.Mesh(tongueGeo, tongueMat);
+    this.tongueMesh.position.set(0.95, 0.65, 0);
+    this.tongueMesh.visible = false;
+    this.group.add(this.tongueMesh);
   }
 
   getGroup(): THREE.Group {
@@ -166,6 +216,24 @@ class DogModel {
     this.tailGroup.rotation.y = wag;
     this.earL.rotation.z = -0.3 + Math.sin(time * speed * 0.7) * 0.05;
     this.earR.rotation.z = 0.3 - Math.sin(time * speed * 0.7) * 0.05;
+  }
+
+  setIdleBob(time: number): void {
+    this.idleBobPhase = time * 1.5;
+    this.group.position.y = Math.sin(this.idleBobPhase) * 0.02;
+  }
+
+  setHappy(happy: boolean): void {
+    this.isHappy = happy;
+    this.tongueMesh.visible = happy;
+    // Brighten eyes when happy
+    if (happy) {
+      this.eyeHighlightL.visible = true;
+      this.eyeHighlightR.visible = true;
+    } else {
+      this.eyeHighlightL.visible = false;
+      this.eyeHighlightR.visible = false;
+    }
   }
 
   animateLegs(walkTime: number, isMoving: boolean): void {
@@ -186,6 +254,7 @@ class NPCModel {
   private walkTime: number;
   private targetPos: THREE.Vector3;
   private wanderTimer: number;
+  private idleBounce: number = 0;
 
   constructor(color: string, accentColor: string) {
     this.walkTime = 0;
@@ -286,8 +355,14 @@ class NPCModel {
       this.group.position.z += dir.z * NPC_SPEED * delta;
     }
 
-    // Tail wag
-    this.tailGroup.rotation.y = Math.sin(time * 3) * 0.3;
+    // Tail wag (faster when moving)
+    const wagSpeed = dist > 0.5 ? 5 : 2;
+    const wagAmp = dist > 0.5 ? 0.3 : 0.15;
+    this.tailGroup.rotation.y = Math.sin(time * wagSpeed) * wagAmp;
+
+    // Idle bounce
+    this.idleBounce = Math.sin(time * 2) * 0.015;
+    this.group.position.y = this.idleBounce;
   }
 }
 
@@ -610,7 +685,10 @@ export class TpEngine {
   private buildZone(): void {
     const bgColor = this.zoneData.skyColor || '#87CEEB';
     this.scene.background = new THREE.Color(bgColor);
-    this.scene.fog = new THREE.Fog(new THREE.Color(bgColor), 15, 40);
+
+    // Zone-aware fog density
+    const fogDensity = this.getFogDensity();
+    this.scene.fog = new THREE.Fog(new THREE.Color(bgColor), fogDensity.near, fogDensity.far);
 
     // Ground
     const groundGeo = new THREE.PlaneGeometry(30, 30, 10, 10);
@@ -640,12 +718,18 @@ export class TpEngine {
       this.scene.add(grass);
     }
 
-    // Lighting
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    // Zone-aware lighting
+    const lighting = this.getZoneLighting();
+    const ambient = new THREE.AmbientLight(
+      new THREE.Color(lighting.ambientColor),
+      lighting.ambientIntensity,
+    );
     this.scene.add(ambient);
 
-    const sun = new THREE.DirectionalLight(0xfff5e0, 1.0);
-    sun.position.set(10, 15, 10);
+    const sunIntensity = lighting.sunIntensity;
+    const sunColor = new THREE.Color(lighting.sunColor).multiplyScalar(sunIntensity);
+    const sun = new THREE.DirectionalLight(sunColor, 0.5 + sunIntensity * 0.5);
+    sun.position.set(10, 15 * sunIntensity + 5, 10);
     sun.castShadow = true;
     sun.shadow.mapSize.width = 2048;
     sun.shadow.mapSize.height = 2048;
@@ -656,6 +740,14 @@ export class TpEngine {
     sun.shadow.camera.top = 15;
     sun.shadow.camera.bottom = -15;
     this.scene.add(sun);
+
+    // Colored hemisphere light for atmosphere
+    const hemiLight = new THREE.HemisphereLight(
+      new THREE.Color(lighting.skyColor),
+      new THREE.Color(lighting.groundColor),
+      0.3,
+    );
+    this.scene.add(hemiLight);
 
     // Build obstacles from zone data
     if (this.zoneData.obstacles) {
@@ -756,6 +848,80 @@ export class TpEngine {
       default:
         return null;
     }
+  }
+
+  /** Get fog density for current zone */
+  private getFogDensity(): { near: number; far: number } {
+    const zoneFogMap: Record<string, { near: number; far: number }> = {
+      dog_park: { near: 12, far: 35 },
+      apartment: { near: 8, far: 22 },
+      shelter: { near: 10, far: 28 },
+      neighborhood: { near: 15, far: 40 },
+      home: { near: 14, far: 38 },
+    };
+    return zoneFogMap[this.zoneId] || { near: 15, far: 40 };
+  }
+
+  /** Get zone-aware lighting configuration */
+  private getZoneLighting(): {
+    ambientColor: string;
+    ambientIntensity: number;
+    sunColor: string;
+    sunIntensity: number;
+    skyColor: string;
+    groundColor: string;
+  } {
+    interface ZoneLight {
+      ambientColor: string;
+      ambientIntensity: number;
+      sunColor: string;
+      sunIntensity: number;
+      skyColor: string;
+      groundColor: string;
+    }
+    const zoneLightMap: Record<string, ZoneLight> = {
+      dog_park: {
+        ambientColor: '#4a6a3a',
+        ambientIntensity: 0.5,
+        sunColor: '#fff5e0',
+        sunIntensity: 0.9,
+        skyColor: '#87CEEB',
+        groundColor: '#4a7c3f',
+      },
+      apartment: {
+        ambientColor: '#2a2a4a',
+        ambientIntensity: 0.3,
+        sunColor: '#4466aa',
+        sunIntensity: 0.3,
+        skyColor: '#1a1a3a',
+        groundColor: '#3a3a4a',
+      },
+      shelter: {
+        ambientColor: '#3a3a2a',
+        ambientIntensity: 0.4,
+        sunColor: '#aa8844',
+        sunIntensity: 0.6,
+        skyColor: '#4a4a3a',
+        groundColor: '#4a4a3a',
+      },
+      neighborhood: {
+        ambientColor: '#3a4a5a',
+        ambientIntensity: 0.45,
+        sunColor: '#88aacc',
+        sunIntensity: 0.7,
+        skyColor: '#6a8aaa',
+        groundColor: '#5a6a4a',
+      },
+      home: {
+        ambientColor: '#4a3a2a',
+        ambientIntensity: 0.5,
+        sunColor: '#ffcc88',
+        sunIntensity: 0.8,
+        skyColor: '#8a6a4a',
+        groundColor: '#5a4a3a',
+      },
+    };
+    return zoneLightMap[this.zoneId] || zoneLightMap.dog_park;
   }
 
   /** Create a visual feature from data */
@@ -1029,6 +1195,21 @@ export class TpEngine {
     // Animate dog
     this.dogModel.animateTail(5, time);
     this.dogModel.animateLegs(time, isMoving);
+    this.dogModel.setIdleBob(time);
+    // Toggle happy when near a feature
+    const dogPos = this.dogModel.getGroup().position;
+    let nearFeature = false;
+    if (this.zoneData.features) {
+      for (const f of this.zoneData.features) {
+        const dx = dogPos.x - f.x;
+        const dz = dogPos.z - f.z;
+        if (Math.sqrt(dx * dx + dz * dz) < 1.5) {
+          nearFeature = true;
+          break;
+        }
+      }
+    }
+    this.dogModel.setHappy(nearFeature);
 
     // Scent trail
     if (isMoving && this.scentTrail) {
