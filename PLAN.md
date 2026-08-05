@@ -539,3 +539,136 @@ All engine files are written. The gap is **main.ts wiring**. Here's the priority
 - **Human interlude is 2D top-down** — simpler canvas rendering
 - **Progressive disclosure** — hints unlock as you explore
 - **Dog trait affects gameplay** — not just cosmetic, changes difficulty/mechanics
+
+---
+
+## 🔜 Remaining Work — Next Steps Plan
+
+> **Current state:** All 17 engine modules written, 207 tests passing, save/load + difficulty scaling complete. The game has all the *pieces* but they are not assembled into a *playable experience*. This plan describes what needs to happen next.
+
+### Phase 4: Assemble the Game Flow (Make It Playable)
+
+**Goal:** Connect all existing pieces into a complete, playable game loop.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 4.1 | **Dog select screen** — build proper screen from `main.ts` with portrait rendering, trait preview, "Start Adventure" button | `main.ts`, `screens/dog-select.ts` | Player picks a dog, sees personality lines |
+| 4.2 | **Full zone routing** — wire `transitionToZone()` to handle all 7 zones (suburban_streets → dog_park → apartment → shelter → neighborhood → home), including FP↔TP↔Search view switching | `main.ts`, `engine/transitions.ts` | Player can move between zones |
+| 4.3 | **Room navigation** — wire exit clicking in FP renderer to `State.enterRoom()`, connect room exits to zone gates (e.g. `dog_park_gate` → `enterZone('dog_park')`) | `main.ts`, `engine/render/fp-renderer.ts` | Player can walk through gates into new zones |
+| 4.4 | **Feature interaction** — wire FP feature clicks to item collection, companion meetings, hint unlocks, threat triggers | `main.ts`, `engine/render/fp-renderer.ts` | Player can collect items, meet Buddy, unlock hints |
+| 4.5 | **Threat mini-games** — wire ThreatManager mini-games (traffic timing, cat/bully combat, storm shelter, vacuum sneak) to actual gameplay triggers | `main.ts`, `engine/threats.ts` | Threats are playable, not just data |
+| 4.6 | **Hint system wiring** — connect hint unlocks to in-game triggers (e.g. finding bone → unlocks `tree_clue` hint) | `main.ts`, `engine/hints.ts` | Hints unlock naturally during play |
+| 4.7 | **Companion system wiring** — connect companion meetings, activation bonuses (happiness, speed, scent), and passive effects | `main.ts`, `engine/companions.ts` | Companions affect gameplay |
+| 4.8 | **Win condition** — wire home door detection to `gameWin()`, score calculation, celebration screen | `main.ts`, `engine/endgame.ts` | Player can win |
+| 4.9 | **Lose condition** — wire happiness reaching 0 to `gameOver()`, lost screen | `main.ts`, `engine/endgame.ts` | Player can lose |
+| 4.10 | **Full game loop test** — play through: dog select → suburban streets → dog park (meet Buddy) → apartment (get treat) → shelter (get map fragment) → neighborhood → home | All | Verify end-to-end playability |
+
+### Phase 5: Audio (Placeholder → Polish)
+
+**Goal:** Replace oscillator fallbacks with actual audio.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 5.1 | **Zone music tracks** — create or source 5 ambient tracks (suburban, dog_park, apartment, shelter, home) | `assets/sounds/`, `engine/audio.ts` | Each zone has distinct mood |
+| 5.2 | **SFX library** — create or source 15+ SFX (footsteps, barks, door, item pickup, traffic, cat, thunder, vacuum, manga sting, success/fail) | `assets/sounds/`, `engine/audio.ts` | Game has audio feedback |
+| 5.3 | **Audio crossfades** — implement smooth music transitions between zones | `engine/audio.ts` | No jarring audio cuts |
+| 5.4 | **Mute toggle** — wire mute button to audio system | `main.ts`, `engine/audio.ts` | Player control |
+
+### Phase 6: Visual Polish
+
+**Goal:** Improve visual quality and juice.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 6.1 | **Dog model upgrade** — replace primitive dog with better procedural model or sprite-based animation | `engine/render/tp-renderer.ts` | Player character looks good |
+| 6.2 | **NPC animations** — add tail wag, leg walk cycles, idle bounce to companion NPCs | `engine/render/tp-renderer.ts` | NPCs feel alive |
+| 6.3 | **Particle upgrades** — add celebration particles on win, item pickup sparkles, zone entrance effects | `engine/effects.ts` | Visual juice |
+| 6.4 | **Screen transitions** — implement smooth fade/wipe between zones, not instant switches | `engine/transitions.ts` | Polished zone changes |
+| 6.5 | **Lighting/atmosphere** — add time-of-day lighting, fog density per zone, colored ambient | `engine/render/fp-renderer.ts`, `engine/render/tp-renderer.ts` | Zones feel distinct |
+| 6.6 | **UI polish** — improve HUD design, panel styling, cursor states, hover feedback | `engine/hud.ts`, `engine/dialogue.ts`, `engine/inventory.ts` | UI feels professional |
+
+### Phase 7: Content & Balance
+
+**Goal:** Fill out the game world and tune the experience.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 7.1 | **Expand zone data** — add more rooms to each zone (currently 3-5 rooms per zone), add more features, items, NPCs | `data.ts` | Game world feels larger |
+| 7.2 | **Add more items** — expand ITEMS map with 10+ items (collar piece, leash, bone, toy, treat, map fragments, etc.) | `data.ts`, `engine/inventory.ts` | More to collect |
+| 7.3 | **Add more companions** — expand COMPANIONS with 5+ dogs with unique dialogue, traits, locations | `data.ts`, `engine/companions.ts` | More to discover |
+| 7.4 | **Add more threats** — expand THREATS with 8+ threats across all 4 types | `data.ts`, `engine/threats.ts` | More gameplay variety |
+| 7.5 | **Balance difficulty** — tune presets using `DIFFICULTY_PRESETS` values, playtest each level | `config.ts`, `main.ts` | Game is fun at all levels |
+| 7.6 | **Dog trait tuning** — verify each dog trait actually changes gameplay meaningfully | `config.ts`, `engine/state.ts`, `main.ts` | Dogs feel different to play |
+
+### Phase 8: Mobile & Accessibility
+
+**Goal:** Make the game accessible on more devices.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 8.1 | **Touch controls** — add virtual D-pad for mobile, tap-to-interact | `main.ts`, `engine/render/tp-renderer.ts` | Playable on phones/tablets |
+| 8.2 | **Responsive layout** — adapt HUD and panels to different screen sizes | `engine/hud.ts`, `engine/inventory.ts` | Works on all screens |
+| 8.3 | **Colorblind mode** — add pattern-based item distinction (not just color) | `engine/render/fp-renderer.ts`, `engine/effects.ts` | Accessible to more players |
+| 8.4 | **Text scaling** — allow text size adjustment for dialogue and hints | `engine/dialogue.ts`, `engine/hints.ts` | Readable for more players |
+| 8.5 | **Keyboard shortcuts** — add more keybinds (e.g. [1-4] for quick inventory use) | `main.ts` | Power user control |
+
+### Phase 9: Testing & Quality
+
+**Goal:** Ensure reliability before release.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 9.1 | **Integration tests** — write tests for game flow (select dog → enter zone → collect item → resolve threat → win) | `src/**/*.test.ts` | Catch regressions |
+| 9.2 | **Data integrity** — expand data-validation tests (all exits valid, all items exist, no dead ends) | `src/data-validation.test.ts` | Catch broken references |
+| 9.3 | **Performance profiling** — measure frame time, memory, load time | `vite.config.ts`, Chrome DevTools | Identify bottlenecks |
+| 9.4 | **Build optimization** — tree-shake, code-split, lazy-load Three.js | `vite.config.ts` | Smaller bundle, faster load |
+| 9.5 | **Browser compatibility** — test on Chrome, Firefox, Safari, Edge | Manual | No browser-specific bugs |
+
+### Phase 10: Deployment
+
+**Goal:** Get the game online.
+
+| # | Task | Files | Impact |
+|---|------|-------|--------|
+| 10.1 | **Build production** — `vite build` with sourcemaps | `vite.config.ts` | Optimized output |
+| 10.2 | **Deploy to GitHub Pages** — configure `vite.config.ts` base path, push dist | `vite.config.ts`, `.github/` | Game is online |
+| 10.3 | **Add manifest.json** — PWA support for mobile install | `turbo-web/public/manifest.json` | Installable on phones |
+| 10.4 | **Add robots.txt / SEO** — basic metadata for sharing | `turbo-web/public/` | Shareable link |
+| 10.5 | **Write README** — game overview, controls, how to play | `README.md` | Players know what to do |
+
+---
+
+### Recommended Execution Order
+
+1. **Phase 4** (game flow) — highest impact, makes the game *playable*
+2. **Phase 5** (audio) — makes the game *feel alive*
+3. **Phase 6** (visual polish) — makes the game *look good*
+4. **Phase 7** (content) — makes the game *long and varied*
+5. **Phase 8** (mobile) — makes the game *accessible*
+6. **Phase 9** (testing) — makes the game *reliable*
+7. **Phase 10** (deployment) — makes the game *live*
+
+### Estimated Scope
+
+| Phase | Effort | Key Deliverable |
+|-------|--------|-----------------|
+| 4 | High | Playable game loop |
+| 5 | Medium | Full audio |
+| 6 | Medium | Visual polish |
+| 7 | High | Full content |
+| 8 | Medium | Mobile support |
+| 9 | Low | Quality assurance |
+| 10 | Low | Live deployment |
+
+### Current Test Status
+
+| Test File | Tests | Status |
+|-----------|-------|--------|
+| `state.test.ts` | 69 | ✅ |
+| `inventory.test.ts` | 21 | ✅ |
+| `threats.test.ts` | 23 | ✅ |
+| `companions.test.ts` | 22 | ✅ |
+| `hints.test.ts` | 20 | ✅ |
+| `endgame.test.ts` | 17 | ✅ |
+| `data-validation.test.ts` | 35 | ✅ |
+| **Total** | **207** | **All passing** |
