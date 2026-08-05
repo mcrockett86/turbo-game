@@ -330,7 +330,7 @@ turbo-game/
 
 ## Current Status (updated 2026-08-05)
 
-All 17 components fully implemented + Phase 0 wiring + Phase 4 game flow + Phase 5 audio complete (~5,700 lines of code).
+All 17 components fully implemented + Phase 0 wiring + Phase 4 game flow + Phase 5 audio + Phase 6 visual polish complete (~6,300 lines of code).
 
 ### Phase 4: Game Flow Assembly — COMPLETE
 
@@ -597,7 +597,7 @@ Build compiles, 207/207 tests pass.
 
 **Build:** compiles, 207/207 tests pass.
 
-### Phase 6: Visual Polish (IN_PROGRESS)
+### Phase 6: Visual Polish ✅ COMPLETE
 
 **Goal:** Improve visual quality and juice.
 
