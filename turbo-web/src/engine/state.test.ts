@@ -709,3 +709,99 @@ describe('State Manager — get() returns copy', () => {
     expect(copy.happiness).toBe(ref.happiness);
   });
 });
+
+describe('State Manager — Difficulty Scaling', () => {
+  beforeEach(resetState);
+
+  it('starts with normal difficulty', () => {
+    expect(State.state.difficulty).toBe('normal');
+  });
+
+  it('sets difficulty to easy', () => {
+    State.setDifficulty('easy');
+    expect(State.state.difficulty).toBe('easy');
+  });
+
+  it('sets difficulty to hard', () => {
+    State.setDifficulty('hard');
+    expect(State.state.difficulty).toBe('hard');
+  });
+
+  it('getDifficultyConfig returns correct values for easy', () => {
+    State.setDifficulty('easy');
+    const config = State.getDifficultyConfig();
+    expect(config.name).toBe('Easy');
+    expect(config.happinessDecayPerSecond).toBe(0.03);
+    expect(config.threatSpeedMultiplier).toBe(0.8);
+    expect(config.threatTimeLimitMultiplier).toBe(1.5);
+    expect(config.happinessDecayPerRoom).toBe(1);
+    expect(config.dogTraitBonus).toBe(1.2);
+    expect(config.companionHelpChance).toBe(0.4);
+  });
+
+  it('getDifficultyConfig returns correct values for normal', () => {
+    State.setDifficulty('normal');
+    const config = State.getDifficultyConfig();
+    expect(config.name).toBe('Normal');
+    expect(config.happinessDecayPerSecond).toBe(0.05);
+    expect(config.threatSpeedMultiplier).toBe(1.0);
+    expect(config.threatTimeLimitMultiplier).toBe(1.0);
+    expect(config.happinessDecayPerRoom).toBe(2);
+    expect(config.dogTraitBonus).toBe(1.0);
+    expect(config.companionHelpChance).toBe(0.25);
+  });
+
+  it('getDifficultyConfig returns correct values for hard', () => {
+    State.setDifficulty('hard');
+    const config = State.getDifficultyConfig();
+    expect(config.name).toBe('Hard');
+    expect(config.happinessDecayPerSecond).toBe(0.08);
+    expect(config.threatSpeedMultiplier).toBe(1.3);
+    expect(config.threatTimeLimitMultiplier).toBe(0.7);
+    expect(config.happinessDecayPerRoom).toBe(3);
+    expect(config.dogTraitBonus).toBe(0.8);
+    expect(config.companionHelpChance).toBe(0.1);
+  });
+
+  it('getDogTraitModifier returns correct modifier for Speed trait', () => {
+    State.state.currentDog = { id: 'turbo', name: 'Turbo', breed: 'Alaskan Husky', trait: '🏃 Speed', traitDesc: '', colors: { fur: [], accent: '#000' }, personality: [], lines: { intro: '', happy: '', scared: '', hint: '', combat: '', foundFriend: '' } } as any;
+    expect(State.getDogTraitModifier()).toBe(1.2);
+  });
+
+  it('getDogTraitModifier returns correct modifier for Brave trait', () => {
+    State.state.currentDog = { id: 'watson', name: 'Watson', breed: 'German Shepherd', trait: '🛡️ Brave', traitDesc: '', colors: { fur: [], accent: '#000' }, personality: [], lines: { intro: '', happy: '', scared: '', hint: '', combat: '', foundFriend: '' } } as any;
+    expect(State.getDogTraitModifier()).toBe(1.15);
+  });
+
+  it('getDogTraitModifier returns 1 for unknown trait', () => {
+    State.state.currentDog = { id: 'unknown', name: 'Unknown', breed: 'Mixed', trait: '🤷 Unknown', traitDesc: '', colors: { fur: [], accent: '#000' }, personality: [], lines: { intro: '', happy: '', scared: '', hint: '', combat: '', foundFriend: '' } } as any;
+    expect(State.getDogTraitModifier()).toBe(1);
+  });
+
+  it('getDogTraitModifier returns 1 when no dog selected', () => {
+    State.state.currentDog = null;
+    expect(State.getDogTraitModifier()).toBe(1);
+  });
+
+  it('getCompanionHelpChance returns correct values per difficulty', () => {
+    State.setDifficulty('easy');
+    expect(State.getCompanionHelpChance()).toBe(0.4);
+
+    State.setDifficulty('normal');
+    expect(State.getCompanionHelpChance()).toBe(0.25);
+
+    State.setDifficulty('hard');
+    expect(State.getCompanionHelpChance()).toBe(0.1);
+  });
+
+  it('emits difficulty-changed event on setDifficulty', () => {
+    let received: GameEvent | null = null;
+    State.on('difficulty-changed', (e) => { received = e; });
+
+    State.setDifficulty('hard');
+
+    expect(received).not.toBeNull();
+    expect(received!.type).toBe('difficulty-changed');
+    expect((received as any).difficulty).toBe('hard');
+  });
+});

@@ -2,6 +2,69 @@
 
 export const SAVE_SCHEMA_VERSION = 1;
 
+// ---- Difficulty Scaling ----
+
+export const DIFFICULTY_PRESETS = {
+  easy: {
+    name: 'Easy',
+    happinessDecayPerSecond: 0.03,
+    threatSpeedMultiplier: 0.8,
+    threatTimeLimitMultiplier: 1.5,
+    happinessDecayPerRoom: 1,
+    dogTraitBonus: 1.2,
+    companionHelpChance: 0.4,
+  },
+  normal: {
+    name: 'Normal',
+    happinessDecayPerSecond: 0.05,
+    threatSpeedMultiplier: 1.0,
+    threatTimeLimitMultiplier: 1.0,
+    happinessDecayPerRoom: 2,
+    dogTraitBonus: 1.0,
+    companionHelpChance: 0.25,
+  },
+  hard: {
+    name: 'Hard',
+    happinessDecayPerSecond: 0.08,
+    threatSpeedMultiplier: 1.3,
+    threatTimeLimitMultiplier: 0.7,
+    happinessDecayPerRoom: 3,
+    dogTraitBonus: 0.8,
+    companionHelpChance: 0.1,
+  },
+} as const;
+
+export type DifficultyKey = keyof typeof DIFFICULTY_PRESETS;
+
+export interface DifficultyConfig {
+  name: string;
+  happinessDecayPerSecond: number;
+  threatSpeedMultiplier: number;
+  threatTimeLimitMultiplier: number;
+  happinessDecayPerRoom: number;
+  dogTraitBonus: number;
+  companionHelpChance: number;
+}
+
+/** Default difficulty applied at game start. */
+export const DEFAULT_DIFFICULTY: DifficultyKey = 'normal';
+
+/** Dog trait modifiers — per-trait multiplier for gameplay effects. */
+export const DOG_TRAIT_MODIFIERS: Record<string, number> = {
+  '🏃 Speed': 1.2,
+  '🛡️ Brave': 1.15,
+  '😊 Happiness': 1.1,
+  '👃 Sniff': 1.25,
+  '🎒 Compact': 1.05,
+};
+
+/** Base companion auto-help chance per difficulty level. */
+export const COMPANION_HELP_CHANCE: Record<DifficultyKey, number> = {
+  easy: 0.4,
+  normal: 0.25,
+  hard: 0.1,
+};
+
 export const CONFIG = {
   // Canvas sizes
   canvasWidth: 1280,

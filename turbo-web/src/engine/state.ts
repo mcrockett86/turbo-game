@@ -1,7 +1,7 @@
 // ===== Game State Manager =====
 // Central state management with pub/sub events
 
-import { CONFIG, SAVE_SCHEMA_VERSION } from '@/config';
+import { CONFIG, SAVE_SCHEMA_VERSION, DEFAULT_DIFFICULTY, DIFFICULTY_PRESETS, DOG_TRAIT_MODIFIERS, COMPANION_HELP_CHANCE, type DifficultyKey, type DifficultyConfig } from '@/config';
 import type {
   GameState, GameEvent, Room, Companion, Threat,
 } from '@/types';
@@ -19,6 +19,7 @@ function createDefaultState(): GameState {
     currentRoomIndex: 0,
     isHome: false,
     gamePhase: 'select',
+    difficulty: DEFAULT_DIFFICULTY as DifficultyKey,
 
     inventory: Array(CONFIG.inventorySlots).fill(null).map(() => ({ item: null, count: 0 })),
 
@@ -304,6 +305,29 @@ function clearSave(): void {
   localStorage.removeItem('turbo-save');
 }
 
+// ---- Difficulty Scaling ----
+
+function setDifficulty(key: DifficultyKey): void {
+  State.state.difficulty = key;
+  emit({ type: 'difficulty-changed' as GameEvent['type'], difficulty: key });
+}
+
+function getDifficultyConfig(): DifficultyConfig {
+  return DIFFICULTY_PRESETS[State.state.difficulty];
+}
+
+/** Get the dog trait modifier for the currently selected dog. */
+function getDogTraitModifier(): number {
+  const dog = State.state.currentDog;
+  if (!dog || !dog.trait) return 1;
+  return DOG_TRAIT_MODIFIERS[dog.trait] ?? 1;
+}
+
+/** Get the companion auto-help chance for the current difficulty. */
+function getCompanionHelpChance(): number {
+  return COMPANION_HELP_CHANCE[State.state.difficulty];
+}
+
 // ---- Public API ----
 export const State = {
   listeners,
@@ -337,6 +361,12 @@ export const State = {
   save: saveGame,
   load: loadGame,
   clearSave,
+
+  // Difficulty
+  setDifficulty,
+  getDifficultyConfig,
+  getDogTraitModifier,
+  getCompanionHelpChance,
 
   // Events
   on,

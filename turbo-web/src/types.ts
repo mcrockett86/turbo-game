@@ -168,6 +168,7 @@ export interface GameState {
   currentRoomIndex: number;
   isHome: boolean;
   gamePhase: 'select' | 'playing' | 'transition' | 'manga' | 'gameover' | 'win';
+  difficulty: 'easy' | 'normal' | 'hard';
 
   // Inventory
   inventory: InventorySlot[]; // max 16 slots
@@ -212,6 +213,7 @@ export type GameEvent =
   | { type: 'transition-start'; zoneName: string; zoneDesc: string }
   | { type: 'transition-end' }
   | { type: 'hud-update'; dogName: string; happiness: number }
+  | { type: 'difficulty-changed'; difficulty: string }
   | { type: 'game-over' }
   | { type: 'game-win'; score: number; time: number; companions: number; items: number };
 
