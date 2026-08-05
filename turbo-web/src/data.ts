@@ -231,6 +231,19 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'home',
     hint: 'The gate. It\'s the same gate. You remember this one. This is it.'
+  },
+  home: {
+    id: 'home',
+    name: '🏡 Home',
+    desc: 'You made it! The golden gate stands before you. This is where you belong.',
+    type: 'fp',
+    rooms: [
+      { id: 'home_gate', name: 'Golden Gate', w: 100, h: 80, d: 80, color: '#d4a017', exits: ['home_yard'], isEntrance: true, entranceZone: 'neighborhood' },
+      { id: 'home_yard', name: 'Backyard', w: 250, h: 150, d: 200, color: '#4a8a3a', exits: ['home_gate', 'home_door'], features: [{type:'celebration', x:125, y:75, w:80, h:60, label:'🎉 Welcome Home!'}] },
+      { id: 'home_door', name: 'Front Door', w: 80, h: 100, d: 60, color: '#8a6a3a', exits: ['home_yard'], isHome: true, features: [{type:'home', x:40, y:50, w:60, h:60, label:'🏠 Home'}] }
+    ],
+    music: 'home',
+    hint: 'You\'re home. You\'re finally home.'
   }
 };
 

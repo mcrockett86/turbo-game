@@ -96,12 +96,12 @@ describe('Data Validation — DOGS', () => {
 });
 
 describe('Data Validation — ZONES', () => {
-  it('has exactly 5 zones', () => {
-    expect(Object.keys(ZONES)).toHaveLength(5);
+  it('has exactly 6 zones', () => {
+    expect(Object.keys(ZONES)).toHaveLength(6);
   });
 
   it('has all required zones', () => {
-    const requiredZones = ['suburban_streets', 'dog_park', 'apartment', 'shelter', 'neighborhood'];
+    const requiredZones = ['suburban_streets', 'dog_park', 'apartment', 'shelter', 'neighborhood', 'home'];
     for (const id of requiredZones) {
       expect(ZONES[id]).toBeDefined(), `Missing zone: ${id}`;
     }
