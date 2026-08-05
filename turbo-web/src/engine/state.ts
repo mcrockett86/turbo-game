@@ -1,7 +1,7 @@
 // ===== Game State Manager =====
 // Central state management with pub/sub events
 
-import { CONFIG } from '@/config';
+import { CONFIG, SAVE_SCHEMA_VERSION } from '@/config';
 import type {
   GameState, GameEvent, Room, Companion, Threat,
 } from '@/types';
@@ -226,17 +226,75 @@ function gameWin(): void {
   });
 }
 
+// ---- Save Schema ----
+
+interface SaveWrapper {
+  saveVersion: number;
+  timestamp: number;
+  state: GameState;
+}
+
 // ---- Persistence ----
+
+/** Deep-clone a GameState using structured clone (safe for plain data). */
+function cloneState(state: GameState): GameState {
+  const serialized = JSON.stringify(state);
+  return JSON.parse(serialized) as GameState;
+}
+
+/** Validate a parsed save wrapper before accepting it. */
+function validateSave(data: unknown): data is SaveWrapper {
+  if (data === null || typeof data !== 'object') return false;
+  const obj = data as Record<string, unknown>;
+
+  // Schema version check
+  if (typeof obj.saveVersion !== 'number' || obj.saveVersion !== SAVE_SCHEMA_VERSION) {
+    return false;
+  }
+
+  // Timestamp check
+  if (typeof obj.timestamp !== 'number') return false;
+
+  // State must be a non-null object
+  if (typeof obj.state !== 'object' || obj.state === null) return false;
+  const s = obj.state as Record<string, unknown>;
+
+  // Required top-level fields
+  if (typeof s.happiness !== 'number') return false;
+  if (typeof s.gamePhase !== 'string') return false;
+  if (typeof s.selectedDog !== 'string' && s.selectedDog !== null) return false;
+  if (typeof s.currentZone !== 'string' && s.currentZone !== null) return false;
+
+  // Happiness bounds
+  if (s.happiness < 0 || s.happiness > 100) return false;
+
+  // Inventory must be an array
+  if (!Array.isArray(s.inventory)) return false;
+  if (s.inventory.length !== CONFIG.inventorySlots) return false;
+
+  return true;
+}
+
 function saveGame(): void {
   try {
-    localStorage.setItem('turbo-save', JSON.stringify(State.state));
+    const wrapper: SaveWrapper = {
+      saveVersion: SAVE_SCHEMA_VERSION,
+      timestamp: Date.now(),
+      state: cloneState(State.state),
+    };
+    localStorage.setItem('turbo-save', JSON.stringify(wrapper));
   } catch { /* ignore */ }
 }
 
 function loadGame(): GameState | null {
   try {
-    const data = localStorage.getItem('turbo-save');
-    return data ? JSON.parse(data) : null;
+    const raw = localStorage.getItem('turbo-save');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!validateSave(parsed)) return null;
+
+    return cloneState(parsed.state);
   } catch {
     return null;
   }

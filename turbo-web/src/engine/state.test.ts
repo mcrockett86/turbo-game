@@ -560,8 +560,9 @@ describe('State Manager — Persistence', () => {
     expect(saved).not.toBeNull();
 
     const parsed = JSON.parse(saved!);
-    expect(parsed.selectedDog).toBe('turbo');
-    expect(parsed.happiness).toBe(75);
+    expect(parsed.saveVersion).toBe(1);
+    expect(parsed.state.selectedDog).toBe('turbo');
+    expect(parsed.state.happiness).toBe(75);
   });
 
   it('loads saved game', () => {
@@ -587,6 +588,86 @@ describe('State Manager — Persistence', () => {
     State.save();
     State.clearSave();
     expect(localStorage.getItem('turbo-save')).toBeNull();
+  });
+
+  it('deep clones state on save (no shared refs)', () => {
+    State.state.selectedDog = 'turbo';
+    State.state.happiness = 75;
+    State.state.inventory[0].item = 'treat';
+    State.state.inventory[0].count = 3;
+    State.save();
+
+    // Mutate the live state after save
+    State.state.selectedDog = 'mutated';
+    State.state.inventory[0].count = 999;
+
+    // Load should return the original saved values
+    const loaded = State.load();
+    expect(loaded!.selectedDog).toBe('turbo');
+    expect(loaded!.inventory[0].count).toBe(3);
+  });
+
+  it('rejects corrupted JSON', () => {
+    localStorage.setItem('turbo-save', 'not valid json{{{');
+    expect(State.load()).toBeNull();
+  });
+
+  it('rejects save with wrong schema version', () => {
+    localStorage.setItem('turbo-save', JSON.stringify({
+      saveVersion: 99,
+      timestamp: Date.now(),
+      state: { ...State.state },
+    }));
+    expect(State.load()).toBeNull();
+  });
+
+  it('rejects save missing required fields', () => {
+    localStorage.setItem('turbo-save', JSON.stringify({
+      saveVersion: 1,
+      timestamp: Date.now(),
+      state: { happiness: 50 }, // missing gamePhase, selectedDog, etc.
+    }));
+    expect(State.load()).toBeNull();
+  });
+
+  it('rejects save with out-of-range happiness', () => {
+    localStorage.setItem('turbo-save', JSON.stringify({
+      saveVersion: 1,
+      timestamp: Date.now(),
+      state: { ...State.state, happiness: 150 },
+    }));
+    expect(State.load()).toBeNull();
+  });
+
+  it('rejects save with non-array inventory', () => {
+    localStorage.setItem('turbo-save', JSON.stringify({
+      saveVersion: 1,
+      timestamp: Date.now(),
+      state: { ...State.state, inventory: 'not-an-array' },
+    }));
+    expect(State.load()).toBeNull();
+  });
+
+  it('rejects save with wrong inventory slot count', () => {
+    localStorage.setItem('turbo-save', JSON.stringify({
+      saveVersion: 1,
+      timestamp: Date.now(),
+      state: { ...State.state, inventory: Array(10).fill(null).map(() => ({ item: null, count: 0 })) },
+    }));
+    expect(State.load()).toBeNull();
+  });
+
+  it('accepts valid save with all fields present', () => {
+    State.state.selectedDog = 'nova';
+    State.state.happiness = 42;
+    State.state.gamePhase = 'playing';
+    State.save();
+
+    const loaded = State.load();
+    expect(loaded).not.toBeNull();
+    expect(loaded!.selectedDog).toBe('nova');
+    expect(loaded!.happiness).toBe(42);
+    expect(loaded!.gamePhase).toBe('playing');
   });
 });
 
