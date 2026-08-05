@@ -503,8 +503,8 @@ All engine files are written. The gap is **main.ts wiring**. Here's the priority
 | 3.1 | Add remaining SFX/music placeholder (Web Audio oscillators) | Audio feedback |
 | 3.2 | Add screen shake on threat hit/miss | Juice |
 | 3.3 | Add particle effects for item pickup, zone entrance | Polish |
-| 3.4 | Fix save/load persistence edge cases | Progression |
-| 3.5 | Add config for difficulty scaling | Replayability |
+| 3.4 | Fix save/load persistence edge cases | Progression | ✅ DONE | save schema versioning, deep clone, validation |
+| 3.5 | Add config for difficulty scaling | Replayability | ✅ DONE | presets, dog trait modifiers |
 
 ---
 
