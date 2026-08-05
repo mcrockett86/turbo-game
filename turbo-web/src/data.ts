@@ -122,7 +122,7 @@ export const ZONES: Record<string, Zone> = {
       { id: 'street_north', name: 'North Street', w: 300, h: 120, d: 400, color: '#6a6a6a', exits: ['start', 'intersection'], features: [{type:'traffic', x:150, y:60, w:80, h:20, label:'🚗 Traffic'}] },
       { id: 'street_east', name: 'East Walk', w: 250, h: 100, d: 350, color: '#5a8a5a', exits: ['start', 'dog_park_gate'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'🦴 Bone', item:'bone'}] },
       { id: 'intersection', name: 'Street Intersection', w: 200, h: 150, d: 200, color: '#7a7a7a', exits: ['street_north', 'street_south', 'alley'], features: [{type:'choice', x:100, y:75, w:60, h:40, label:'Choose path'}] },
-      { id: 'street_south', name: 'South Avenue', w: 350, h: 120, d: 300, color: '#6a6a6a', exits: ['intersection'], features: [{type:'door', x:175, y:60, w:40, h:50, label:'🚪 Door', locked:true, item:'key'}]},
+      { id: 'street_south', name: 'South Avenue', w: 350, h: 120, d: 300, color: '#6a6a6a', exits: ['intersection', 'apt_gate'], features: [{type:'door', x:175, y:60, w:40, h:50, label:'🚪 Door', locked:true, item:'key'}]},
       { id: 'alley', name: 'Back Alley', w: 180, h: 100, d: 300, color: '#3a3a4a', exits: ['intersection', 'shelter_entrance'], features: [{type:'cat', x:90, y:50, w:40, h:30, label:'🐱 Mean Cat'}] },
       { id: 'dog_park_gate', name: 'Dog Park Gate', w: 100, h: 80, d: 100, color: '#5a9a5a', exits: ['street_east'], isEntrance: true, entranceZone: 'dog_park' },
       { id: 'shelter_entrance', name: 'Shelter Door', w: 120, h: 100, d: 120, color: '#4a4a6a', exits: ['alley'], isEntrance: true, entranceZone: 'shelter' },

@@ -379,6 +379,8 @@ export class FpRoomRenderer {
   private lastFrameTime: number = 0;
   private canvas: HTMLCanvasElement;
   private glowTime: number = 0;
+  private happinessTimer: number = 0;
+  private happinessInterval: number | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -432,6 +434,9 @@ export class FpRoomRenderer {
     // Start loop
     this.lastFrameTime = performance.now();
     this.animate();
+
+    // Start happiness decay
+    this.startHappinessDecay();
   }
 
   private buildRoom(): void {
@@ -647,6 +652,20 @@ export class FpRoomRenderer {
     return this.zoneId;
   }
 
+  startHappinessDecay(): void {
+    if (this.happinessInterval) return;
+    this.happinessInterval = window.setInterval(() => {
+      const decay = CONFIG.happinessDecayPerSecond;
+      const current = State.state.happiness;
+      if (current > 0) {
+        State.state.happiness = Math.max(0, current - decay);
+        if (State.state.happiness <= 0) {
+          State.gameOver();
+        }
+      }
+    }, 1000);
+  }
+
   dispose(): void {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
@@ -662,5 +681,11 @@ export class FpRoomRenderer {
     this.renderer.dispose();
     this.featureGroups.clear();
     this.exitGroups.clear();
+
+    // Clean up happiness decay timer
+    if (this.happinessInterval) {
+      window.clearInterval(this.happinessInterval);
+      this.happinessInterval = null;
+    }
   }
 }

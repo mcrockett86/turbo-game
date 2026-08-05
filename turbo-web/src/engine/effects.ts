@@ -127,7 +127,7 @@ export class VisualEffectsRenderer {
   }
 
   /** Update effects */
-  private update(delta: number): void {
+  update(delta: number): void {
     // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
@@ -168,7 +168,7 @@ export class VisualEffectsRenderer {
   }
 
   /** Render effects */
-  private render(): void {
+  render(): void {
     const ctx = this.ctx;
     const w = this.canvas.width;
     const h = this.canvas.height;

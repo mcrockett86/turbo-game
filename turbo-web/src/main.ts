@@ -27,6 +27,10 @@ let searchRenderer: SearchRenderer | null = null;
 // ---- Active zone type tracking ----
 let activeZoneType: 'fp' | 'tp' | 'search' | null = null;
 
+// ---- Transition renderer ----
+import { ZoneTransitionRenderer } from '@/engine/transitions';
+let transitionRenderer: ZoneTransitionRenderer | null = null;
+
 // ---- Canvas Overlay Instances ----
 let hudRenderer: HUDRenderer | null = null;
 let dialogueRenderer: DialogueRenderer | null = null;
@@ -118,16 +122,17 @@ function renderOverlays(_time: number): void {
     searchRenderer.update(1 / 60);
   }
 
-  // Effects overlay
+  // Effects overlay — update particles in the unified loop
   if (effectsRenderer && !document.getElementById('effects-canvas')?.classList.contains('hidden')) {
-    effectsRenderer.start();
+    effectsRenderer.update(1 / 60);
+    effectsRenderer.render();
   }
 
-  // Endgame overlay
+  // Endgame overlay — only draw if in a terminal state
   if (endgameRenderer) {
     const state = endgameRenderer.getState();
-    if (state !== 'playing') {
-      (endgameRenderer as any).startRenderLoop();
+    if (state === 'won' || state === 'lost') {
+      endgameRenderer.draw();
     }
   }
 }
@@ -195,16 +200,7 @@ function initOverlays(): void {
       }, 1000);
     });
     dialogueRenderer.setOnLineAdvance(() => {
-      // Advance to next line in dialogue
-      if (dialogueRenderer) {
-        dialogueRenderer.advanceLine();
-      }
-    });
-    dialogueRenderer.setOnLineAdvance(() => {
-      // Advance to next line in dialogue
-      if (dialogueRenderer) {
-        dialogueRenderer.advanceLine();
-      }
+      if (dialogueRenderer) dialogueRenderer.advanceLine();
     });
   }
 
@@ -387,18 +383,32 @@ function wireStateEvents(): void {
   // Game won
   State.on('game-win', ((event: GameEvent) => {
     const e = event as GameEvent & { score: number; time: number; companions: number; items: number };
+    // Stop active zone renderer
+    fpRenderer?.dispose(); fpRenderer = null;
+    tpEngine?.dispose(); tpEngine = null;
+    searchRenderer?.stop(); searchRenderer?.dispose(); searchRenderer = null;
+    activeZoneType = null;
+    // Stop render loop
+    stopRenderLoop();
+    // Show endgame
     if (endgameRenderer) {
       endgameRenderer.setState('won');
       endgameRenderer.setScoreData(e.score, e.time, e.items, e.companions, 0, State.state.happiness);
       endgameRenderer.setFinalDialogue('You made it home, Turbo!');
       document.getElementById('endgame-canvas')?.classList.remove('hidden');
-      document.getElementById('effects-canvas')?.classList.remove('hidden');
-      if (effectsRenderer) effectsRenderer.start();
     }
   }) as Parameters<typeof State.on>[1]);
 
   // Game over
   State.on('game-over', ((event: GameEvent) => {
+    // Stop active zone renderer
+    fpRenderer?.dispose(); fpRenderer = null;
+    tpEngine?.dispose(); tpEngine = null;
+    searchRenderer?.stop(); searchRenderer?.dispose(); searchRenderer = null;
+    activeZoneType = null;
+    // Stop render loop
+    stopRenderLoop();
+    // Show endgame
     if (endgameRenderer) {
       endgameRenderer.setState('lost');
       endgameRenderer.setScoreData(0, (Date.now() - State.state.startTime) / 1000, State.state.inventory.filter(s => s.item !== null).length, State.state.companions.length, 0, State.state.happiness);
@@ -537,6 +547,26 @@ function renderDogSelect(): void {
 
   grid.innerHTML = '';
 
+  // Add start button if it doesn't exist
+  let startBtn = document.getElementById('start-adventure-btn');
+  if (!startBtn) {
+    startBtn = document.createElement('button');
+    startBtn.id = 'start-adventure-btn';
+    startBtn.className = 'start-btn';
+    startBtn.textContent = '🐾 Start Adventure';
+    startBtn.style.display = 'none';
+    startBtn.addEventListener('click', () => {
+      Audio.playSFX('select');
+      const selected = document.querySelector('.dog-card.selected');
+      if (selected) {
+        const dogId = selected.dataset.dogId;
+        const dog = DOGS[dogId as keyof typeof DOGS];
+        if (dog) startAdventure(dogId, dog);
+      }
+    });
+    document.getElementById('dog-select')?.appendChild(startBtn);
+  }
+
   for (const dogId of Object.keys(DOGS)) {
     const dog = DOGS[dogId as keyof typeof DOGS];
     const card = document.createElement('div');
@@ -587,10 +617,9 @@ function selectDog(dogId: string, card: HTMLElement): void {
   State.showDialogue(dog.lines.intro, dog.name);
   Audio.playSFX('bark');
 
-  // Auto-start after 3 seconds
-  setTimeout(() => {
-    startAdventure(dogId, dog);
-  }, 3000);
+  // Show start button
+  const startBtn = document.getElementById('start-adventure-btn');
+  if (startBtn) startBtn.style.display = 'block';
 }
 
 // ---- Start Adventure ----
@@ -667,6 +696,11 @@ function startFPView(): void {
   fpRenderer.setOnExitClick((exitRoomId: string) => {
     handleExitClick(exitRoomId);
   });
+
+  // Start happiness decay timer
+  if (!fpRenderer.happinessInterval) {
+    fpRenderer.startHappinessDecay();
+  }
 
   // Show HUD
   document.getElementById('hud')!.classList.remove('hidden');
@@ -822,9 +856,44 @@ function transitionToZone(zoneId: string): void {
 
   State.startTransition(zoneWithRooms.name, zoneWithRooms.desc);
   Audio.playMusic(zoneId);
-  showZoneTransition(zoneWithRooms.name, zoneWithRooms.desc);
 
-  setTimeout(() => {
+  // Use ZoneTransitionRenderer for smooth transition
+  const transitionCanvas = document.getElementById('effects-canvas');
+  if (transitionCanvas instanceof HTMLCanvasElement) {
+    if (!transitionRenderer) {
+      transitionRenderer = new ZoneTransitionRenderer(transitionCanvas);
+    }
+    const types: Array<'fade' | 'wipe' | 'zoom' | 'slide'> = ['fade', 'wipe', 'zoom', 'slide'];
+    const chosenType = types[Math.floor(Math.random() * types.length)];
+    transitionRenderer.startTransition(chosenType, zoneWithRooms.name, 1.5, () => {
+      // After transition completes
+      State.enterZone(zoneId, zoneData);
+      State.endTransition();
+      activeZoneType = zoneType;
+
+      switch (zoneType) {
+        case 'fp':
+          if (zoneWithRooms.rooms && zoneWithRooms.rooms.length > 0) {
+            startFPView();
+          }
+          break;
+        case 'tp':
+          startTPView(zoneId, zoneData);
+          break;
+        case 'search':
+          startSearchView(zoneId, zoneData);
+          break;
+      }
+
+      // Hide transition canvas
+      if (document.getElementById('effects-canvas')) {
+        document.getElementById('effects-canvas')?.classList.add('hidden');
+      }
+    });
+    // Show transition canvas
+    document.getElementById('effects-canvas')?.classList.remove('hidden');
+  } else {
+    // Fallback: instant transition
     State.enterZone(zoneId, zoneData);
     State.endTransition();
     activeZoneType = zoneType;
@@ -835,16 +904,14 @@ function transitionToZone(zoneId: string): void {
           startFPView();
         }
         break;
-
       case 'tp':
         startTPView(zoneId, zoneData);
         break;
-
-      case 'human':
+      case 'search':
         startSearchView(zoneId, zoneData);
         break;
     }
-  }, 2500);
+  }
 }
 
 // ---- TP View (Phase 1) ----
@@ -871,12 +938,40 @@ function startTPView(zoneId: string, zoneData: Zone): void {
       Audio.playSFX('item_pickup');
       State.showDialogue('Found a scent clue! This leads somewhere familiar.', 'Turbo');
     }
+    if (type === 'water_bowl') {
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + 5);
+      State.updateHUD(State.state.currentDog?.name || 'Turbo', State.state.happiness);
+      State.showDialogue('Refreshing! *gulps water*', 'Turbo');
+    }
+    if (type === 'fire_hydrant') {
+      State.showDialogue('A good sniff. *sniff sniff*', 'Turbo');
+    }
   });
 
   tpEngine.setOnNpcClick((npc: NPC) => {
     console.log('[Turbo] NPC clicked:', npc.name);
     if (npc.dialogue && npc.dialogue.length > 0) {
-      State.showDialogue(npc.dialogue[0], npc.name);
+      // Check if this NPC is a companion
+      const companionId = npc.id;
+      const existing = State.state.companions.find(c => c.id === companionId);
+      if (existing && !existing.active) {
+        State.activateCompanion(companionId);
+        State.showDialogue(npc.dialogue[0], npc.name);
+      } else if (!existing) {
+        State.meetCompanion({
+          id: companionId,
+          name: npc.name,
+          breed: npc.name,
+          trait: '🐾 New Friend',
+          dialogue: npc.dialogue,
+          met: true,
+          active: false,
+        });
+        State.showDialogue(npc.dialogue[0], npc.name);
+      } else {
+        const line = npc.dialogue[Math.floor(Math.random() * npc.dialogue.length)];
+        State.showDialogue(line, npc.name);
+      }
     }
   });
 
@@ -912,6 +1007,8 @@ function startSearchView(zoneId: string, zoneData: Zone): void {
     console.log('[Turbo] Home found in search view!');
     State.gameWin();
     State.showDialogue('Home. Sweet home. *happy tail wags*', 'Turbo');
+    // Stop search render loop on win
+    searchRenderer?.stop();
   });
 
   // Start render loop
@@ -968,11 +1065,84 @@ function dropItem(item: any): void {
 // ---- Restart / Menu ----
 function restartGame(): void {
   localStorage.removeItem('turbo-save');
-  location.reload();
+  resetGame();
 }
 
 function backToMenu(): void {
-  location.reload();
+  resetGame();
+}
+
+// ---- Full Game Reset ----
+function resetGame(): void {
+  // Stop render loop
+  stopRenderLoop();
+
+  // Dispose all renderers
+  fpRenderer?.dispose();
+  fpRenderer = null;
+  tpEngine?.dispose();
+  tpEngine = null;
+  searchRenderer?.stop();
+  searchRenderer?.dispose();
+  searchRenderer = null;
+  transitionRenderer?.dispose();
+  transitionRenderer = null;
+
+  // Hide all canvases
+  const canvasIds = [
+    'fp-canvas', 'tp-canvas', 'human-canvas',
+    'hud-canvas', 'dialogue-canvas', 'inventory-canvas',
+    'companion-canvas', 'hint-canvas', 'manga-canvas',
+    'effects-canvas', 'endgame-canvas',
+  ];
+  for (const id of canvasIds) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+
+  // Hide HTML overlays
+  const overlayIds = ['hud', 'zone-transition'];
+  for (const id of overlayIds) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  }
+
+  // Reset state
+  State.state = {
+    selectedDog: null,
+    currentDog: null,
+    happiness: 80,
+    currentZone: null,
+    currentZoneIndex: 0,
+    currentRoom: null,
+    currentRoomIndex: 0,
+    isHome: false,
+    gamePhase: 'select',
+    difficulty: 'normal',
+    inventory: Array(CONFIG.inventorySlots).fill(null).map(() => ({ item: null, count: 0 })),
+    companions: [],
+    activeCompanion: null,
+    hintsUnlocked: [],
+    mapFragments: 0,
+    routeProgress: 0,
+    flags: {},
+    threatActive: false,
+    currentThreat: null,
+    startTime: Date.now(),
+    highScore: 0,
+  };
+
+  // Reset panels
+  panelsOpen = { inventory: false, companion: false, hint: false };
+
+  // Re-init overlays
+  initOverlays();
+
+  // Re-show dog select
+  renderDogSelect();
+  document.getElementById('dog-select')?.classList.remove('hidden');
+
+  console.log('[Turbo] Game reset complete.');
 }
 
 // ---- Dog Portrait Drawing (procedural) ----
@@ -1122,8 +1292,14 @@ function handleKeyDown(e: KeyboardEvent): void {
     }
   } else if (activeZoneType === 'tp' && tpEngine) {
     tpEngine.onKeyDown(e.key.toLowerCase());
+  } else if (activeZoneType === 'search' && searchRenderer) {
+    // Search view uses its own internal key handler, but we need to ensure
+    // the canvas has focus for keyboard events to fire
+    const humanCanvas = document.getElementById('human-canvas');
+    if (humanCanvas instanceof HTMLCanvasElement) {
+      humanCanvas.focus();
+    }
   }
-  // Search view doesn't need keyboard input (mouse-driven)
 }
 
 function handleKeyUp(e: KeyboardEvent): void {
