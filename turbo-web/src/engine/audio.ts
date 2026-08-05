@@ -60,24 +60,49 @@ const SFX_SOURCES: Record<string, string> = {
 
 // ---- State ----
 let musicPlayer: Howl | null = null;
+let crossfadePlayer: Howl | null = null; // temporary for crossfade
 let currentMusic: string | null = null;
 let masterVolume = CONFIG.masterVolume;
 let musicVolume = CONFIG.musicVolume;
 let sfxVolume = CONFIG.sfxVolume;
 let muted = false;
+const CROSSFADE_DURATION = 2000; // ms
 
-// ---- Music ----
+// ---- Music with Crossfade ----
 function playMusic(zoneId: string): void {
   const track = MUSIC_TRACKS[zoneId] || MUSIC_TRACKS.quiet;
   if (currentMusic === track) return;
 
-  // Stop current
   if (musicPlayer) {
-    musicPlayer.fade(musicVolume, 0, 1000);
-    setTimeout(() => musicPlayer?.unload(), 1100);
+    // Crossfade: fade out old while new fades in
+    const oldPlayer = musicPlayer;
+    const oldVolume = musicVolume;
+
+    // Start new track
+    musicPlayer = new Howl({
+      src: [track],
+      loop: true,
+      volume: 0,
+      onload: () => {
+        musicPlayer?.play();
+        // Crossfade over duration
+        musicPlayer?.fade(0, oldVolume, CROSSFADE_DURATION);
+        // Fade out old track
+        oldPlayer.fade(oldVolume, 0, CROSSFADE_DURATION);
+        setTimeout(() => {
+          oldPlayer.stop();
+          oldPlayer.unload();
+        }, CROSSFADE_DURATION + 100);
+      },
+      onend: () => {
+        musicPlayer?.play();
+      },
+    });
+    currentMusic = track;
+    return;
   }
 
-  // Start new
+  // No current music — just start
   musicPlayer = new Howl({
     src: [track],
     loop: true,
@@ -86,7 +111,6 @@ function playMusic(zoneId: string): void {
       musicPlayer?.play();
     },
     onend: () => {
-      // Restart loop
       musicPlayer?.play();
     },
   });
@@ -235,6 +259,254 @@ function playFallbackSFX(sfxId: string): void {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
       osc.start(now);
       osc.stop(now + 0.1);
+      break;
+    case 'footsteps':
+      // Soft padding steps (noise bursts)
+      for (let i = 0; i < 3; i++) {
+        const noise = ctx.createBufferSource();
+        const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let j = 0; j < data.length; j++) data[j] = (Math.random() * 2 - 1) * 0.15;
+        noise.buffer = buf;
+        const ng = ctx.createGain();
+        noise.connect(ng);
+        ng.connect(ctx.destination);
+        const t = now + i * 0.1;
+        ng.gain.setValueAtTime(0.15 * sfxVolume, t);
+        ng.gain.exponentialRampToValueAtTime(0.01, t + 0.08);
+        noise.start(t);
+        noise.stop(t + 0.08);
+      }
+      break;
+    case 'door_open':
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.linearRampToValueAtTime(300, now + 0.3);
+      gain.gain.setValueAtTime(0.25 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+      break;
+    case 'door_close':
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.linearRampToValueAtTime(100, now + 0.15);
+      gain.gain.setValueAtTime(0.2 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+      break;
+    case 'door_locked':
+      // Metallic click
+      const osc2a = ctx.createOscillator();
+      const gain2a = ctx.createGain();
+      osc2a.connect(gain2a);
+      gain2a.connect(ctx.destination);
+      osc2a.type = 'square';
+      osc2a.frequency.setValueAtTime(800, now);
+      gain2a.gain.setValueAtTime(0.15 * sfxVolume, now);
+      gain2a.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc2a.start(now);
+      osc2a.stop(now + 0.05);
+      break;
+    case 'transition_whoosh':
+      // Noise sweep
+      const noiseSrc = ctx.createBufferSource();
+      const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.6, ctx.sampleRate);
+      const noiseData = noiseBuf.getChannelData(0);
+      for (let i = 0; i < noiseData.length; i++) noiseData[i] = (Math.random() * 2 - 1);
+      noiseSrc.buffer = noiseBuf;
+      const noiseGain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(200, now);
+      filter.frequency.linearRampToValueAtTime(2000, now + 0.3);
+      filter.frequency.linearRampToValueAtTime(400, now + 0.6);
+      filter.Q.value = 2;
+      noiseGain.gain.setValueAtTime(0.3 * sfxVolume, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+      noiseSrc.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+      noiseSrc.start(now);
+      noiseSrc.stop(now + 0.6);
+      break;
+    case 'item_use':
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+      osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+      gain.gain.setValueAtTime(0.2 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+      break;
+    case 'item_combine':
+      // Two-tone chime
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, now);
+      gain.gain.setValueAtTime(0.15 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+      const osc3 = ctx.createOscillator();
+      const gain3 = ctx.createGain();
+      osc3.connect(gain3);
+      gain3.connect(ctx.destination);
+      osc3.type = 'sine';
+      osc3.frequency.setValueAtTime(784, now + 0.12);
+      gain3.gain.setValueAtTime(0.15 * sfxVolume, now + 0.12);
+      gain3.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc3.start(now + 0.12);
+      osc3.stop(now + 0.35);
+      break;
+    case 'traffic_near':
+      // Low rumble
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(80, now);
+      osc.frequency.linearRampToValueAtTime(120, now + 0.5);
+      osc.frequency.linearRampToValueAtTime(60, now + 0.8);
+      gain.gain.setValueAtTime(0.15 * sfxVolume, now);
+      gain.gain.linearRampToValueAtTime(0.3 * sfxVolume, now + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+      osc.start(now);
+      osc.stop(now + 0.8);
+      break;
+    case 'cat_hiss':
+      // Noise burst
+      const hissSrc = ctx.createBufferSource();
+      const hissBuf = ctx.createBuffer(1, ctx.sampleRate * 0.4, ctx.sampleRate);
+      const hissData = hissBuf.getChannelData(0);
+      for (let i = 0; i < hissData.length; i++) hissData[i] = (Math.random() * 2 - 1) * 0.5;
+      hissSrc.buffer = hissBuf;
+      const hissGain = ctx.createGain();
+      const hissFilter = ctx.createBiquadFilter();
+      hissFilter.type = 'highpass';
+      hissFilter.frequency.value = 3000;
+      hissGain.gain.setValueAtTime(0.3 * sfxVolume, now);
+      hissGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      hissSrc.connect(hissFilter);
+      hissFilter.connect(hissGain);
+      hissGain.connect(ctx.destination);
+      hissSrc.start(now);
+      hissSrc.stop(now + 0.4);
+      break;
+    case 'dog_growl':
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(100, now);
+      osc.frequency.linearRampToValueAtTime(70, now + 0.6);
+      // Add vibrato
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.frequency.value = 8;
+      lfoGain.gain.value = 15;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      gain.gain.setValueAtTime(0.25 * sfxVolume, now);
+      gain.gain.setValueAtTime(0.25 * sfxVolume, now + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+      lfo.start(now);
+      lfo.stop(now + 0.7);
+      osc.start(now);
+      osc.stop(now + 0.7);
+      break;
+    case 'vacuum':
+      // Low drone with modulation
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(90, now);
+      gain.gain.setValueAtTime(0.2 * sfxVolume, now);
+      const vacLfo = ctx.createOscillator();
+      const vacLfoGain = ctx.createGain();
+      vacLfo.frequency.value = 3;
+      vacLfoGain.gain.value = 20;
+      vacLfo.connect(vacLfoGain);
+      vacLfoGain.connect(osc.frequency);
+      gain.gain.setValueAtTime(0.2 * sfxVolume, now);
+      gain.gain.linearRampToValueAtTime(0.3 * sfxVolume, now + 1);
+      gain.gain.linearRampToValueAtTime(0.2 * sfxVolume, now + 2);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 2.5);
+      vacLfo.start(now);
+      vacLfo.stop(now + 2.5);
+      osc.start(now);
+      osc.stop(now + 2.5);
+      break;
+    case 'impact':
+      // Low thud
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
+      gain.gain.setValueAtTime(0.4 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+      break;
+    case 'click':
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1000, now);
+      gain.gain.setValueAtTime(0.08 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+      osc.start(now);
+      osc.stop(now + 0.03);
+      break;
+    case 'select':
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.12 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+      osc.start(now);
+      osc.stop(now + 0.08);
+      break;
+    case 'manga_speed_line':
+      // Rising sweep
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.exponentialRampToValueAtTime(2000, now + 0.2);
+      gain.gain.setValueAtTime(0.15 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+      break;
+    case 'victory':
+      // Ascending arpeggio
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.value = freq;
+        const t = now + i * 0.12;
+        g.gain.setValueAtTime(0.15 * sfxVolume, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + 0.2);
+        o.start(t);
+        o.stop(t + 0.2);
+      });
+      break;
+    case 'defeat':
+      // Descending tone
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.linearRampToValueAtTime(150, now + 0.5);
+      gain.gain.setValueAtTime(0.2 * sfxVolume, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+      osc.start(now);
+      osc.stop(now + 0.6);
+      break;
+    case 'found_home':
+      // Happy ascending melody
+      [523, 659, 784, 1047, 784, 1047].forEach((freq, i) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.value = freq;
+        const t = now + i * 0.1;
+        g.gain.setValueAtTime(0.12 * sfxVolume, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+        o.start(t);
+        o.stop(t + 0.12);
+      });
       break;
     default:
       osc.type = 'sine';

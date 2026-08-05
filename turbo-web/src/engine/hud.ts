@@ -15,6 +15,7 @@ interface HUDState {
   companionName: string | null;
   isTransitioning: boolean;
   threatActive: boolean;
+  muted: boolean;
 }
 
 // ---- Constants ----
@@ -46,6 +47,7 @@ export class HUDRenderer {
       companionName: null,
       isTransitioning: false,
       threatActive: false,
+      muted: false,
     };
   }
 
@@ -82,6 +84,11 @@ export class HUDRenderer {
   /** Set threat active */
   setThreatActive(active: boolean): void {
     this.state.threatActive = active;
+  }
+
+  /** Set mute state */
+  setMuted(muted: boolean): void {
+    this.state.muted = muted;
   }
 
   /** Main render loop */
@@ -129,6 +136,9 @@ export class HUDRenderer {
     if (this.state.threatActive) {
       this.renderThreatIndicator(ctx, w, h);
     }
+
+    // Top-right: Mute button
+    this.renderMuteButton(ctx, w, h);
   }
 
   /** Render dog info (name + happiness) */
@@ -241,6 +251,26 @@ export class HUDRenderer {
     ctx.fillText('⚠️ THREAT DETECTED — Press SPACE to resolve', x, y);
   }
 
+  /** Render mute button */
+  private renderMuteButton(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+    const x = w - 60;
+    const y = h - 35;
+    const size = 24;
+
+    // Background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.beginPath();
+    ctx.roundRect(x - size / 2, y - size / 2, size, size, 4);
+    ctx.fill();
+
+    // Icon
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(this.state.muted ? '🔇' : '🔊', x, y);
+  }
+
   // ---- Callbacks ----
   setOnPanelToggle(fn: (panel: string) => void): void {
     this.onPanelToggle = fn;
@@ -255,5 +285,20 @@ export class HUDRenderer {
   /** Dispose */
   dispose(): void {
     this.stop();
+  }
+
+  /** Check if click is on mute button */
+  handleClick(x: number, y: number): boolean {
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const muteX = w - 60;
+    const muteY = h - 35;
+    const size = 24;
+
+    if (x >= muteX - size / 2 && x <= muteX + size / 2 &&
+        y >= muteY - size / 2 && y <= muteY + size / 2) {
+      return true;
+    }
+    return false;
   }
 }

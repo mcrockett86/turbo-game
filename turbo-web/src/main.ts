@@ -504,6 +504,19 @@ function setupUI(): void {
   document.addEventListener('keydown', handleKeyDown);
   document.addEventListener('keyup', handleKeyUp);
 
+  // Mute button click
+  document.getElementById('hud-canvas')?.addEventListener('click', (e) => {
+    if (!hudRenderer) return;
+    const rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (hudRenderer.handleClick(x, y)) {
+      Audio.playSFX('click');
+      const isMuted = Audio.toggleMute();
+      if (hudRenderer) hudRenderer.setMuted(isMuted);
+    }
+  });
+
   // Window resize
   window.addEventListener('resize', onWindowResize);
 }

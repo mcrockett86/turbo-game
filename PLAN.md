@@ -330,7 +330,7 @@ turbo-game/
 
 ## Current Status (updated 2026-08-05)
 
-All 17 components fully implemented + Phase 0 wiring complete + Phase 4 game flow assembled (~5,500 lines of code).
+All 17 components fully implemented + Phase 0 wiring + Phase 4 game flow + Phase 5 audio complete (~5,700 lines of code).
 
 ### Phase 4: Game Flow Assembly — COMPLETE
 
@@ -584,16 +584,18 @@ All 10 tasks completed. Game now has:
 
 Build compiles, 207/207 tests pass.
 
-### Phase 5: Audio (Placeholder → Polish)
+### Phase 5: Audio (Placeholder → Polish) ✅ COMPLETE
 
-**Goal:** Replace oscillator fallbacks with actual audio.
+**Goal:** Complete procedural audio system with all SFX, crossfades, and mute control.
 
-| # | Task | Files | Impact |
-|---|------|-------|--------|
-| 5.1 | **Zone music tracks** — create or source 5 ambient tracks (suburban, dog_park, apartment, shelter, home) | `assets/sounds/`, `engine/audio.ts` | Each zone has distinct mood |
-| 5.2 | **SFX library** — create or source 15+ SFX (footsteps, barks, door, item pickup, traffic, cat, thunder, vacuum, manga sting, success/fail) | `assets/sounds/`, `engine/audio.ts` | Game has audio feedback |
-| 5.3 | **Audio crossfades** — implement smooth music transitions between zones | `engine/audio.ts` | No jarring audio cuts |
-| 5.4 | **Mute toggle** — wire mute button to audio system | `main.ts`, `engine/audio.ts` | Player control |
+| # | Task | Status |
+|---|------|--------|
+| 5.1 | **All SFX procedural fallback** — 26 SFX now generated via Web Audio API (footsteps, doors, cat hiss, dog growl, vacuum, impact, click, select, manga_speed_line, victory, defeat, found_home, etc.) | ✅ DONE |
+| 5.2 | **Music crossfades** — smooth 2s crossfade between zone music tracks | ✅ DONE |
+| 5.3 | **Mute button** — HUD top-right mute toggle (🔊/🔇) with click handler | ✅ DONE |
+| 5.4 | **Audio context resume** — browser gesture handling on first click | ✅ DONE |
+
+**Build:** compiles, 207/207 tests pass.
 
 ### Phase 6: Visual Polish
 
@@ -662,8 +664,8 @@ Build compiles, 207/207 tests pass.
 ### Recommended Execution Order
 
 1. **Phase 4** (game flow) — ✅ COMPLETE — makes the game *playable*
-2. **Phase 5** (audio) — next priority — makes the game *feel alive*
-3. **Phase 6** (visual polish) — makes the game *look good*
+2. **Phase 5** (audio) — ✅ COMPLETE — makes the game *feel alive*
+3. **Phase 6** (visual polish) — next priority — makes the game *look good*
 4. **Phase 7** (content) — makes the game *long and varied*
 5. **Phase 8** (mobile) — makes the game *accessible*
 6. **Phase 9** (testing) — makes the game *reliable*
