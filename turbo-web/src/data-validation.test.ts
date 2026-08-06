@@ -173,8 +173,8 @@ describe('Data Validation — ZONES', () => {
 });
 
 describe('Data Validation — ITEMS', () => {
-  it('has exactly 8 items', () => {
-    expect(Object.keys(ITEMS)).toHaveLength(8);
+  it('has exactly 20 items', () => {
+    expect(Object.keys(ITEMS)).toHaveLength(20);
   });
 
   it('every item has required fields', () => {
@@ -213,8 +213,8 @@ describe('Data Validation — ITEMS', () => {
 });
 
 describe('Data Validation — THREATS', () => {
-  it('has exactly 5 threats', () => {
-    expect(Object.keys(THREATS)).toHaveLength(5);
+  it('has exactly 12 threats', () => {
+    expect(Object.keys(THREATS)).toHaveLength(12);
   });
 
   it('has all required threat types', () => {

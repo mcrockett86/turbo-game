@@ -108,6 +108,70 @@ export const COMPANIONS: Record<string, Companion> = {
     met: false,
     active: false,
   },
+  shelter_dog: {
+    id: 'shelter_dog',
+    name: 'Rex',
+    breed: 'Mixed Breed',
+    trait: '🗺️ Navigator',
+    dialogue: [
+      'I was here a long time ago. I remember the way out.',
+      'The kennels... they\'re not so bad if you find a friend.',
+      'There\'s a side gate. The guard leaves it unlatched sometimes.',
+      'Follow the scent posts — they lead somewhere!',
+    ],
+    color: '#5a4a3a',
+    accentColor: '#8a7a5a',
+    met: false,
+    active: false,
+  },
+  park_stray: {
+    id: 'park_stray',
+    name: 'Luna',
+    breed: 'Border Collie',
+    trait: '🧠 Smart',
+    dialogue: [
+      'I can help you find your way. I\'ve been watching things.',
+      'The apartment building has a back entrance. Watch for the cat.',
+      'I\'ve seen dogs go that way. They came back... mostly okay.',
+      'The neighborhood is close. I can feel it in my paws.',
+    ],
+    color: '#3a3a3a',
+    accentColor: '#ffffff',
+    met: false,
+    active: false,
+  },
+  neighborhood_dog: {
+    id: 'neighborhood_dog',
+    name: 'Max',
+    breed: 'Labrador Retriever',
+    trait: '🦴 Finder',
+    dialogue: [
+      'I live nearby! Well, I lived nearby. Now I visit.',
+      'This is my old neighborhood. I know every squirrel.',
+      'The house with the golden gate? That\'s the one!',
+      'My human used to bring me here. It was the best.',
+    ],
+    color: '#B8860B',
+    accentColor: '#DAA520',
+    met: false,
+    active: false,
+  },
+  alley_cat_friendly: {
+    id: 'alley_cat_friendly',
+    name: 'Whiskers',
+    breed: 'Cat',
+    trait: '👁️ Watcher',
+    dialogue: [
+      'Dogs. Always dogs. But... you seem nice.',
+      'I\'ve seen things from the rooftops. Things you couldn\'t imagine.',
+      'The shelter has a back exit. But the cat guard is fierce.',
+      'If you want to find home, follow the smells. Cats don\'t forget.',
+    ],
+    color: '#6a6a6a',
+    accentColor: '#9a9a9a',
+    met: false,
+    active: false,
+  },
 };
 
 // ===== ZONES =====
@@ -124,6 +188,8 @@ export const ZONES: Record<string, Zone> = {
       { id: 'intersection', name: 'Street Intersection', w: 200, h: 150, d: 200, color: '#7a7a7a', exits: ['street_north', 'street_south', 'alley'], features: [{type:'choice', x:100, y:75, w:60, h:40, label:'Choose path'}] },
       { id: 'street_south', name: 'South Avenue', w: 350, h: 120, d: 300, color: '#6a6a6a', exits: ['intersection', 'apt_gate'], features: [{type:'door', x:175, y:60, w:40, h:50, label:'🚪 Door', locked:true, item:'key'}]},
       { id: 'alley', name: 'Back Alley', w: 180, h: 100, d: 300, color: '#3a3a4a', exits: ['intersection', 'shelter_entrance'], features: [{type:'cat', x:90, y:50, w:40, h:30, label:'🐱 Mean Cat'}] },
+      { id: 'side_street', name: 'Side Street', w: 200, h: 100, d: 250, color: '#5a5a6a', exits: ['street_north', 'backyard'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'🐾 Scent Mark', item:'map_fragment'}] },
+      { id: 'backyard', name: 'Backyard', w: 150, h: 100, d: 200, color: '#4a6a3a', exits: ['side_street'], features: [{type:'food', x:75, y:50, w:40, h:30, label:'🍖 Treat', item:'treat'}] },
       { id: 'dog_park_gate', name: 'Dog Park Gate', w: 100, h: 80, d: 100, color: '#5a9a5a', exits: ['street_east'], isEntrance: true, entranceZone: 'dog_park' },
       { id: 'shelter_entrance', name: 'Shelter Door', w: 120, h: 100, d: 120, color: '#4a4a6a', exits: ['alley'], isEntrance: true, entranceZone: 'shelter' },
       { id: 'apt_gate', name: 'Apartment Gate', w: 100, h: 80, d: 100, color: '#7a6a5a', exits: ['street_south'], isEntrance: true, entranceZone: 'apartment' }
@@ -196,8 +262,10 @@ export const ZONES: Record<string, Zone> = {
     rooms: [
       { id: 'apt_entrance', name: 'Entryway', w: 120, h: 80, d: 150, color: '#8a7a6a', exits: ['apt_living', 'apt_kitchen'], isEntrance: true, entranceZone: 'suburban_streets' },
       { id: 'apt_living', name: 'Living Room', w: 200, h: 100, d: 180, color: '#7a6a5a', exits: ['apt_entrance', 'apt_bedroom'], features: [{type:'tv', x:100, y:50, w:60, h:40, label:'📺 TV (barks back)'}] },
-      { id: 'apt_kitchen', name: 'Kitchen', w: 150, h: 90, d: 120, color: '#9a8a7a', exits: ['apt_entrance'], features: [{type:'food', x:75, y:45, w:40, h:30, label:'🍖 Food', item:'treat'}] },
-      { id: 'apt_bedroom', name: 'Bedroom', w: 160, h: 90, d: 140, color: '#6a5a7a', exits: ['apt_living'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🧸 Toy', item:'toy'}] }
+      { id: 'apt_kitchen', name: 'Kitchen', w: 150, h: 90, d: 120, color: '#9a8a7a', exits: ['apt_entrance', 'apt_bathroom'], features: [{type:'food', x:75, y:45, w:40, h:30, label:'🍖 Food', item:'treat'}] },
+      { id: 'apt_bedroom', name: 'Bedroom', w: 160, h: 90, d: 140, color: '#6a5a7a', exits: ['apt_living', 'apt_bathroom'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🧸 Toy', item:'toy'}] },
+      { id: 'apt_bathroom', name: 'Bathroom', w: 100, h: 80, d: 100, color: '#8a8a9a', exits: ['apt_kitchen', 'apt_bedroom'], features: [{type:'water_bowl', x:50, y:40, w:30, h:30, label:'💧 Water Bowl'}] },
+      { id: 'apt_balcony', name: 'Balcony', w: 120, h: 70, d: 80, color: '#5a7a5a', exits: ['apt_living'], features: [{type:'hint', x:60, y:35, w:40, h:30, label:'🌳 View', item:'tree_clue'}] }
     ],
     music: 'apartment',
     hint: 'Under the bed: a red ball. You remember throwing this. Someone threw this. For YOU.'
@@ -208,11 +276,13 @@ export const ZONES: Record<string, Zone> = {
     desc: 'Cages, sounds, and hope. Maybe some dogs here know the way home.',
     type: 'fp',
     rooms: [
-      { id: 'shelter_lobby', name: 'Lobby', w: 200, h: 100, d: 150, color: '#8a8a9a', exits: ['shelter_kennels', 'shelter_office', 'shelter_exit'] },
+      { id: 'shelter_lobby', name: 'Lobby', w: 200, h: 100, d: 150, color: '#8a8a9a', exits: ['shelter_kennels', 'shelter_office', 'shelter_exit', 'shelter_garden'] },
       { id: 'shelter_exit', name: 'Exit Door', w: 80, h: 60, d: 80, color: '#6a6a7a', exits: ['shelter_lobby', 'shelter_to_neighborhood'] },
       { id: 'shelter_to_neighborhood', name: 'Side Gate', w: 60, h: 50, d: 60, color: '#5a5a6a', exits: ['shelter_lobby'] },
       { id: 'shelter_kennels', name: 'Kennels', w: 300, h: 120, d: 200, color: '#7a7a8a', exits: ['shelter_lobby'], features: [{type:'dog_friend', x:150, y:60, w:50, h:40, label:'🐕 New Friend', item:'friend'}] },
-      { id: 'shelter_office', name: 'Office', w: 120, h: 80, d: 100, color: '#6a6a7a', exits: ['shelter_lobby'], features: [{type:'hint', x:60, y:40, w:40, h:30, label:'📋 Poster', item:'map_fragment'}] }
+      { id: 'shelter_office', name: 'Office', w: 120, h: 80, d: 100, color: '#6a6a7a', exits: ['shelter_lobby'], features: [{type:'hint', x:60, y:40, w:40, h:30, label:'📋 Poster', item:'map_fragment'}] },
+      { id: 'shelter_garden', name: 'Garden', w: 150, h: 100, d: 120, color: '#4a7a3a', exits: ['shelter_lobby'], features: [{type:'food', x:75, y:50, w:40, h:30, label:'🍖 Treat', item:'treat'}] },
+      { id: 'shelter_vet', name: 'Vet Room', w: 100, h: 80, d: 100, color: '#9a9aaa', exits: ['shelter_lobby'], features: [{type:'hint', x:50, y:40, w:40, h:30, label:'📋 Medical Record', item:'collar'}] }
     ],
     music: 'shelter',
     hint: 'A poster shows a lost dog. It looks... familiar. But it could be anyone.'
@@ -224,10 +294,12 @@ export const ZONES: Record<string, Zone> = {
     type: 'fp',
     rooms: [
       { id: 'neighborhood_entrance', name: 'Side Gate', w: 80, h: 60, d: 80, color: '#5a5a5a', exits: ['neighborhood_start'], isEntrance: true, entranceZone: 'shelter' },
-      { id: 'neighborhood_start', name: 'Street Corner', w: 250, h: 120, d: 200, color: '#5a8a5a', exits: ['neighborhood_main', 'neighborhood_park', 'neighborhood_entrance'] },
-      { id: 'neighborhood_main', name: 'Main Street', w: 350, h: 140, d: 300, color: '#6a6a6a', exits: ['neighborhood_start', 'neighborhood_home'], features: [{type:'person', x:175, y:70, w:40, h:60, label:'👤 "Have you seen a dog like him?"'}] },
+      { id: 'neighborhood_start', name: 'Street Corner', w: 250, h: 120, d: 200, color: '#5a8a5a', exits: ['neighborhood_main', 'neighborhood_park', 'neighborhood_entrance', 'neighborhood_library'] },
+      { id: 'neighborhood_main', name: 'Main Street', w: 350, h: 140, d: 300, color: '#6a6a6a', exits: ['neighborhood_start', 'neighborhood_home', 'neighborhood_market'], features: [{type:'person', x:175, y:70, w:40, h:60, label:'👤 "Have you seen a dog like him?"'}] },
       { id: 'neighborhood_park', name: 'Local Park', w: 200, h: 100, d: 180, color: '#4a7a3a', exits: ['neighborhood_start'], features: [{type:'hint', x:100, y:50, w:60, h:30, label:'🌳 Old Tree', item:'tree_clue'}] },
-      { id: 'neighborhood_home', name: 'The House', w: 180, h: 100, d: 150, color: '#8a7a5a', exits: ['neighborhood_main'], isHome: true, features: [{type:'home', x:90, y:50, w:60, h:60, label:'🏠 Home'}] }
+      { id: 'neighborhood_home', name: 'The House', w: 180, h: 100, d: 150, color: '#8a7a5a', exits: ['neighborhood_main'], isHome: true, features: [{type:'home', x:90, y:50, w:60, h:60, label:'🏠 Home'}] },
+      { id: 'neighborhood_library', name: 'Library', w: 140, h: 90, d: 120, color: '#7a6a5a', exits: ['neighborhood_start'], features: [{type:'hint', x:70, y:45, w:50, h:30, label:'📚 Lost Dog Poster', item:'photo'}] },
+      { id: 'neighborhood_market', name: 'Market', w: 200, h: 110, d: 160, color: '#8a7a4a', exits: ['neighborhood_main'], features: [{type:'food', x:100, y:55, w:50, h:30, label:'🍖 Food Stand', item:'treat'}] }
     ],
     music: 'home',
     hint: 'The gate. It\'s the same gate. You remember this one. This is it.'
@@ -256,7 +328,19 @@ export const ITEMS = {
   map_fragment: { name: '📋 Map Fragment', desc: 'Part of a map. Shows a street.' },
   tree_clue: { name: '🌳 Tree Clue', desc: 'A tree you remember. Marked with a scratch.' },
   friend: { name: '🐕 Friend', desc: 'A new companion!' },
-  food: { name: '🍎 Food', desc: 'A snack for the road.' }
+  food: { name: '🍎 Food', desc: 'A snack for the road.' },
+  collar_piece: { name: '📿 Collar Piece', desc: 'A piece of your collar. You recognize this.' },
+  leash: { name: '🔗 Leash', desc: 'A red leash. Your human used this.' },
+  collar: { name: '🎀 Collar', desc: 'Your collar! You remember wearing this.' },
+  medal: { name: '🏅 Medal', desc: 'A dog show medal. You won this once.' },
+  bone_necklace: { name: '🦴 Bone Necklace', desc: 'A necklace made of bones. Creepy but familiar.' },
+  photo: { name: '📸 Photo', desc: 'A photo of you and your human. You miss them.' },
+  blanket: { name: '🧶 Blanket', desc: 'A piece of your favorite blanket. Smells like home.' },
+  water_bottle: { name: '💧 Water Bottle', desc: 'Half-full water. Perfect for a hot day.' },
+  squirrel_dog: { name: '🐿️ Squirrel Toy', desc: 'A toy squirrel. You love this one.' },
+  tennis_ball: { name: '🎾 Tennis Ball', desc: 'A slobbery tennis ball. Classic.' },
+  dog_tag: { name: '🏷️ Dog Tag', desc: 'Your dog tag with your name on it.' },
+  treat_bag: { name: '🥡 Treat Bag', desc: 'An open bag of treats. Jackpot!' }
 };
 
 // ===== THREATS =====
@@ -304,6 +388,69 @@ export const THREATS: Record<string, Threat> = {
     description: 'The dreaded vacuum cleaner! Hide!',
     solve: 'Stay still when it approaches, move when safe',
     mangaText: 'VRRRRR!',
+    mangaType: 'scare'
+  },
+  mailman: {
+    name: 'Mail Carrier',
+    icon: '📬',
+    type: 'timing',
+    description: 'The mail carrier is coming! They might have something for you.',
+    solve: 'Press SPACE to intercept the mail package',
+    mangaText: 'THUMP!',
+    mangaType: 'near-miss'
+  },
+  garden_hose: {
+    name: 'Garden Hose',
+    icon: '🚿',
+    type: 'sneak',
+    description: 'A sprinkler is spraying everywhere! Stay dry!',
+    solve: 'Move to the dry zone when the sprinkler is away',
+    mangaText: 'SPRINKLE!',
+    mangaType: 'scare'
+  },
+  construction: {
+    name: 'Construction Crew',
+    icon: '🚧',
+    type: 'timing',
+    description: 'Heavy machinery is working! Watch for the crane!',
+    solve: 'Press SPACE when the crane arm is clear',
+    mangaText: 'CLANG!',
+    mangaType: 'near-miss'
+  },
+  ice_cream_truck: {
+    name: 'Ice Cream Truck',
+    icon: '🍦',
+    type: 'comfort',
+    description: 'The ice cream truck is here! But can you reach it?',
+    solve: 'Follow the music and catch the truck before it leaves',
+    mangaText: 'DOOOOONG!',
+    mangaType: 'scare'
+  },
+  squirrel: {
+    name: 'Squirrel',
+    icon: '🐿️',
+    type: 'sneak',
+    description: 'A squirrel is taunting you from a tree!',
+    solve: 'Stay still and wait for the right moment to pounce',
+    mangaText: 'SQUEAK!',
+    mangaType: 'near-miss'
+  },
+  neighbor_dog: {
+    name: 'Neighbor Dog',
+    icon: '🐕',
+    type: 'combat',
+    description: 'A friendly dog wants to play! But how to respond?',
+    solve: 'Press SPACE to bark back or wag tail',
+    mangaText: 'WOOF!',
+    mangaType: 'fight'
+  },
+  storm_sewer: {
+    name: 'Storm Drain',
+    icon: '🕳️',
+    type: 'timing',
+    description: 'Rain is filling the storm drain! Your toy might be down there!',
+    solve: 'Press SPACE to grab the toy before it washes away',
+    mangaText: 'WHOOSH!',
     mangaType: 'scare'
   }
 };

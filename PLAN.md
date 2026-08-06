@@ -33,7 +33,7 @@
 | 4.2 | Dialogue system | ✅ DONE | Typewriter, personality lines |
 | 4.3 | Visual effects | ✅ DONE | Particles, screen shake, lighting |
 | 4.4 | Endgame (win/lose) | ✅ DONE | Celebration, found by shelter, restart |
-| 5.1 | Unit testing framework | ✅ DONE | vitest + jsdom, 7 test files, 187 tests passing |
+| 5.1 | Unit testing framework | ✅ DONE | vitest + jsdom, 8 test files, 298 tests passing |
 | 0.1 | HUD wiring | ✅ DONE | HUDRenderer auto-synced from State | 
 | 0.2 | Dialogue wiring | ✅ DONE | DialogueRenderer with typewriter + SPACE advance |
 | 0.3 | Inventory panel | ✅ DONE | InventoryRenderer canvas overlay |
@@ -48,6 +48,19 @@
 
 > All 7 test files written, 187 tests passing.
 >
+
+## ✅ Integration Tests — Phase 0 Wiring Verified
+
+> 91 integration tests covering all Phase 0 wiring tasks (0.1–0.9).
+> All tests pass, validating the engine-to-main.ts wiring contracts.
+>
+> **Fixes applied during verification:**
+> - #1: `simulateHUDSync` passes `activeCompanion` ID (not name) — aligned test expectation
+> - #2-3: `wrapText` splits on spaces not newlines — used text long enough to wrap
+> - #4-6,8: jsdom `getContext('2d')` returns null — mocked `HTMLCanvasElement.prototype.getContext` globally
+> - #7: `onThreatUpdate` fires in render loop not synchronously — manually ticked update
+> - #9-10: Method is `render()` not `draw()` — renamed test calls
+> - #11: Event emit missing `newHappiness` field — added to test event payload
 > | Test File | Tests | Coverage |
 > |-----------|-------|----------|
 > | `state.test.ts` | 49 | State transitions, pub/sub, persistence, happiness bounds |
@@ -57,6 +70,7 @@
 > | `threats.test.ts` | 23 | Start/stop, combat/storm/vacuum mini-games, resolution |
 > | `endgame.test.ts` | 17 | State transitions, score data, callbacks, resize |
 > | `data-validation.test.ts` | 35 | DOGS/ZONES/ITEMS/THREATS integrity, config validation |
+> | `main-integration.test.ts` | 91 | Phase 0 wiring: HUD, dialogue, inventory, companion, hint, threat, manga, effects, endgame |
 >
 > **Framework:** vitest + jsdom (native Vite integration, zero config)
 >
@@ -610,7 +624,7 @@ Build compiles, 207/207 tests pass.
 | 6.5 | **Lighting/atmosphere** — time-of-day, fog density, colored ambient, hemisphere light | `engine/render/fp-renderer.ts`, `engine/render/tp-renderer.ts` | Zones feel distinct | ✅ DONE |
 | 6.6 | **UI polish** — panel glow, hover feedback, smooth panel transitions, mute button glow | `engine/hud.ts` | UI feels professional | ✅ DONE |
 
-### Phase 7: Content & Balance
+### Phase 7: Content & Balance (IN_PROGRESS)
 
 **Goal:** Fill out the game world and tune the experience.
 
