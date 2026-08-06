@@ -51,8 +51,8 @@
 
 ## ✅ Integration Tests — Phase 0 Wiring Verified
 
-> 91 integration tests covering all Phase 0 wiring tasks (0.1–0.9).
-> All tests pass, validating the engine-to-main.ts wiring contracts.
+> 91 integration tests + 59 playthrough tests covering all Phase 0 wiring tasks (0.1–0.9) and complete game flows.
+> All 357 tests pass, validating the engine-to-main.ts wiring contracts and end-to-end playability.
 >
 > **Fixes applied during verification:**
 > - #1: `simulateHUDSync` passes `activeCompanion` ID (not name) — aligned test expectation
@@ -418,7 +418,7 @@ All 17 components fully implemented + Phase 0 wiring + Phase 4 game flow + Phase
 > - `turbo-web/src/engine/companions.ts` — Added `CompanionRenderer` class (~150 lines)
 > - `turbo-web/index.html` — Removed duplicate canvas elements
 >
-> ### Test Results: 187/187 passing ✅
+> ### Test Results: 357/357 passing ✅
 
 ## Unit Testing — Framework Investigation
 
@@ -653,13 +653,13 @@ Build compiles, 207/207 tests pass.
 
 **Goal:** Ensure reliability before release.
 
-| # | Task | Files | Impact |
-|---|------|-------|--------|
-| 9.1 | **Integration tests** — write tests for game flow (select dog → enter zone → collect item → resolve threat → win) | `src/**/*.test.ts` | Catch regressions |
-| 9.2 | **Data integrity** — expand data-validation tests (all exits valid, all items exist, no dead ends) | `src/data-validation.test.ts` | Catch broken references |
-| 9.3 | **Performance profiling** — measure frame time, memory, load time | `vite.config.ts`, Chrome DevTools | Identify bottlenecks |
-| 9.4 | **Build optimization** — tree-shake, code-split, lazy-load Three.js | `vite.config.ts` | Smaller bundle, faster load |
-| 9.5 | **Browser compatibility** — test on Chrome, Firefox, Safari, Edge | Manual | No browser-specific bugs |
+| # | Task | Files | Impact | Status |
+|---|------|-------|--------|--------|
+| 9.1 | **Integration tests** — write tests for game flow (select dog → enter zone → collect item → resolve threat → win) | `src/**/*.test.ts` | Catch regressions | ✅ DONE — 59 playthrough tests |
+| 9.2 | **Data integrity** — expand data-validation tests (all exits valid, all items exist, no dead ends) | `src/data-validation.test.ts` | Catch broken references | ✅ DONE |
+| 9.3 | **Performance profiling** — measure frame time, memory, load time | `vite.config.ts`, Chrome DevTools | Identify bottlenecks | TODO |
+| 9.4 | **Build optimization** — tree-shake, code-split, lazy-load Three.js | `vite.config.ts` | Smaller bundle, faster load | TODO |
+| 9.5 | **Browser compatibility** — test on Chrome, Firefox, Safari, Edge | Manual | No browser-specific bugs | TODO |
 
 ### Phase 10: Deployment
 
@@ -697,7 +697,7 @@ Build compiles, 207/207 tests pass.
 | 9 | Low | Quality assurance |
 | 10 | Low | Live deployment |
 
-### Current Test Status
+### Current Test Status (updated 2026-08-06)
 
 | Test File | Tests | Status |
 |-----------|-------|--------|
@@ -708,4 +708,6 @@ Build compiles, 207/207 tests pass.
 | `hints.test.ts` | 20 | ✅ |
 | `endgame.test.ts` | 17 | ✅ |
 | `data-validation.test.ts` | 35 | ✅ |
-| **Total** | **207** | **All passing** |
+| `main-integration.test.ts` | 91 | ✅ |
+| `playthrough.test.ts` | 59 | ✅ |
+| **Total** | **357** | **All passing** |
