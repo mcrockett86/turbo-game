@@ -697,6 +697,7 @@ export class FpRoomRenderer {
   // ---- Animation Loop ----
 
   private animate(): void {
+    console.log('[FP] animate called');
     this.animationId = requestAnimationFrame(() => this.animate());
 
     const now = performance.now();
