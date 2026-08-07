@@ -355,7 +355,7 @@ describe('Playthrough 2 — Full Exploration (all zones, items, companions)', ()
   });
 
   it('verifies all zone room counts', () => {
-    expect(ZONES.suburban_streets.rooms).toHaveLength(11);
+    expect(ZONES.suburban_streets.rooms).toHaveLength(30);
     expect(ZONES.apartment.rooms).toHaveLength(6);
     expect(ZONES.shelter.rooms).toHaveLength(7);
     expect(ZONES.neighborhood.rooms).toHaveLength(7);
@@ -457,8 +457,8 @@ describe('Playthrough 3 — Threat Gauntlet (all threat types)', () => {
     expect(State.state.happiness).toBe(initial - 15); // happinessThreatFail
   });
 
-  it('tracks all 12 threat types from data.ts', () => {
-    expect(Object.keys(ZONES)).toHaveLength(6);
+  it('tracks all 40 threat types from data.ts', () => {
+    expect(Object.keys(ZONES)).toHaveLength(18);
     // Verify THREATS has 12 entries
     const threatData = {
       traffic: { name: 'Traffic', icon: '🚗', type: 'timing', description: '', solve: '', mangaText: '', mangaType: '' },
@@ -650,9 +650,9 @@ describe('Playthrough 7 — Route Progression (hints unlock route)', () => {
 
   it('all zone hints are accessible', () => {
     const zoneHints = Object.values(ZONES).map(z => z.hint);
-    expect(zoneHints.length).toBe(6);
+    expect(zoneHints.length).toBe(18);
     // Each zone has a unique hint
-    expect(new Set(zoneHints).size).toBe(6);
+    expect(new Set(zoneHints).size).toBe(18);
   });
 });
 
@@ -806,7 +806,7 @@ describe('Playthrough 11 — Zone Navigation (room connectivity)', () => {
 
   it('suburban_streets has interconnected rooms', () => {
     const zone = ZONES.suburban_streets;
-    expect(zone.rooms.length).toBe(11);
+    expect(zone.rooms.length).toBe(30);
 
     // Verify exit connectivity
     const roomMap = new Map(zone.rooms.map(r => [r.id, r]));
@@ -826,7 +826,7 @@ describe('Playthrough 11 — Zone Navigation (room connectivity)', () => {
 
   it('all zones have unique names', () => {
     const names = Object.values(ZONES).map(z => z.name);
-    expect(new Set(names).size).toBe(6);
+    expect(new Set(names).size).toBe(18);
   });
 
   it('all zones have descriptions', () => {
@@ -847,9 +847,9 @@ describe('Playthrough 11 — Zone Navigation (room connectivity)', () => {
 describe('Playthrough 12 — Item Collection (all items accessible)', () => {
   beforeEach(resetState);
 
-  it('all 20 items from data.ts can be collected (in batches)', () => {
+  it('all 69 items from data.ts can be collected (in batches)', () => {
     const itemIds = Object.keys(ITEMS);
-    expect(itemIds.length).toBe(20);
+    expect(itemIds.length).toBe(69);
 
     // Collect first 16 items (fills all inventory slots)
     for (let i = 0; i < 16; i++) {
@@ -902,9 +902,9 @@ describe('Playthrough 13 — Companion Activation (bonus system)', () => {
     expect(State.state.activeCompanion).toBeNull();
   });
 
-  it('all 5 companions are defined', () => {
+  it('all 15 companions are defined', () => {
     const companionIds = Object.keys(COMPANIONS);
-    expect(companionIds).toHaveLength(5);
+    expect(companionIds).toHaveLength(15);
 
     for (const id of companionIds) {
       const c = COMPANIONS[id as keyof typeof COMPANIONS];
@@ -926,9 +926,9 @@ describe('Playthrough 14 — Difficulty Scaling', () => {
   it('easy mode has lower happiness decay', () => {
     State.setDifficulty('easy');
     const config = State.getDifficultyConfig();
-    expect(config.happinessDecayPerSecond).toBe(0.03);
-    expect(config.happinessDecayPerRoom).toBe(1);
-    expect(config.threatSpeedMultiplier).toBe(0.8);
+    expect(config.happinessDecayPerSecond).toBe(0.02);
+    expect(config.happinessDecayPerRoom).toBe(0.5);
+    expect(config.threatSpeedMultiplier).toBe(0.7);
   });
 
   it('normal mode has default values', () => {
@@ -944,7 +944,7 @@ describe('Playthrough 14 — Difficulty Scaling', () => {
     const config = State.getDifficultyConfig();
     expect(config.happinessDecayPerSecond).toBe(0.08);
     expect(config.happinessDecayPerRoom).toBe(3);
-    expect(config.threatSpeedMultiplier).toBe(1.3);
+    expect(config.threatSpeedMultiplier).toBe(1.2);
     expect(config.companionHelpChance).toBe(0.1);
   });
 
@@ -952,13 +952,13 @@ describe('Playthrough 14 — Difficulty Scaling', () => {
     expect(State.getDogTraitModifier()).toBe(1); // no dog selected
 
     State.selectDog('turbo', DOGS.turbo);
-    expect(State.getDogTraitModifier()).toBe(1.2); // Speed
+    expect(State.getDogTraitModifier()).toBe(1.25); // Speed
 
     State.selectDog('watson', DOGS.watson);
-    expect(State.getDogTraitModifier()).toBe(1.15); // Brave
+    expect(State.getDogTraitModifier()).toBe(1.2); // Brave
 
     State.selectDog('walter', DOGS.walter);
-    expect(State.getDogTraitModifier()).toBe(1.25); // Sniff
+    expect(State.getDogTraitModifier()).toBe(1.3); // Sniff
   });
 });
 
@@ -1126,7 +1126,7 @@ describe('Playthrough 17 — Configuration Verification', () => {
   it('has all 5 dog traits in DOG_TRAIT_MODIFIERS', () => {
     const traits = ['🏃 Speed', '🛡️ Brave', '😊 Happiness', '👃 Sniff', '🎒 Compact'];
     for (const trait of traits) {
-      expect(trait in { '🏃 Speed': 1.2, '🛡️ Brave': 1.15, '😊 Happiness': 1.1, '👃 Sniff': 1.25, '🎒 Compact': 1.05 }).toBe(true);
+      expect(trait in { '🏃 Speed': 1.25, '🛡️ Brave': 1.2, '😊 Happiness': 1.15, '👃 Sniff': 1.3, '🎒 Compact': 1.1 }).toBe(true);
     }
   });
 });

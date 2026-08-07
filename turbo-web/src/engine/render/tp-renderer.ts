@@ -1042,6 +1042,52 @@ export class TpEngine {
         markerGroup.add(pathMesh);
         break;
       }
+      case 'return_gate': {
+        // Exit gate — white arch with pulsing glow
+        const gatePostGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8);
+        const gateMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const leftPost = new THREE.Mesh(gatePostGeo, gateMat);
+        leftPost.position.set(-0.3, 0.6, 0);
+        markerGroup.add(leftPost);
+        const rightPost = new THREE.Mesh(gatePostGeo, gateMat);
+        rightPost.position.set(0.3, 0.6, 0);
+        markerGroup.add(rightPost);
+        const archGeo = new THREE.TorusGeometry(0.3, 0.05, 8, 16, Math.PI);
+        const archMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffaa, emissiveIntensity: 0.3 });
+        const arch = new THREE.Mesh(archGeo, archMat);
+        arch.position.y = 1.2;
+        markerGroup.add(arch);
+        // Ground marker
+        const groundGeo = new THREE.CircleGeometry(0.5, 16);
+        const groundMat = new THREE.MeshBasicMaterial({ color: 0xffffcc, transparent: true, opacity: 0.4 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0.01;
+        markerGroup.add(ground);
+        markerGroup.userData.glowMat = archMat;
+        break;
+      }
+      case 'cave_entrance': {
+        // Cave entrance — dark archway
+        const caveMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.9 });
+        const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.5, 0.5), caveMat);
+        leftWall.position.set(-0.5, 0.75, 0);
+        markerGroup.add(leftWall);
+        const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.5, 0.5), caveMat);
+        rightWall.position.set(0.5, 0.75, 0);
+        markerGroup.add(rightWall);
+        const topRock = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.4, 0.6), caveMat);
+        topRock.position.set(0, 1.6, 0);
+        markerGroup.add(topRock);
+        // Inner glow
+        const glowGeo = new THREE.PlaneGeometry(0.6, 1.0);
+        const glowMat = new THREE.MeshBasicMaterial({ color: 0x4a9eff, transparent: true, opacity: 0.2, side: THREE.DoubleSide });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        glow.position.set(0, 0.8, 0.26);
+        markerGroup.add(glow);
+        markerGroup.userData.glowMat = glowMat;
+        break;
+      }
       default:
         // Generic marker
         const geo = new THREE.BoxGeometry(0.3, 0.3, 0.3);

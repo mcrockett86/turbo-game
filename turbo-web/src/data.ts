@@ -353,7 +353,27 @@ export const ZONES: Record<string, Zone> = {
       { id: 'backyard', name: 'Backyard', w: 150, h: 100, d: 200, color: '#4a6a3a', exits: ['side_street'], features: [{type:'food', x:75, y:50, w:40, h:30, label:'🍖 Treat', item:'treat'}] },
       { id: 'dog_park_gate', name: 'Dog Park Gate', w: 100, h: 80, d: 100, color: '#5a9a5a', exits: ['street_east'], isEntrance: true, entranceZone: 'dog_park' },
       { id: 'shelter_entrance', name: 'Shelter Door', w: 120, h: 100, d: 120, color: '#4a4a6a', exits: ['alley'], isEntrance: true, entranceZone: 'shelter' },
-      { id: 'apt_gate', name: 'Apartment Gate', w: 100, h: 80, d: 100, color: '#7a6a5a', exits: ['street_south'], isEntrance: true, entranceZone: 'apartment' }
+      { id: 'apt_gate', name: 'Apartment Gate', w: 100, h: 80, d: 100, color: '#7a6a5a', exits: ['street_south'], isEntrance: true, entranceZone: 'apartment' },
+      // New zone exits
+      { id: 'pet_store_road', name: 'Pet Store Road', w: 200, h: 100, d: 250, color: '#5a5a6a', exits: ['street_north', 'pet_store_gate'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'🐾 Scent', item:'pet_shop_ticket'}] },
+      { id: 'pet_store_gate', name: 'Pet Store Gate', w: 100, h: 80, d: 100, color: '#FFB6C1', exits: ['pet_store_road'], isEntrance: true, entranceZone: 'pet_store' },
+      { id: 'garden_gate', name: 'Garden Gate', w: 100, h: 80, d: 100, color: '#FFB6C1', exits: ['side_street'], isEntrance: true, entranceZone: 'garden' },
+      { id: 'library_gate', name: 'Library Gate', w: 100, h: 80, d: 100, color: '#D2B48C', exits: ['side_street'], isEntrance: true, entranceZone: 'library' },
+      { id: 'market_gate', name: 'Market Gate', w: 100, h: 80, d: 100, color: '#FFD700', exits: ['street_south'], isEntrance: true, entranceZone: 'market' },
+      { id: 'north_road', name: 'North Road', w: 250, h: 120, d: 300, color: '#6a6a6a', exits: ['street_north', 'dog_show_gate', 'lake_road'] },
+      { id: 'dog_show_gate', name: 'Dog Show Gate', w: 100, h: 80, d: 100, color: '#8B4513', exits: ['north_road'], isEntrance: true, entranceZone: 'dog_show' },
+      { id: 'lake_road', name: 'Lake Road', w: 200, h: 100, d: 250, color: '#4a9eff', exits: ['north_road', 'lake_entrance'] },
+      { id: 'lake_entrance', name: 'Lake Shore', w: 100, h: 80, d: 100, color: '#006994', exits: ['lake_road'], isEntrance: true, entranceZone: 'lake' },
+      { id: 'forest_path', name: 'Forest Path', w: 200, h: 100, d: 250, color: '#1a3a0a', exits: ['lake_road', 'forest_gate'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'🌲 Trail Mark', item:'pinecone'}] },
+      { id: 'forest_gate', name: 'Forest Gate', w: 100, h: 80, d: 100, color: '#2d5a1e', exits: ['forest_path'], isEntrance: true, entranceZone: 'forest' },
+      { id: 'south_coast', name: 'South Coast', w: 250, h: 120, d: 300, color: '#87CEEB', exits: ['street_south', 'beach_gate', 'mountain_path'] },
+      { id: 'beach_gate', name: 'Beach Gate', w: 100, h: 80, d: 100, color: '#F4A460', exits: ['south_coast'], isEntrance: true, entranceZone: 'beach' },
+      { id: 'mountain_path', name: 'Mountain Path', w: 200, h: 100, d: 250, color: '#708090', exits: ['south_coast', 'mountain_gate'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'🗺️ Trail', item:'compass_fragment'}] },
+      { id: 'mountain_gate', name: 'Mountain Gate', w: 100, h: 80, d: 100, color: '#4682B4', exits: ['mountain_path'], isEntrance: true, entranceZone: 'mountain' },
+      { id: 'waterfall_road', name: 'Waterfall Road', w: 200, h: 100, d: 250, color: '#2d5a1e', exits: ['forest_path', 'waterfall_gate'], features: [{type:'hint', x:100, y:50, w:30, h:30, label:'💧 Splash', item:'lake_stone'}] },
+      { id: 'waterfall_gate', name: 'Waterfall Gate', w: 100, h: 80, d: 100, color: '#006994', exits: ['waterfall_road'], isEntrance: true, entranceZone: 'waterfall' },
+      { id: 'secret_park_road', name: 'Secret Park Road', w: 200, h: 100, d: 250, color: '#191970', exits: ['forest_path', 'park_secret_gate'] },
+      { id: 'park_secret_gate', name: 'Secret Park Gate', w: 100, h: 80, d: 100, color: '#4a4a4a', exits: ['secret_park_road'], isEntrance: true, entranceZone: 'park_secret' }
     ],
     music: 'suburban',
     hint: 'You see a squirrel. It reminds you of... something. A yard? With squirrels?'
@@ -412,7 +432,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'fire_hydrant', x: -5, z: -2, id: 'fire_hydrant', label: '🚒 Fire Hydrant' },
       { type: 'scent_post', x: 0, z: 7, id: 'scent_post', label: '🐾 Scent Post' },
       { type: 'treasure', x: -7, z: 5, id: 'treasure_1', label: '✨ Scent Clue' },
+      { type: 'return_gate', x: 0, z: -8, id: 'park_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'A big dog says "Home is where the fence is." Fences are everywhere... but which fence?',
   },
   apartment: {
@@ -429,7 +451,8 @@ export const ZONES: Record<string, Zone> = {
       { id: 'apt_balcony', name: 'Balcony', w: 120, h: 70, d: 80, color: '#5a7a5a', exits: ['apt_living'], features: [{type:'hint', x:60, y:35, w:40, h:30, label:'🌳 View', item:'tree_clue'}] }
     ],
     music: 'apartment',
-    hint: 'Under the bed: a red ball. You remember throwing this. Someone threw this. For YOU.'
+    hint: 'Under the bed: a red ball. You remember throwing this. Someone threw this. For YOU.',
+    returnZone: 'suburban_streets',
   },
   shelter: {
     id: 'shelter',
@@ -439,14 +462,15 @@ export const ZONES: Record<string, Zone> = {
     rooms: [
       { id: 'shelter_lobby', name: 'Lobby', w: 200, h: 100, d: 150, color: '#8a8a9a', exits: ['shelter_kennels', 'shelter_office', 'shelter_exit', 'shelter_garden'] },
       { id: 'shelter_exit', name: 'Exit Door', w: 80, h: 60, d: 80, color: '#6a6a7a', exits: ['shelter_lobby', 'shelter_to_neighborhood'] },
-      { id: 'shelter_to_neighborhood', name: 'Side Gate', w: 60, h: 50, d: 60, color: '#5a5a6a', exits: ['shelter_lobby'] },
+      { id: 'shelter_to_neighborhood', name: 'Side Gate', w: 60, h: 50, d: 60, color: '#5a5a6a', exits: ['shelter_lobby'], isEntrance: true, entranceZone: 'neighborhood' },
       { id: 'shelter_kennels', name: 'Kennels', w: 300, h: 120, d: 200, color: '#7a7a8a', exits: ['shelter_lobby'], features: [{type:'dog_friend', x:150, y:60, w:50, h:40, label:'🐕 New Friend', item:'friend'}] },
       { id: 'shelter_office', name: 'Office', w: 120, h: 80, d: 100, color: '#6a6a7a', exits: ['shelter_lobby'], features: [{type:'hint', x:60, y:40, w:40, h:30, label:'📋 Poster', item:'map_fragment'}] },
       { id: 'shelter_garden', name: 'Garden', w: 150, h: 100, d: 120, color: '#4a7a3a', exits: ['shelter_lobby'], features: [{type:'food', x:75, y:50, w:40, h:30, label:'🍖 Treat', item:'treat'}] },
       { id: 'shelter_vet', name: 'Vet Room', w: 100, h: 80, d: 100, color: '#9a9aaa', exits: ['shelter_lobby'], features: [{type:'hint', x:50, y:40, w:40, h:30, label:'📋 Medical Record', item:'collar'}] }
     ],
     music: 'shelter',
-    hint: 'A poster shows a lost dog. It looks... familiar. But it could be anyone.'
+    hint: 'A poster shows a lost dog. It looks... familiar. But it could be anyone.',
+    returnZone: 'suburban_streets',
   },
   neighborhood: {
     id: 'neighborhood',
@@ -458,12 +482,13 @@ export const ZONES: Record<string, Zone> = {
       { id: 'neighborhood_start', name: 'Street Corner', w: 250, h: 120, d: 200, color: '#5a8a5a', exits: ['neighborhood_main', 'neighborhood_park', 'neighborhood_entrance', 'neighborhood_library'] },
       { id: 'neighborhood_main', name: 'Main Street', w: 350, h: 140, d: 300, color: '#6a6a6a', exits: ['neighborhood_start', 'neighborhood_home', 'neighborhood_market'], features: [{type:'person', x:175, y:70, w:40, h:60, label:'👤 "Have you seen a dog like him?"'}] },
       { id: 'neighborhood_park', name: 'Local Park', w: 200, h: 100, d: 180, color: '#4a7a3a', exits: ['neighborhood_start'], features: [{type:'hint', x:100, y:50, w:60, h:30, label:'🌳 Old Tree', item:'tree_clue'}] },
-      { id: 'neighborhood_home', name: 'The House', w: 180, h: 100, d: 150, color: '#8a7a5a', exits: ['neighborhood_main'], isHome: true, features: [{type:'home', x:90, y:50, w:60, h:60, label:'🏠 Home'}] },
+      { id: 'neighborhood_home', name: 'The House', w: 180, h: 100, d: 150, color: '#8a7a5a', exits: ['neighborhood_main'], isHome: true, isEntrance: true, entranceZone: 'home', features: [{type:'home', x:90, y:50, w:60, h:60, label:'🏠 Home'}] },
       { id: 'neighborhood_library', name: 'Library', w: 140, h: 90, d: 120, color: '#7a6a5a', exits: ['neighborhood_start'], features: [{type:'hint', x:70, y:45, w:50, h:30, label:'📚 Lost Dog Poster', item:'photo'}] },
       { id: 'neighborhood_market', name: 'Market', w: 200, h: 110, d: 160, color: '#8a7a4a', exits: ['neighborhood_main'], features: [{type:'food', x:100, y:55, w:50, h:30, label:'🍖 Food Stand', item:'treat'}] }
     ],
     music: 'home',
-    hint: 'The gate. It\'s the same gate. You remember this one. This is it.'
+    hint: 'The gate. It\'s the same gate. You remember this one. This is it.',
+    returnZone: 'suburban_streets',
   },
   home: {
     id: 'home',
@@ -476,7 +501,8 @@ export const ZONES: Record<string, Zone> = {
       { id: 'home_door', name: 'Front Door', w: 80, h: 100, d: 60, color: '#8a6a3a', exits: ['home_yard'], isHome: true, features: [{type:'home', x:40, y:50, w:60, h:60, label:'🏠 Home'}] }
     ],
     music: 'home',
-    hint: 'You\'re home. You\'re finally home.'
+    hint: 'You\'re home. You\'re finally home.',
+    returnZone: 'suburban_streets',
   },
   // New zones
   lake: {
@@ -518,7 +544,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -6, z: 5, id: 'lake_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 7, z: -6, id: 'lake_treasure', label: '✨ Hidden Treasure' },
       { type: 'bridge', x: 5, z: 3, id: 'wooden_bridge', label: '🌉 Wooden Bridge' },
+      { type: 'return_gate', x: 0, z: -8, id: 'lake_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The water sparkles. You remember swimming here once. With your human.',
   },
   pet_store: {
@@ -577,7 +605,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -8, z: 6, id: 'show_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 9, z: -7, id: 'show_treasure', label: '✨ Trophy Case' },
       { type: 'lure', x: 6, z: 4, id: 'treat_lure', label: '🍖 Treat Lure' },
+      { type: 'return_gate', x: 0, z: -8, id: 'show_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The roar of the crowd excites you. You remember winning here once.',
   },
   forest: {
@@ -620,7 +650,10 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -9, z: 7, id: 'forest_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 8, z: -8, id: 'forest_treasure', label: '✨ Cave Entrance' },
       { type: 'lure', x: 5, z: 6, id: 'forest_lure', label: '🍖 Food Scent' },
+      { type: 'return_gate', x: 0, z: -8, id: 'forest_exit', label: '🚪 Exit to Streets' },
+      { type: 'cave_entrance', x: 10, z: 0, id: 'cave_path', label: '🕳️ Cave Entrance' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The forest smells like home. Your human used to bring you here for walks.',
   },
   beach: {
@@ -661,7 +694,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -7, z: 6, id: 'beach_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 8, z: -7, id: 'beach_treasure', label: '✨ Buried Treasure' },
       { type: 'lure', x: 5, z: 5, id: 'beach_lure', label: '🍖 Fish Scent' },
+      { type: 'return_gate', x: 0, z: -8, id: 'beach_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The sand feels familiar. Your human used to throw the ball here.',
   },
   mountain: {
@@ -702,7 +737,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -8, z: 7, id: 'mountain_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 9, z: -8, id: 'mountain_treasure', label: '✨ Cave Treasure' },
       { type: 'lure', x: 6, z: 6, id: 'mountain_lure', label: '🍖 Food Scent' },
+      { type: 'return_gate', x: 0, z: -8, id: 'mountain_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The mountain air is crisp. Your human used to hike here with you.',
   },
   garden: {
@@ -719,6 +756,7 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'garden',
     hint: 'The roses smell like your human\'s garden. You remember playing here.',
+    returnZone: 'suburban_streets',
   },
   library: {
     id: 'library',
@@ -734,6 +772,7 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'library',
     hint: 'The books smell like home. Your human used to read to you here.',
+    returnZone: 'suburban_streets',
   },
   market: {
     id: 'market',
@@ -749,6 +788,7 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'market',
     hint: 'The smells of the market remind you of days spent shopping with your human.',
+    returnZone: 'suburban_streets',
   },
   cave: {
     id: 'cave',
@@ -763,6 +803,7 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'cave',
     hint: 'The crystals glow with a familiar light. You remember this place.',
+    returnZone: 'suburban_streets',
   },
   waterfall: {
     id: 'waterfall',
@@ -802,7 +843,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -7, z: 6, id: 'waterfall_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 8, z: -7, id: 'waterfall_treasure', label: '✨ Hidden Treasure' },
       { type: 'lure', x: 5, z: 5, id: 'waterfall_lure', label: '🍖 Fish Scent' },
+      { type: 'return_gate', x: 0, z: -8, id: 'waterfall_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The sound of the waterfall is soothing. You remember playing here with your human.',
   },
   park_secret: {
@@ -843,7 +886,9 @@ export const ZONES: Record<string, Zone> = {
       { type: 'scent_post', x: -8, z: 6, id: 'secret_scent', label: '🐾 Scent Post' },
       { type: 'treasure', x: 9, z: -8, id: 'secret_treasure', label: '✨ Moon Treasure' },
       { type: 'lure', x: 6, z: 6, id: 'secret_lure', label: '🍖 Moon Treat' },
+      { type: 'return_gate', x: 0, z: -8, id: 'park_secret_exit', label: '🚪 Exit to Streets' },
     ],
+    returnZone: 'suburban_streets',
     hint: 'The park glows under the moonlight. Your human used to bring you here at night.',
   }
 };

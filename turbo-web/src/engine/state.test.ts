@@ -731,12 +731,12 @@ describe('State Manager — Difficulty Scaling', () => {
     State.setDifficulty('easy');
     const config = State.getDifficultyConfig();
     expect(config.name).toBe('Easy');
-    expect(config.happinessDecayPerSecond).toBe(0.03);
-    expect(config.threatSpeedMultiplier).toBe(0.8);
-    expect(config.threatTimeLimitMultiplier).toBe(1.5);
-    expect(config.happinessDecayPerRoom).toBe(1);
-    expect(config.dogTraitBonus).toBe(1.2);
-    expect(config.companionHelpChance).toBe(0.4);
+    expect(config.happinessDecayPerSecond).toBe(0.02);
+    expect(config.threatSpeedMultiplier).toBe(0.7);
+    expect(config.threatTimeLimitMultiplier).toBe(1.8);
+    expect(config.happinessDecayPerRoom).toBe(0.5);
+    expect(config.dogTraitBonus).toBe(1.3);
+    expect(config.companionHelpChance).toBe(0.5);
   });
 
   it('getDifficultyConfig returns correct values for normal', () => {
@@ -756,21 +756,21 @@ describe('State Manager — Difficulty Scaling', () => {
     const config = State.getDifficultyConfig();
     expect(config.name).toBe('Hard');
     expect(config.happinessDecayPerSecond).toBe(0.08);
-    expect(config.threatSpeedMultiplier).toBe(1.3);
-    expect(config.threatTimeLimitMultiplier).toBe(0.7);
+    expect(config.threatSpeedMultiplier).toBe(1.2);
+    expect(config.threatTimeLimitMultiplier).toBe(0.75);
     expect(config.happinessDecayPerRoom).toBe(3);
-    expect(config.dogTraitBonus).toBe(0.8);
+    expect(config.dogTraitBonus).toBe(0.9);
     expect(config.companionHelpChance).toBe(0.1);
   });
 
   it('getDogTraitModifier returns correct modifier for Speed trait', () => {
     State.state.currentDog = { id: 'turbo', name: 'Turbo', breed: 'Alaskan Husky', trait: '🏃 Speed', traitDesc: '', colors: { fur: [], accent: '#000' }, personality: [], lines: { intro: '', happy: '', scared: '', hint: '', combat: '', foundFriend: '' } } as any;
-    expect(State.getDogTraitModifier()).toBe(1.2);
+    expect(State.getDogTraitModifier()).toBe(1.25);
   });
 
   it('getDogTraitModifier returns correct modifier for Brave trait', () => {
     State.state.currentDog = { id: 'watson', name: 'Watson', breed: 'German Shepherd', trait: '🛡️ Brave', traitDesc: '', colors: { fur: [], accent: '#000' }, personality: [], lines: { intro: '', happy: '', scared: '', hint: '', combat: '', foundFriend: '' } } as any;
-    expect(State.getDogTraitModifier()).toBe(1.15);
+    expect(State.getDogTraitModifier()).toBe(1.2);
   });
 
   it('getDogTraitModifier returns 1 for unknown trait', () => {

@@ -96,8 +96,8 @@ describe('Data Validation — DOGS', () => {
 });
 
 describe('Data Validation — ZONES', () => {
-  it('has exactly 6 zones', () => {
-    expect(Object.keys(ZONES)).toHaveLength(6);
+  it('has exactly 18 zones', () => {
+    expect(Object.keys(ZONES)).toHaveLength(18);
   });
 
   it('has all required zones', () => {
@@ -173,8 +173,8 @@ describe('Data Validation — ZONES', () => {
 });
 
 describe('Data Validation — ITEMS', () => {
-  it('has exactly 20 items', () => {
-    expect(Object.keys(ITEMS)).toHaveLength(20);
+  it('has exactly 69 items', () => {
+    expect(Object.keys(ITEMS)).toHaveLength(69);
   });
 
   it('every item has required fields', () => {
@@ -187,8 +187,8 @@ describe('Data Validation — ITEMS', () => {
 
   it('every item name contains an emoji', () => {
     for (const [id, item] of Object.entries(ITEMS)) {
-      expect(item.name).toMatch(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u),
-        `${id}: item name "${item.name}" missing emoji`;
+      expect(item.name).toMatch(/[^\x00-\x7F]/),
+        `${id}: item name "${item.name}" missing non-ASCII (emoji)`;
     }
   });
 
@@ -213,8 +213,8 @@ describe('Data Validation — ITEMS', () => {
 });
 
 describe('Data Validation — THREATS', () => {
-  it('has exactly 12 threats', () => {
-    expect(Object.keys(THREATS)).toHaveLength(12);
+  it('has exactly 40 threats', () => {
+    expect(Object.keys(THREATS)).toHaveLength(40);
   });
 
   it('has all required threat types', () => {

@@ -26,7 +26,7 @@ export interface RoomFeature {
       | 'water' | 'pet_shop' | 'dog_show' | 'locked_door' | 'secret_passage'
       | 'lure' | 'bridge' | 'trap' | 'treasure_chest' | 'companion_trap'
       | 'music_box' | 'fountain' | 'mailbox' | 'fire_hydrant' | 'scent_post'
-      | 'treasure' | 'water_bowl' | 'celebration';
+      | 'treasure' | 'water_bowl' | 'celebration' | 'return_gate' | 'cave_entrance';
   x: number;
   y: number;
   w: number;
@@ -67,6 +67,7 @@ export interface Zone {
   obstacles?: Obstacle[];
   npcs?: NPC[];
   features?: RoomFeatureExtended[];
+  returnZone?: string;
 }
 
 // ---- Item ----
