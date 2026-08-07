@@ -7,12 +7,15 @@ export const SAVE_SCHEMA_VERSION = 1;
 export const DIFFICULTY_PRESETS = {
   easy: {
     name: 'Easy',
-    happinessDecayPerSecond: 0.03,
-    threatSpeedMultiplier: 0.8,
-    threatTimeLimitMultiplier: 1.5,
-    happinessDecayPerRoom: 1,
-    dogTraitBonus: 1.2,
-    companionHelpChance: 0.4,
+    happinessDecayPerSecond: 0.02,
+    threatSpeedMultiplier: 0.7,
+    threatTimeLimitMultiplier: 1.8,
+    happinessDecayPerRoom: 0.5,
+    dogTraitBonus: 1.3,
+    companionHelpChance: 0.5,
+    threatFailPenalty: -8,
+    threatSuccessBonus: 8,
+    comfortItemBonus: 1.5,
   },
   normal: {
     name: 'Normal',
@@ -22,15 +25,21 @@ export const DIFFICULTY_PRESETS = {
     happinessDecayPerRoom: 2,
     dogTraitBonus: 1.0,
     companionHelpChance: 0.25,
+    threatFailPenalty: -15,
+    threatSuccessBonus: 5,
+    comfortItemBonus: 1.0,
   },
   hard: {
     name: 'Hard',
     happinessDecayPerSecond: 0.08,
-    threatSpeedMultiplier: 1.3,
-    threatTimeLimitMultiplier: 0.7,
+    threatSpeedMultiplier: 1.2,
+    threatTimeLimitMultiplier: 0.75,
     happinessDecayPerRoom: 3,
-    dogTraitBonus: 0.8,
+    dogTraitBonus: 0.9,
     companionHelpChance: 0.1,
+    threatFailPenalty: -20,
+    threatSuccessBonus: 3,
+    comfortItemBonus: 0.8,
   },
 } as const;
 
@@ -44,18 +53,36 @@ export interface DifficultyConfig {
   happinessDecayPerRoom: number;
   dogTraitBonus: number;
   companionHelpChance: number;
+  // New fields for finer difficulty control
+  threatFailPenalty: number;
+  threatSuccessBonus: number;
+  comfortItemBonus: number;
 }
 
 /** Default difficulty applied at game start. */
 export const DEFAULT_DIFFICULTY: DifficultyKey = 'normal';
 
-/** Dog trait modifiers — per-trait multiplier for gameplay effects. */
+/** Dog trait modifiers — per-trait multiplier for gameplay effects.
+ * Speed: threat evasion (timing/sneak threats easier)
+ * Brave: combat threats easier, intimidation bonus
+ * Happiness: comfort items more effective, slower decay
+ * Sniff: find hidden items/threats faster, better route hints
+ * Compact: inventory +1 slot, smaller hitbox for sneak threats */
 export const DOG_TRAIT_MODIFIERS: Record<string, number> = {
-  '🏃 Speed': 1.2,
-  '🛡️ Brave': 1.15,
-  '😊 Happiness': 1.1,
-  '👃 Sniff': 1.25,
-  '🎒 Compact': 1.05,
+  '🏃 Speed': 1.25,
+  '🛡️ Brave': 1.2,
+  '😊 Happiness': 1.15,
+  '👃 Sniff': 1.3,
+  '🎒 Compact': 1.1,
+};
+
+/** Which threat types each trait helps with (multiplier above). */
+export const DOG_TRAIT_THREAT_BONUS: Record<string, string[]> = {
+  '🏃 Speed': ['timing', 'sneak'],
+  '🛡️ Brave': ['combat'],
+  '😊 Happiness': ['comfort'],
+  '👃 Sniff': ['timing', 'comfort'],
+  '🎒 Compact': ['sneak', 'combat'],
 };
 
 /** Base companion auto-help chance per difficulty level. */
@@ -95,16 +122,21 @@ export const CONFIG = {
   dogTailLength: 6,
   dogEarSize: 3,
 
-  // Happiness
+  // Happiness — defaults (overridden by difficulty preset at runtime)
   happinessMax: 100,
   happinessMin: 0,
   happinessDecayPerRoom: 2,
   happinessDecayPerSecond: 0.05,
+  // threat resolution bonuses/penalties (multiplied by difficulty preset)
   happinessThreatFail: -15,
   happinessThreatSuccess: 5,
+  // item happiness bonuses (multiplied by comfortItemBonus from difficulty)
   happinessItemTreat: 10,
   happinessItemToy: 5,
   happinessItemFriend: 8,
+  happinessItemComfort: 12, // warm_blanket, favorite_toy, blanket
+  happinessItemRare: 20, // golden_treat, diamond_bone, magic_bone
+  happinessItemStory: 15, // home_photo, letter, diary_page
 
   // Inventory
   inventorySlots: 16,

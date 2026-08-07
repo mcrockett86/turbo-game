@@ -1,7 +1,7 @@
 // ===== Game State Manager =====
 // Central state management with pub/sub events
 
-import { CONFIG, SAVE_SCHEMA_VERSION, DEFAULT_DIFFICULTY, DIFFICULTY_PRESETS, DOG_TRAIT_MODIFIERS, COMPANION_HELP_CHANCE, type DifficultyKey, type DifficultyConfig } from '@/config';
+import { CONFIG, SAVE_SCHEMA_VERSION, DEFAULT_DIFFICULTY, DIFFICULTY_PRESETS, DOG_TRAIT_MODIFIERS, DOG_TRAIT_THREAT_BONUS, COMPANION_HELP_CHANCE, type DifficultyKey, type DifficultyConfig } from '@/config';
 import type {
   GameState, GameEvent, Room, Companion, Threat,
 } from '@/types';
@@ -87,12 +87,14 @@ function enterRoom(roomId: string, roomIndex: number): void {
   State.state.currentRoomIndex = roomIndex;
   emit({ type: 'room-entered', roomId });
 
-  // Happiness decay for entering a new room
-  State.state.happiness = Math.max(0, State.state.happiness - CONFIG.happinessDecayPerRoom);
+  // Happiness decay for entering a new room (difficulty-scaled)
+  const diff = getDifficultyConfig();
+  const decay = diff.happinessDecayPerRoom;
+  State.state.happiness = Math.max(0, State.state.happiness - decay);
   emit({
     type: 'happiness-changed',
     newHappiness: State.state.happiness,
-    delta: -CONFIG.happinessDecayPerRoom,
+    delta: -decay,
   });
 }
 
@@ -124,19 +126,38 @@ function useItem(itemId: string): boolean {
   slot.count--;
   if (slot.count <= 0) slot.item = null;
 
-  // Apply item effects
+  // Apply item effects (difficulty-scaled via comfortItemBonus)
+  const diff = getDifficultyConfig();
+  const comfortBonus = diff.comfortItemBonus;
+
   switch (itemId) {
     case 'treat':
-      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + CONFIG.happinessItemTreat);
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + Math.round(CONFIG.happinessItemTreat * comfortBonus));
       break;
     case 'toy':
-      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + CONFIG.happinessItemToy);
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + Math.round(CONFIG.happinessItemToy * comfortBonus));
       break;
     case 'map_fragment':
       State.state.mapFragments++;
       break;
     case 'key':
       State.state.flags['hasKey'] = true;
+      break;
+    // New item categories
+    case 'warm_blanket':
+    case 'favorite_toy':
+    case 'blanket':
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + Math.round(CONFIG.happinessItemComfort * comfortBonus));
+      break;
+    case 'golden_treat':
+    case 'diamond_bone':
+    case 'magic_bone':
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + Math.round(CONFIG.happinessItemRare * comfortBonus));
+      break;
+    case 'home_photo':
+    case 'letter':
+    case 'diary_page':
+      State.state.happiness = Math.min(CONFIG.happinessMax, State.state.happiness + Math.round(CONFIG.happinessItemStory * comfortBonus));
       break;
   }
 
@@ -171,7 +192,23 @@ function startThreat(threat: Threat): void {
 }
 
 function resolveThreat(success: boolean): void {
-  const delta = success ? CONFIG.happinessThreatSuccess : CONFIG.happinessThreatFail;
+  const diff = getDifficultyConfig();
+  let delta = success ? diff.threatSuccessBonus : diff.threatFailPenalty;
+
+  // Dog trait bonus: if threat type matches a trait, amplify the outcome
+  if (success && State.state.currentThreat) {
+    const threatType = State.state.currentThreat.type;
+    const dog = State.state.currentDog;
+    if (dog && dog.trait && DOG_TRAIT_THREAT_BONUS[dog.trait]) {
+      const supportedTypes = DOG_TRAIT_THREAT_BONUS[dog.trait];
+      if (supportedTypes.includes(threatType)) {
+        const traitMod = DOG_TRAIT_MODIFIERS[dog.trait] ?? 1;
+        // Bonus: add a fraction of the success bonus based on trait modifier
+        delta = Math.round(delta * (1 + (traitMod - 1) * 0.5));
+      }
+    }
+  }
+
   State.state.happiness = Math.max(CONFIG.happinessMin, Math.min(CONFIG.happinessMax, State.state.happiness + delta));
   State.state.threatActive = false;
   State.state.currentThreat = null;
