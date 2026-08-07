@@ -690,8 +690,12 @@ function showZoneTransition(name: string, desc: string): void {
 function startFPView(): void {
   console.log('[Turbo] Starting FP view...');
   const canvasEl = document.getElementById('fp-canvas');
-  if (!canvasEl || !(canvasEl instanceof HTMLCanvasElement)) return;
+  if (!canvasEl || !(canvasEl instanceof HTMLCanvasElement)) {
+    console.error('[Turbo] Invalid canvas element');
+    return;
+  }
   const canvas = canvasEl;
+  console.log('[Turbo] Canvas:', canvas.width, 'x', canvas.height);
 
   canvas.style.display = 'block';
 

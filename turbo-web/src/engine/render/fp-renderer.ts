@@ -477,11 +477,13 @@ export class FpRoomRenderer {
 
   init(zoneId: string, zoneData: Zone, roomIndex: number): void {
     if (this.disposed) return;
+    console.log('[FP] init called:', zoneId, roomIndex);
 
     this.zoneId = zoneId;
     this.zoneData = zoneData;
     this.roomIndex = roomIndex;
     this.room = zoneData.rooms![roomIndex];
+    console.log('[FP] Room:', this.room.id, this.room.w, 'x', this.room.h, 'x', this.room.d);
 
     // Scene
     this.scene = new Scene();
@@ -537,9 +539,11 @@ export class FpRoomRenderer {
     const sh = this.room.h * s;
     const sd = this.room.d * s;
 
+    console.log('[FP] Building room with scale', s, '->', sw, 'x', sh, 'x', sd);
     // Room geometry (scaled)
     this.roomGroup = buildRoomGeometry(this.room, sw, sh, sd);
     this.scene.add(this.roomGroup);
+    console.log('[FP] Room built:', this.roomGroup.children.length, 'children');
 
     // Lighting
     this.lightGroup = setupLighting(this.scene, this.room, this.zoneId, sw, sh, sd);
