@@ -704,7 +704,9 @@ function startFPView(): void {
   if (fpViewEl) fpViewEl.classList.add('active');
 
   // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
+  console.log('[Turbo] Window size:', window.innerWidth, 'x', window.innerHeight);
   sizeCanvasToWindow(canvas);
+  console.log('[Turbo] Canvas after sizing:', canvas.width, 'x', canvas.height);
 
   // Dispose previous renderer if switching rooms
   fpRenderer?.dispose();
