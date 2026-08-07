@@ -1,0 +1,22 @@
+{
+  "name": "Turbo: Lost & Found",
+  "short_name": "Turbo",
+  "description": "Help Turbo the husky find his way home!",
+  "start_url": "/turbo-game/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4a9eff",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/turbo-game/assets/turbo-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/turbo-game/assets/turbo-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
@@ -6,6 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+  // GitHub Pages: /turbo-game/ matches repo name
+  base: process.env.NODE_ENV === 'production' ? '/turbo-game/' : '/',
   root: '.',
   build: {
     outDir: '../dist',
