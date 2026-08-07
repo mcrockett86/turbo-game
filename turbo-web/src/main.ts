@@ -653,6 +653,12 @@ function startAdventure(dogId: string, dog: Dog): void {
   if (firstZone) {
     State.enterZone('suburban_streets', firstZone);
     Audio.playMusic('suburban');
+
+    // Show the FP view container so the canvas is visible
+    const fpView = document.getElementById('fp-view');
+    if (fpView) fpView.classList.add('active');
+    document.getElementById('dog-select')?.classList.remove('active');
+
     showZoneTransition(firstZone.name, firstZone.desc);
 
     // Enter first room after transition
@@ -688,6 +694,10 @@ function startFPView(): void {
   const canvas = canvasEl;
 
   canvas.style.display = 'block';
+
+  // Show the fp-view container (safety net — startAdventure also does this)
+  const fpViewEl = document.getElementById('fp-view');
+  if (fpViewEl) fpViewEl.classList.add('active');
 
   // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
   sizeCanvasToWindow(canvas);
@@ -868,14 +878,17 @@ function transitionToZone(zoneId: string): void {
     }
   }
 
-  // Hide TP/search canvases, show relevant one
-  const tpCanvas = document.getElementById('tp-canvas');
-  const fpCanvas = document.getElementById('fp-canvas');
-  const humanCanvas = document.getElementById('human-canvas');
+  // Hide all screen containers
+  for (const id of ['fp-view', 'tp-view', 'human-view']) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  }
+  // Hide dog select screen
+  document.getElementById('dog-select')?.classList.remove('active');
 
-  if (tpCanvas instanceof HTMLCanvasElement) tpCanvas.style.display = 'none';
-  if (fpCanvas instanceof HTMLCanvasElement) fpCanvas.style.display = 'none';
-  if (humanCanvas instanceof HTMLCanvasElement) humanCanvas.style.display = 'none';
+  // Show the relevant screen container
+  const targetEl = document.getElementById(`${zoneType}-view`);
+  if (targetEl) targetEl.classList.add('active');
 
   State.startTransition(zoneWithRooms.name, zoneWithRooms.desc);
   Audio.playMusic(zoneId);
@@ -946,6 +959,10 @@ function startTPView(zoneId: string, zoneData: Zone): void {
 
   canvas.style.display = 'block';
 
+  // Show the tp-view container
+  const tpViewEl = document.getElementById('tp-view');
+  if (tpViewEl) tpViewEl.classList.add('active');
+
   // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
   sizeCanvasToWindow(canvas);
 
@@ -971,6 +988,15 @@ function startTPView(zoneId: string, zoneData: Zone): void {
     }
     if (type === 'fire_hydrant') {
       State.showDialogue('A good sniff. *sniff sniff*', 'Turbo');
+    }
+    if (type === 'return_gate') {
+      const returnZone = (zoneData as any).returnZone;
+      if (returnZone) {
+        transitionToZone(returnZone);
+      }
+    }
+    if (type === 'cave_entrance') {
+      transitionToZone('cave');
     }
   });
 
@@ -1013,6 +1039,10 @@ function startSearchView(zoneId: string, zoneData: Zone): void {
   const canvas = canvasEl;
 
   canvas.style.display = 'block';
+
+  // Show the human-view container
+  const humanViewEl = document.getElementById('human-view');
+  if (humanViewEl) humanViewEl.classList.add('active');
 
   // Dispose previous renderer
   if (searchRenderer) {
