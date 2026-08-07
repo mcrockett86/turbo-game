@@ -624,7 +624,12 @@ Build compiles, 207/207 tests pass.
 | 6.5 | **Lighting/atmosphere** — time-of-day, fog density, colored ambient, hemisphere light | `engine/render/fp-renderer.ts`, `engine/render/tp-renderer.ts` | Zones feel distinct | ✅ DONE |
 | 6.6 | **UI polish** — panel glow, hover feedback, smooth panel transitions, mute button glow | `engine/hud.ts` | UI feels professional | ✅ DONE |
 
-### Phase 7: Content & Balance (IN_PROGRESS)
+### Phase 7: Content & Balance ✅ COMPLETE
+
+All content expansion, zone wiring, balance tuning, and connectivity fixes implemented.
+Bug fix: screen container visibility (fp-view/tp-view/human-view never got `active` class, so canvas was hidden behind `.screen { display: none }`).
+
+### Phase 8: Mobile & Accessibility
 
 **Goal:** Fill out the game world and tune the experience.
 
