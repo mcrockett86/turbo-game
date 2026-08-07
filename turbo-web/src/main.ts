@@ -710,18 +710,28 @@ function startFPView(): void {
   fpRenderer?.dispose();
 
   // Initialize renderer
+  console.log('[Turbo] Creating FpRoomRenderer...');
   fpRenderer = new FpRoomRenderer(canvas);
+  console.log('[Turbo] FpRoomRenderer created:', !!fpRenderer);
 
   // Get current zone and room
   const zoneId = State.state.currentZone;
   const zoneIndex = State.state.currentZoneIndex;
   const roomIndex = State.state.currentRoomIndex;
+  console.log('[Turbo] Zone:', zoneId, 'Room index:', roomIndex);
 
-  if (!zoneId || !ZONES[zoneId as keyof typeof ZONES]) return;
+  if (!zoneId || !ZONES[zoneId as keyof typeof ZONES]) {
+    console.error('[Turbo] Invalid zone:', zoneId);
+    return;
+  }
 
   const zoneData = ZONES[zoneId as keyof typeof ZONES];
-  if (!('rooms' in zoneData) || !zoneData.rooms || roomIndex >= zoneData.rooms.length) return;
+  if (!('rooms' in zoneData) || !zoneData.rooms || roomIndex >= zoneData.rooms.length) {
+    console.error('[Turbo] Invalid room:', roomIndex, 'in zone with', zoneData.rooms?.length, 'rooms');
+    return;
+  }
 
+  console.log('[Turbo] Calling fpRenderer.init...');
   fpRenderer.init(zoneId, zoneData, roomIndex);
 
   // Wire up feature clicks
