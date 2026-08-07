@@ -21,3 +21,7 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# test images
+deep-analysis-screenshots
+playthrough-screenshots
