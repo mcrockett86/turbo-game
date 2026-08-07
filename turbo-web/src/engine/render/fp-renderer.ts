@@ -27,6 +27,7 @@ import {
 } from 'three';
 
 import { CONFIG } from '@/config';
+import { State } from '@/engine/state';
 import type { Room, RoomFeature, Zone } from '@/types';
 
 // ---- Constants ----

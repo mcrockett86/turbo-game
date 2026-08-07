@@ -1,6 +1,6 @@
 # Turbo: Lost & Found — Deep Playthrough Analysis Report
 
-**Date:** 2026-08-07T01:42:59.289Z
+**Date:** 2026-08-07T04:52:32.618Z
 **Game:** Turbo: Lost & Found (web-based, Vite + TypeScript)
 **Analysis Method:** Playwright browser automation with DOM inspection
 **Playthroughs:** 5
@@ -13,14 +13,14 @@ Ran **5** deep analysis playthroughs across all 5 dogs. Key findings:
 
 | Category | Finding |
 |----------|---------|
-| **Canvases** | 17 canvas elements (potential rendering complexity) |
+| **Canvases** | 12 canvas elements (potential rendering complexity) |
 | **UI Panels** | 5 panels (HUD, inventory, companions, hints) |
-| **Buttons** | 5 interactive buttons |
-| **Emoji Usage** | 14 emojis in DOM |
+| **Buttons** | 4 interactive buttons |
+| **Emoji Usage** | 7 emojis in DOM |
 | **Rendering Issues** | 5 issues detected |
-| **UI Issues** | 0 issues detected |
-| **Avg Load Time** | 204ms |
-| **Avg Game Ready** | 9905ms |
+| **UI Issues** | 5 issues detected |
+| **Avg Load Time** | 54ms |
+| **Avg Game Ready** | 4024ms |
 
 
 ---
@@ -30,187 +30,247 @@ Ran **5** deep analysis playthroughs across all 5 dogs. Key findings:
 ### Turbo (Speed)
 
 **Performance:**
-- Load time: 542ms
-- Game ready: 10353ms
-- Happiness timeline: 0 → 0%
+- Load time: 53ms
+- Game ready: 4393ms
+- Happiness timeline: 0%
 
 **DOM Metrics:**
-- Canvases: 17
+- Canvases: 12
 - Panels: 5
-- Buttons: 5
-- Text elements: 8
-- Emojis: 14
-
-**DOM Insights:**
-```
-Inventory panel: VISIBLE - "
-      🎒 Bag
-      
-      Close
-    "
-Companions panel: VISIBLE - "
-      🐕 Pack
-      
-    "
-Hints panel: VISIBLE - "
-      🗺️ Route Home
-      
-    "
-
-```
+- Buttons: 4
+- Text elements: 6
+- Emojis: 7
 
 **Rendering Issues:**
-- Empty canvases: manga-canvas, tp-canvas, human-canvas, hud-canvas, dialogue-canvas, manga-canvas, effects-canvas, endgame-canvas
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
 
-**Screenshots:** [01-home-turbo.png](deep-analysis-screenshots/01-home-turbo.png).png, [02-selected-turbo.png](deep-analysis-screenshots/02-selected-turbo.png).png, [03-game-turbo.png](deep-analysis-screenshots/03-game-turbo.png).png, [07-end-turbo.png](deep-analysis-screenshots/07-end-turbo.png).png
+**UI/Accessibility Issues:**
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
+
+**Errors:**
+- elementHandle.click: Timeout 30000ms exceeded.
+Call log:
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+**Screenshots:** [01-home-turbo.png](deep-analysis-screenshots/01-home-turbo.png).png, [02-selected-turbo.png](deep-analysis-screenshots/02-selected-turbo.png).png, [error-turbo.png](deep-analysis-screenshots/error-turbo.png).png
 
 ### Watson (Brave)
 
 **Performance:**
-- Load time: 119ms
-- Game ready: 9785ms
-- Happiness timeline: 0 → 0%
+- Load time: 54ms
+- Game ready: 3919ms
+- Happiness timeline: 0%
 
 **DOM Metrics:**
-- Canvases: 17
+- Canvases: 12
 - Panels: 5
-- Buttons: 5
-- Text elements: 8
-- Emojis: 14
-
-**DOM Insights:**
-```
-Inventory panel: VISIBLE - "
-      🎒 Bag
-      
-      Close
-    "
-Companions panel: VISIBLE - "
-      🐕 Pack
-      
-    "
-Hints panel: VISIBLE - "
-      🗺️ Route Home
-      
-    "
-
-```
+- Buttons: 4
+- Text elements: 6
+- Emojis: 7
 
 **Rendering Issues:**
-- Empty canvases: manga-canvas, tp-canvas, human-canvas, hud-canvas, dialogue-canvas, manga-canvas, effects-canvas, endgame-canvas
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
 
-**Screenshots:** [01-home-watson.png](deep-analysis-screenshots/01-home-watson.png).png, [02-selected-watson.png](deep-analysis-screenshots/02-selected-watson.png).png, [03-game-watson.png](deep-analysis-screenshots/03-game-watson.png).png, [07-end-watson.png](deep-analysis-screenshots/07-end-watson.png).png
+**UI/Accessibility Issues:**
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
+
+**Errors:**
+- elementHandle.click: Timeout 30000ms exceeded.
+Call log:
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+**Screenshots:** [01-home-watson.png](deep-analysis-screenshots/01-home-watson.png).png, [02-selected-watson.png](deep-analysis-screenshots/02-selected-watson.png).png, [error-watson.png](deep-analysis-screenshots/error-watson.png).png
 
 ### Nova (Happiness)
 
 **Performance:**
-- Load time: 117ms
-- Game ready: 9798ms
-- Happiness timeline: 0 → 0%
+- Load time: 48ms
+- Game ready: 3867ms
+- Happiness timeline: 0%
 
 **DOM Metrics:**
-- Canvases: 17
+- Canvases: 12
 - Panels: 5
-- Buttons: 5
-- Text elements: 8
-- Emojis: 14
-
-**DOM Insights:**
-```
-Inventory panel: VISIBLE - "
-      🎒 Bag
-      
-      Close
-    "
-Companions panel: VISIBLE - "
-      🐕 Pack
-      
-    "
-Hints panel: VISIBLE - "
-      🗺️ Route Home
-      
-    "
-
-```
+- Buttons: 4
+- Text elements: 6
+- Emojis: 7
 
 **Rendering Issues:**
-- Empty canvases: manga-canvas, tp-canvas, human-canvas, hud-canvas, dialogue-canvas, manga-canvas, effects-canvas, endgame-canvas
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
 
-**Screenshots:** [01-home-nova.png](deep-analysis-screenshots/01-home-nova.png).png, [02-selected-nova.png](deep-analysis-screenshots/02-selected-nova.png).png, [03-game-nova.png](deep-analysis-screenshots/03-game-nova.png).png, [07-end-nova.png](deep-analysis-screenshots/07-end-nova.png).png
+**UI/Accessibility Issues:**
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
+
+**Errors:**
+- elementHandle.click: Timeout 30000ms exceeded.
+Call log:
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+**Screenshots:** [01-home-nova.png](deep-analysis-screenshots/01-home-nova.png).png, [02-selected-nova.png](deep-analysis-screenshots/02-selected-nova.png).png, [error-nova.png](deep-analysis-screenshots/error-nova.png).png
 
 ### Walter (Sniff)
 
 **Performance:**
-- Load time: 124ms
-- Game ready: 9790ms
-- Happiness timeline: 0 → 0%
+- Load time: 56ms
+- Game ready: 3950ms
+- Happiness timeline: 0%
 
 **DOM Metrics:**
-- Canvases: 17
+- Canvases: 12
 - Panels: 5
-- Buttons: 5
-- Text elements: 8
-- Emojis: 14
-
-**DOM Insights:**
-```
-Inventory panel: VISIBLE - "
-      🎒 Bag
-      
-      Close
-    "
-Companions panel: VISIBLE - "
-      🐕 Pack
-      
-    "
-Hints panel: VISIBLE - "
-      🗺️ Route Home
-      
-    "
-
-```
+- Buttons: 4
+- Text elements: 6
+- Emojis: 7
 
 **Rendering Issues:**
-- Empty canvases: manga-canvas, tp-canvas, human-canvas, hud-canvas, dialogue-canvas, manga-canvas, effects-canvas, endgame-canvas
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
 
-**Screenshots:** [01-home-walter.png](deep-analysis-screenshots/01-home-walter.png).png, [02-selected-walter.png](deep-analysis-screenshots/02-selected-walter.png).png, [03-game-walter.png](deep-analysis-screenshots/03-game-walter.png).png, [07-end-walter.png](deep-analysis-screenshots/07-end-walter.png).png
+**UI/Accessibility Issues:**
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
+
+**Errors:**
+- elementHandle.click: Timeout 30000ms exceeded.
+Call log:
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+**Screenshots:** [01-home-walter.png](deep-analysis-screenshots/01-home-walter.png).png, [02-selected-walter.png](deep-analysis-screenshots/02-selected-walter.png).png, [error-walter.png](deep-analysis-screenshots/error-walter.png).png
 
 ### Beaux (Compact)
 
 **Performance:**
-- Load time: 119ms
-- Game ready: 9800ms
-- Happiness timeline: 0 → 0%
+- Load time: 61ms
+- Game ready: 3989ms
+- Happiness timeline: 0%
 
 **DOM Metrics:**
-- Canvases: 17
+- Canvases: 12
 - Panels: 5
-- Buttons: 5
-- Text elements: 8
-- Emojis: 14
-
-**DOM Insights:**
-```
-Inventory panel: VISIBLE - "
-      🎒 Bag
-      
-      Close
-    "
-Companions panel: VISIBLE - "
-      🐕 Pack
-      
-    "
-Hints panel: VISIBLE - "
-      🗺️ Route Home
-      
-    "
-
-```
+- Buttons: 4
+- Text elements: 6
+- Emojis: 7
 
 **Rendering Issues:**
-- Empty canvases: manga-canvas, tp-canvas, human-canvas, hud-canvas, dialogue-canvas, manga-canvas, effects-canvas, endgame-canvas
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
 
-**Screenshots:** [01-home-beaux.png](deep-analysis-screenshots/01-home-beaux.png).png, [02-selected-beaux.png](deep-analysis-screenshots/02-selected-beaux.png).png, [03-game-beaux.png](deep-analysis-screenshots/03-game-beaux.png).png, [07-end-beaux.png](deep-analysis-screenshots/07-end-beaux.png).png
+**UI/Accessibility Issues:**
+- <VITE-ERROR-OVERLAY> has high z-index: 99999
+
+**Errors:**
+- elementHandle.click: Element is not attached to the DOM
+Call log:
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    15 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <vite-error-overlay></vite-error-overlay> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+
+**Screenshots:** [01-home-beaux.png](deep-analysis-screenshots/01-home-beaux.png).png, [02-selected-beaux.png](deep-analysis-screenshots/02-selected-beaux.png).png, [error-beaux.png](deep-analysis-screenshots/error-beaux.png).png
 
 
 ---
@@ -235,7 +295,7 @@ Hints panel: VISIBLE - "
 
 - **White canvas background:** The main game canvas renders on white, making it hard to distinguish game elements
 - **Asymmetric layout:** All UI is on the left, right side is empty — wastes screen real estate
-- **Emoji-heavy UI:** 14 emojis create a playful tone but may reduce readability
+- **Emoji-heavy UI:** 7 emojis create a playful tone but may reduce readability
 - **Dog trait icons:** Icons don't match trait descriptions (e.g., Walter's "Sniff" shows 🔔 bell instead of 👃 nose)
 
 **Recommendations:**

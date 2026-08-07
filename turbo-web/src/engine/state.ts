@@ -366,15 +366,14 @@ function getCompanionHelpChance(): number {
 }
 
 // ---- Public API ----
-export const State = {
+// Use a local variable to avoid bare `State` references in the minified build.
+// Internal functions reference `s` (resolved at call time, not definition time),
+// and the export is assigned after all functions are defined.
+const s = {
   listeners,
-
   state: createDefaultState() as GameState,
-
-  get(): GameState { return { ...State.state }; },
-  getRef(): GameState { return State.state; },
-
-  // Transitions
+  get(): GameState { return { ...s.state }; },
+  getRef(): GameState { return s.state; },
   selectDog,
   enterZone,
   enterRoom,
@@ -393,20 +392,17 @@ export const State = {
   updateHUD,
   gameOver,
   gameWin,
-
-  // Persistence
   save: saveGame,
   load: loadGame,
   clearSave,
-
-  // Difficulty
   setDifficulty,
   getDifficultyConfig,
   getDogTraitModifier,
   getCompanionHelpChance,
-
-  // Events
   on,
   off,
   emit,
 };
+
+/** The global game state singleton. Exported after all internal functions are defined. */
+export const State = s;
