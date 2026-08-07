@@ -1,6 +1,6 @@
 # Turbo: Lost & Found — Deep Playthrough Analysis Report
 
-**Date:** 2026-08-06T22:37:46.288Z
+**Date:** 2026-08-07T01:42:59.289Z
 **Game:** Turbo: Lost & Found (web-based, Vite + TypeScript)
 **Analysis Method:** Playwright browser automation with DOM inspection
 **Playthroughs:** 5
@@ -19,8 +19,8 @@ Ran **5** deep analysis playthroughs across all 5 dogs. Key findings:
 | **Emoji Usage** | 14 emojis in DOM |
 | **Rendering Issues** | 5 issues detected |
 | **UI Issues** | 0 issues detected |
-| **Avg Load Time** | 195ms |
-| **Avg Game Ready** | 9911ms |
+| **Avg Load Time** | 204ms |
+| **Avg Game Ready** | 9905ms |
 
 
 ---
@@ -30,8 +30,8 @@ Ran **5** deep analysis playthroughs across all 5 dogs. Key findings:
 ### Turbo (Speed)
 
 **Performance:**
-- Load time: 513ms
-- Game ready: 10369ms
+- Load time: 542ms
+- Game ready: 10353ms
 - Happiness timeline: 0 → 0%
 
 **DOM Metrics:**
@@ -67,8 +67,8 @@ Hints panel: VISIBLE - "
 ### Watson (Brave)
 
 **Performance:**
-- Load time: 117ms
-- Game ready: 9809ms
+- Load time: 119ms
+- Game ready: 9785ms
 - Happiness timeline: 0 → 0%
 
 **DOM Metrics:**
@@ -104,7 +104,7 @@ Hints panel: VISIBLE - "
 ### Nova (Happiness)
 
 **Performance:**
-- Load time: 113ms
+- Load time: 117ms
 - Game ready: 9798ms
 - Happiness timeline: 0 → 0%
 
@@ -141,8 +141,8 @@ Hints panel: VISIBLE - "
 ### Walter (Sniff)
 
 **Performance:**
-- Load time: 121ms
-- Game ready: 9794ms
+- Load time: 124ms
+- Game ready: 9790ms
 - Happiness timeline: 0 → 0%
 
 **DOM Metrics:**
@@ -178,8 +178,8 @@ Hints panel: VISIBLE - "
 ### Beaux (Compact)
 
 **Performance:**
-- Load time: 113ms
-- Game ready: 9787ms
+- Load time: 119ms
+- Game ready: 9800ms
 - Happiness timeline: 0 → 0%
 
 **DOM Metrics:**

@@ -628,14 +628,14 @@ Build compiles, 207/207 tests pass.
 
 **Goal:** Fill out the game world and tune the experience.
 
-| # | Task | Files | Impact |
-|---|------|-------|--------|
-| 7.1 | **Expand zone data** — add more rooms to each zone (currently 3-5 rooms per zone), add more features, items, NPCs | `data.ts` | Game world feels larger |
-| 7.2 | **Add more items** — expand ITEMS map with 10+ items (collar piece, leash, bone, toy, treat, map fragments, etc.) | `data.ts`, `engine/inventory.ts` | More to collect |
-| 7.3 | **Add more companions** — expand COMPANIONS with 5+ dogs with unique dialogue, traits, locations | `data.ts`, `engine/companions.ts` | More to discover |
-| 7.4 | **Add more threats** — expand THREATS with 8+ threats across all 4 types | `data.ts`, `engine/threats.ts` | More gameplay variety |
-| 7.5 | **Balance difficulty** — tune presets using `DIFFICULTY_PRESETS` values, playtest each level | `config.ts`, `main.ts` | Game is fun at all levels |
-| 7.6 | **Dog trait tuning** — verify each dog trait actually changes gameplay meaningfully | `config.ts`, `engine/state.ts`, `main.ts` | Dogs feel different to play |
+| # | Task | Files | Impact | Status |
+|---|------|-------|--------|--------|
+| 7.1 | **Expand zone data** — add more rooms to each zone (currently 3-5 rooms per zone), add more features, items, NPCs | `data.ts` | Game world feels larger | ✅ DONE — 10 new zones added (lake, pet_store, dog_show, forest, beach, mountain, garden, library, market, cave, waterfall, park_secret) |
+| 7.2 | **Add more items** — expand ITEMS map with 10+ items (collar piece, leash, bone, toy, treat, map fragments, etc.) | `data.ts`, `engine/inventory.ts` | More to collect | ✅ DONE — 40+ new items added (crafting, comfort, zone-specific, collectibles, quest, rare, food, utility, story) |
+| 7.3 | **Add more companions** — expand COMPANIONS with 5+ dogs with unique dialogue, traits, locations | `data.ts`, `engine/companions.ts` | More to discover | ✅ DONE — 10 new companions added (lake_dog, pet_shop_dog, dog_show_dog, forest_dog, beach_dog, mountain_dog, garden_dog, library_dog, market_dog, park_secret_dog) |
+| 7.4 | **Add more threats** — expand THREATS with 8+ threats across all 4 types | `data.ts`, `engine/threats.ts` | More gameplay variety | ✅ DONE — 20 new threats added (lake_ripple, pet_shop_cat, dog_show_judge, forest_wolf, beach_crab, mountain_goat, garden_snake, library_silent, market_chase, park_squirrel, fog, lightning, flood, earthquake, raccoon, owl, deer, treasure_guardian, lake_monster, pet_shop_bell, dog_show_roar, forest_thorn, beach_wave, mountain_rockfall, garden_insect, library_boo, market_fire, park_tornado) |
+| 7.5 | **Balance difficulty** — tune presets using `DIFFICULTY_PRESETS` values, playtest each level | `config.ts`, `main.ts` | Game is fun at all levels | TODO |
+| 7.6 | **Dog trait tuning** — verify each dog trait actually changes gameplay meaningfully | `config.ts`, `engine/state.ts`, `main.ts` | Dogs feel different to play | TODO |
 
 ### Phase 8: Mobile & Accessibility
 

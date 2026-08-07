@@ -172,6 +172,167 @@ export const COMPANIONS: Record<string, Companion> = {
     met: false,
     active: false,
   },
+  // New companions from new zones
+  lake_dog: {
+    id: 'lake_dog',
+    name: 'River',
+    breed: 'Nova Scotia Duck Tolling Retriever',
+    trait: '🏊 Swimmer',
+    dialogue: [
+      'The lake is beautiful this time of year!',
+      'I used to swim here every day with my human.',
+      'There\'s a secret path behind the waterfall. Want to see?',
+      'Follow the water — it leads somewhere special.',
+    ],
+    color: '#D2691E',
+    accentColor: '#FFD700',
+    met: false,
+    active: false,
+  },
+  pet_shop_dog: {
+    id: 'pet_shop_dog',
+    name: 'Coco',
+    breed: 'Poodle',
+    trait: '✨ Groomed',
+    dialogue: [
+      'Oh my! You\'re so scruffy! Let me help!',
+      'I know all the best treats in town!',
+      'The dog show is coming up! Want to enter?',
+      'My human takes me to the pet shop every week!',
+    ],
+    color: '#FFB6C1',
+    accentColor: '#FF69B4',
+    met: false,
+    active: false,
+  },
+  dog_show_dog: {
+    id: 'dog_show_dog',
+    name: 'Champion',
+    breed: 'Standard Poodle',
+    trait: '🏆 Champion',
+    dialogue: [
+      'I\'ve won every dog show in the region!',
+      'Would you like to compete? I can train you!',
+      'The secret to winning is confidence and treats!',
+      'Follow the crowd — they all head to the park!',
+    ],
+    color: '#FFFFFF',
+    accentColor: '#FFD700',
+    met: false,
+    active: false,
+  },
+  forest_dog: {
+    id: 'forest_dog',
+    name: 'Forest',
+    breed: 'German Shorthaired Pointer',
+    trait: '🌲 Hunter',
+    dialogue: [
+      'The forest is vast and full of wonders!',
+      'I can smell home from here! Well, almost.',
+      'Watch out for the storm drain ahead!',
+      'The cave behind the waterfall holds secrets.',
+    ],
+    color: '#8B4513',
+    accentColor: '#D2691E',
+    met: false,
+    active: false,
+  },
+  beach_dog: {
+    id: 'beach_dog',
+    name: 'Surfer',
+    breed: 'Australian Shepherd',
+    trait: '🏄 Surfer',
+    dialogue: [
+      'The beach is my happy place!',
+      'I found a treasure map here once! Want to see?',
+      'The waves bring all sorts of interesting things.',
+      'Follow the seagulls — they know where the good stuff is!',
+    ],
+    color: '#4682B4',
+    accentColor: '#87CEEB',
+    met: false,
+    active: false,
+  },
+  mountain_dog: {
+    id: 'mountain_dog',
+    name: 'Peak',
+    breed: 'Bernese Mountain Dog',
+    trait: '⛰️ Climber',
+    dialogue: [
+      'The mountain path is steep but worth it!',
+      'I\'ve seen dogs go up there and come back with stories.',
+      'The cave at the top holds ancient treasures.',
+      'Watch your step on the rocky paths!',
+    ],
+    color: '#2F4F4F',
+    accentColor: '#708090',
+    met: false,
+    active: false,
+  },
+  garden_dog: {
+    id: 'garden_dog',
+    name: 'Blossom',
+    breed: 'Cavalier King Charles Spaniel',
+    trait: '🌸 Gentle',
+    dialogue: [
+      'The garden is so beautiful this time of year!',
+      'I love collecting flowers for my nest.',
+      'There\'s a secret passage behind the rose bush!',
+      'Follow the scent of lavender — it leads home.',
+    ],
+    color: '#8B0000',
+    accentColor: '#FF6347',
+    met: false,
+    active: false,
+  },
+  library_dog: {
+    id: 'library_dog',
+    name: 'Bookworm',
+    breed: 'Basenji',
+    trait: '📚 Scholar',
+    dialogue: [
+      'I love the library! So many stories to discover.',
+      'There\'s a hidden passage behind the bookshelf!',
+      'The librarian dog knows all the secrets of the neighborhood.',
+      'Follow the scent of old paper — it leads somewhere special.',
+    ],
+    color: '#D2B48C',
+    accentColor: '#8B4513',
+    met: false,
+    active: false,
+  },
+  market_dog: {
+    id: 'market_dog',
+    name: 'Baker',
+    breed: 'Bichon Frise',
+    trait: '🍪 Baker',
+    dialogue: [
+      'I bake the best treats in town!',
+      'Want to learn my secret recipe? It\'s simple!',
+      'The market has all sorts of interesting smells.',
+      'Follow the aroma of fresh bread — it leads to the pet shop!',
+    ],
+    color: '#FFF8DC',
+    accentColor: '#FFD700',
+    met: false,
+    active: false,
+  },
+  park_secret_dog: {
+    id: 'park_secret_dog',
+    name: 'Shadow',
+    breed: 'Belgian Malinois',
+    trait: '🌙 Stealth',
+    dialogue: [
+      'I know all the secret paths in the park.',
+      'There\'s a hidden treasure behind the old oak tree.',
+      'The moon bone only appears at night. Want to wait?',
+      'Follow the shadows — they lead to the lake.',
+    ],
+    color: '#1a1a1a',
+    accentColor: '#4a4a4a',
+    met: false,
+    active: false,
+  },
 };
 
 // ===== ZONES =====
@@ -316,6 +477,374 @@ export const ZONES: Record<string, Zone> = {
     ],
     music: 'home',
     hint: 'You\'re home. You\'re finally home.'
+  },
+  // New zones
+  lake: {
+    id: 'lake',
+    name: '🌊 The Lake',
+    desc: 'A peaceful lake surrounded by trees. The water sparkles in the sunlight.',
+    type: 'tp',
+    music: 'lake',
+    skyColor: '#87CEEB',
+    groundColor: '#2d5a1e',
+    dogColor: '#4a9eff',
+    accentColor: '#006994',
+    companions: ['lake_dog'],
+    obstacles: [
+      { type: 'tree', x: -5, z: 4, height: 4, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: 6, z: -3, height: 3.5, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bush', x: -7, z: -5, color: '#2d6a1e' },
+      { type: 'bench', x: 4, z: 6, width: 2, color: '#8B6914' },
+      { type: 'fence', x: 0, z: 8, width: 8, height: 1, color: '#8B4513' },
+    ],
+    npcs: [
+      {
+        id: 'lake_dog_npc',
+        name: 'River',
+        color: '#D2691E',
+        accentColor: '#FFD700',
+        x: 3,
+        z: -2,
+        dialogue: [
+          'The lake is beautiful this time of year!',
+          'I used to swim here every day with my human.',
+          'There\'s a secret path behind the waterfall. Want to see?',
+          'Follow the water — it leads somewhere special.',
+        ],
+      },
+    ],
+    features: [
+      { type: 'water', x: 0, z: 0, id: 'lake_center', label: '🌊 Lake Center' },
+      { type: 'scent_post', x: -6, z: 5, id: 'lake_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 7, z: -6, id: 'lake_treasure', label: '✨ Hidden Treasure' },
+      { type: 'bridge', x: 5, z: 3, id: 'wooden_bridge', label: '🌉 Wooden Bridge' },
+    ],
+    hint: 'The water sparkles. You remember swimming here once. With your human.',
+  },
+  pet_store: {
+    id: 'pet_store',
+    name: '🏪 Pet Paradise',
+    desc: 'A colorful pet shop filled with treats, toys, and friendly animals.',
+    type: 'fp',
+    rooms: [
+      { id: 'pet_entrance', name: 'Entrance', w: 120, h: 80, d: 150, color: '#FFB6C1', exits: ['pet_main', 'pet_back'], isEntrance: true, entranceZone: 'suburban_streets' },
+      { id: 'pet_main', name: 'Main Hall', w: 200, h: 100, d: 180, color: '#FF69B4', exits: ['pet_entrance', 'pet_treats', 'pet_toys', 'pet_grooming'], features: [{type:'pet_shop', x:100, y:50, w:60, h:40, label:'🏪 Pet Paradise'}] },
+      { id: 'pet_treats', name: 'Treat Room', w: 150, h: 90, d: 120, color: '#FFD700', exits: ['pet_main'], features: [{type:'food', x:75, y:45, w:40, h:30, label:'🍪 Treats', item:'pet_shop_treat'}] },
+      { id: 'pet_toys', name: 'Toy Room', w: 160, h: 90, d: 140, color: '#FF69B4', exits: ['pet_main'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🧸 Toys', item:'pet_shop_ticket'}] },
+      { id: 'pet_grooming', name: 'Grooming Room', w: 100, h: 80, d: 100, color: '#FFF0F5', exits: ['pet_main'], features: [{type:'water', x:50, y:40, w:30, h:30, label:'💧 Water Bowl'}] },
+      { id: 'pet_back', name: 'Back Room', w: 120, h: 70, d: 80, color: '#FFB6C1', exits: ['pet_entrance'], features: [{type:'secret_passage', x:60, y:35, w:40, h:30, label:'🔑 Secret Passage', item:'secret_key'}] }
+    ],
+    music: 'pet_store',
+    hint: 'The smell of treats is overwhelming. Your human used to bring you here!',
+  },
+  dog_show: {
+    id: 'dog_show',
+    name: '🏆 Dog Show Arena',
+    desc: 'A grand arena where dogs compete for glory. The air is filled with excitement.',
+    type: 'tp',
+    music: 'dog_show',
+    skyColor: '#87CEEB',
+    groundColor: '#8B4513',
+    dogColor: '#FFD700',
+    accentColor: '#FF6347',
+    companions: ['dog_show_dog'],
+    obstacles: [
+      { type: 'fence', x: -10, z: -8, width: 8, height: 1.5, color: '#8B4513' },
+      { type: 'fence', x: 10, z: 8, width: 8, height: 1.5, color: '#8B4513' },
+      { type: 'tree', x: -6, z: 5, height: 4, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: 7, z: -6, height: 3.5, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bench', x: 5, z: 7, width: 3, color: '#8B6914' },
+      { type: 'bench', x: -8, z: -5, width: 3, color: '#8B6914' },
+    ],
+    npcs: [
+      {
+        id: 'dog_show_dog_npc',
+        name: 'Champion',
+        color: '#FFFFFF',
+        accentColor: '#FFD700',
+        x: 2,
+        z: -3,
+        dialogue: [
+          'I\'ve won every dog show in the region!',
+          'Would you like to compete? I can train you!',
+          'The secret to winning is confidence and treats!',
+          'Follow the crowd — they all head to the park!',
+        ],
+      },
+    ],
+    features: [
+      { type: 'dog_show', x: 0, z: 0, id: 'show_ring', label: '🏆 Show Ring' },
+      { type: 'scent_post', x: -8, z: 6, id: 'show_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 9, z: -7, id: 'show_treasure', label: '✨ Trophy Case' },
+      { type: 'lure', x: 6, z: 4, id: 'treat_lure', label: '🍖 Treat Lure' },
+    ],
+    hint: 'The roar of the crowd excites you. You remember winning here once.',
+  },
+  forest: {
+    id: 'forest',
+    name: '🌲 The Deep Forest',
+    desc: 'A dense forest with towering trees. Sunlight filters through the canopy.',
+    type: 'tp',
+    music: 'forest',
+    skyColor: '#2F4F4F',
+    groundColor: '#1a3a0a',
+    dogColor: '#8B4513',
+    accentColor: '#D2691E',
+    companions: ['forest_dog'],
+    obstacles: [
+      { type: 'tree', x: -8, z: 6, height: 5, trunkColor: '#5a3a1a', leafColor: '#1a3a0a' },
+      { type: 'tree', x: 7, z: -5, height: 4.5, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: -3, z: -7, height: 4, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bush', x: 6, z: 7, color: '#2d6a1e' },
+      { type: 'bush', x: -7, z: -6, color: '#3a8a2e' },
+      { type: 'fence', x: 0, z: 9, width: 6, height: 1.2, color: '#8B4513' },
+    ],
+    npcs: [
+      {
+        id: 'forest_dog_npc',
+        name: 'Forest',
+        color: '#8B4513',
+        accentColor: '#D2691E',
+        x: -2,
+        z: 4,
+        dialogue: [
+          'The forest is vast and full of wonders!',
+          'I can smell home from here! Well, almost.',
+          'Watch out for the storm drain ahead!',
+          'The cave behind the waterfall holds secrets.',
+        ],
+      },
+    ],
+    features: [
+      { type: 'fountain', x: 0, z: 0, id: 'forest_fountain', label: '💧 Forest Spring' },
+      { type: 'scent_post', x: -9, z: 7, id: 'forest_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 8, z: -8, id: 'forest_treasure', label: '✨ Cave Entrance' },
+      { type: 'lure', x: 5, z: 6, id: 'forest_lure', label: '🍖 Food Scent' },
+    ],
+    hint: 'The forest smells like home. Your human used to bring you here for walks.',
+  },
+  beach: {
+    id: 'beach',
+    name: '🏖️ Sandy Beach',
+    desc: 'A wide sandy beach with crashing waves. Seagulls cry overhead.',
+    type: 'tp',
+    music: 'beach',
+    skyColor: '#87CEEB',
+    groundColor: '#F4A460',
+    dogColor: '#4682B4',
+    accentColor: '#87CEEB',
+    companions: ['beach_dog'],
+    obstacles: [
+      { type: 'tree', x: -6, z: 5, height: 3, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: 7, z: -4, height: 2.5, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bush', x: -8, z: -6, color: '#2d6a1e' },
+      { type: 'bench', x: 4, z: 7, width: 2, color: '#8B6914' },
+    ],
+    npcs: [
+      {
+        id: 'beach_dog_npc',
+        name: 'Surfer',
+        color: '#4682B4',
+        accentColor: '#87CEEB',
+        x: 3,
+        z: -2,
+        dialogue: [
+          'The beach is my happy place!',
+          'I found a treasure map here once! Want to see?',
+          'The waves bring all sorts of interesting things.',
+          'Follow the seagulls — they know where the good stuff is!',
+        ],
+      },
+    ],
+    features: [
+      { type: 'water', x: 0, z: -8, id: 'ocean', label: '🌊 Ocean' },
+      { type: 'scent_post', x: -7, z: 6, id: 'beach_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 8, z: -7, id: 'beach_treasure', label: '✨ Buried Treasure' },
+      { type: 'lure', x: 5, z: 5, id: 'beach_lure', label: '🍖 Fish Scent' },
+    ],
+    hint: 'The sand feels familiar. Your human used to throw the ball here.',
+  },
+  mountain: {
+    id: 'mountain',
+    name: '⛰️ Mountain Peak',
+    desc: 'A towering mountain with rocky paths. The view from the top is breathtaking.',
+    type: 'tp',
+    music: 'mountain',
+    skyColor: '#4682B4',
+    groundColor: '#708090',
+    dogColor: '#2F4F4F',
+    accentColor: '#708090',
+    companions: ['mountain_dog'],
+    obstacles: [
+      { type: 'tree', x: -7, z: 5, height: 4, trunkColor: '#5a3a1a', leafColor: '#1a3a0a' },
+      { type: 'tree', x: 8, z: -6, height: 3.5, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'bush', x: -9, z: -7, color: '#2d6a1e' },
+      { type: 'fence', x: 0, z: 10, width: 7, height: 1.5, color: '#8B4513' },
+    ],
+    npcs: [
+      {
+        id: 'mountain_dog_npc',
+        name: 'Peak',
+        color: '#2F4F4F',
+        accentColor: '#708090',
+        x: -3,
+        z: 4,
+        dialogue: [
+          'The mountain path is steep but worth it!',
+          'I\'ve seen dogs go up there and come back with stories.',
+          'The cave at the top holds ancient treasures.',
+          'Watch your step on the rocky paths!',
+        ],
+      },
+    ],
+    features: [
+      { type: 'fountain', x: 0, z: 0, id: 'mountain_spring', label: '💧 Mountain Spring' },
+      { type: 'scent_post', x: -8, z: 7, id: 'mountain_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 9, z: -8, id: 'mountain_treasure', label: '✨ Cave Treasure' },
+      { type: 'lure', x: 6, z: 6, id: 'mountain_lure', label: '🍖 Food Scent' },
+    ],
+    hint: 'The mountain air is crisp. Your human used to hike here with you.',
+  },
+  garden: {
+    id: 'garden',
+    name: '🌺 Secret Garden',
+    desc: 'A hidden garden filled with beautiful flowers and peaceful paths.',
+    type: 'fp',
+    rooms: [
+      { id: 'garden_entrance', name: 'Garden Gate', w: 120, h: 80, d: 150, color: '#FF69B4', exits: ['garden_main', 'garden_flowers'], isEntrance: true, entranceZone: 'suburban_streets' },
+      { id: 'garden_main', name: 'Main Path', w: 200, h: 100, d: 180, color: '#FFB6C1', exits: ['garden_entrance', 'garden_fountain', 'garden_rose'], features: [{type:'fountain', x:100, y:50, w:60, h:40, label:'⛲ Fountain'}] },
+      { id: 'garden_flowers', name: 'Flower Bed', w: 150, h: 90, d: 120, color: '#FFD700', exits: ['garden_main'], features: [{type:'hint', x:75, y:45, w:50, h:30, label:'🌸 Flowers', item:'flower'}] },
+      { id: 'garden_fountain', name: 'Fountain Area', w: 160, h: 90, d: 140, color: '#87CEEB', exits: ['garden_main'], features: [{type:'water', x:80, y:45, w:40, h:30, label:'💧 Fountain'}] },
+      { id: 'garden_rose', name: 'Rose Garden', w: 100, h: 80, d: 100, color: '#FF6347', exits: ['garden_main'], features: [{type:'secret_passage', x:50, y:40, w:40, h:30, label:'🔑 Rose Passage', item:'secret_key'}] }
+    ],
+    music: 'garden',
+    hint: 'The roses smell like your human\'s garden. You remember playing here.',
+  },
+  library: {
+    id: 'library',
+    name: '📚 Old Library',
+    desc: 'A quiet library filled with books and mysterious secrets.',
+    type: 'fp',
+    rooms: [
+      { id: 'library_entrance', name: 'Entrance Hall', w: 120, h: 80, d: 150, color: '#D2B48C', exits: ['library_main', 'library_stacks'], isEntrance: true, entranceZone: 'suburban_streets' },
+      { id: 'library_main', name: 'Main Hall', w: 200, h: 100, d: 180, color: '#8B4513', exits: ['library_entrance', 'library_reference', 'library_special'], features: [{type:'person', x:100, y:50, w:40, h:60, label:'👤 Librarian Dog'}] },
+      { id: 'library_stacks', name: 'Book Stacks', w: 150, h: 90, d: 120, color: '#654321', exits: ['library_main'], features: [{type:'hint', x:75, y:45, w:50, h:30, label:'📚 Books', item:'letter'}] },
+      { id: 'library_reference', name: 'Reference Room', w: 160, h: 90, d: 140, color: '#8B6914', exits: ['library_main'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🗺️ Maps', item:'treasure_map'}] },
+      { id: 'library_special', name: 'Special Collection', w: 100, h: 80, d: 100, color: '#4a2a0a', exits: ['library_main'], features: [{type:'secret_passage', x:50, y:40, w:40, h:30, label:'🔑 Hidden Door', item:'secret_key'}] }
+    ],
+    music: 'library',
+    hint: 'The books smell like home. Your human used to read to you here.',
+  },
+  market: {
+    id: 'market',
+    name: '🏪 Town Market',
+    desc: 'A bustling market with vendors selling treats, toys, and more.',
+    type: 'fp',
+    rooms: [
+      { id: 'market_entrance', name: 'Market Gate', w: 120, h: 80, d: 150, color: '#FFD700', exits: ['market_main', 'market_food'], isEntrance: true, entranceZone: 'suburban_streets' },
+      { id: 'market_main', name: 'Main Market', w: 200, h: 100, d: 180, color: '#FF69B4', exits: ['market_entrance', 'market_toys', 'market_treats'], features: [{type:'person', x:100, y:50, w:40, h:60, label:'👤 Market Vendor'}] },
+      { id: 'market_food', name: 'Food Stalls', w: 150, h: 90, d: 120, color: '#FFB6C1', exits: ['market_main'], features: [{type:'food', x:75, y:45, w:40, h:30, label:'🍖 Food', item:'pizza_crust'}] },
+      { id: 'market_toys', name: 'Toy Shop', w: 160, h: 90, d: 140, color: '#87CEEB', exits: ['market_main'], features: [{type:'hint', x:80, y:45, w:50, h:30, label:'🧸 Toys', item:'dog_show_ribbon'}] },
+      { id: 'market_treats', name: 'Treat Stand', w: 100, h: 80, d: 100, color: '#FFD700', exits: ['market_main'], features: [{type:'food', x:50, y:40, w:40, h:30, label:'🍪 Treats', item:'cookie'}] }
+    ],
+    music: 'market',
+    hint: 'The smells of the market remind you of days spent shopping with your human.',
+  },
+  cave: {
+    id: 'cave',
+    name: '🕳️ Crystal Cave',
+    desc: 'A mysterious cave filled with glowing crystals and ancient secrets.',
+    type: 'fp',
+    rooms: [
+      { id: 'cave_entrance', name: 'Cave Entrance', w: 120, h: 80, d: 150, color: '#2F4F4F', exits: ['cave_main', 'cave_deep'], isEntrance: true, entranceZone: 'forest' },
+      { id: 'cave_main', name: 'Main Cave', w: 200, h: 100, d: 180, color: '#4682B4', exits: ['cave_entrance', 'cave_crystal', 'cave_deep'], features: [{type:'fountain', x:100, y:50, w:60, h:40, label:'💧 Crystal Spring'}] },
+      { id: 'cave_crystal', name: 'Crystal Chamber', w: 150, h: 90, d: 120, color: '#87CEEB', exits: ['cave_main'], features: [{type:'treasure', x:75, y:45, w:50, h:30, label:'💎 Crystal Treasure', item:'cave_crystal'}] },
+      { id: 'cave_deep', name: 'Deep Cave', w: 160, h: 90, d: 140, color: '#1a1a2e', exits: ['cave_main'], features: [{type:'secret_passage', x:80, y:45, w:50, h:30, label:'🔑 Secret Exit', item:'secret_key'}] }
+    ],
+    music: 'cave',
+    hint: 'The crystals glow with a familiar light. You remember this place.',
+  },
+  waterfall: {
+    id: 'waterfall',
+    name: '💧 Waterfall Falls',
+    desc: 'A majestic waterfall cascading into a peaceful pool below.',
+    type: 'tp',
+    music: 'waterfall',
+    skyColor: '#87CEEB',
+    groundColor: '#2d5a1e',
+    dogColor: '#4a9eff',
+    accentColor: '#006994',
+    companions: ['lake_dog'],
+    obstacles: [
+      { type: 'tree', x: -6, z: 5, height: 4, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'tree', x: 7, z: -4, height: 3.5, trunkColor: '#5a3a1a', leafColor: '#3a7a2e' },
+      { type: 'bush', x: -8, z: -6, color: '#2d6a1e' },
+      { type: 'bench', x: 4, z: 7, width: 2, color: '#8B6914' },
+    ],
+    npcs: [
+      {
+        id: 'waterfall_dog_npc',
+        name: 'River',
+        color: '#D2691E',
+        accentColor: '#FFD700',
+        x: 2,
+        z: -3,
+        dialogue: [
+          'The waterfall is beautiful this time of year!',
+          'There\'s a secret path behind the falls. Want to see?',
+          'The pool below holds ancient treasures.',
+          'Follow the water — it leads somewhere special.',
+        ],
+      },
+    ],
+    features: [
+      { type: 'water', x: 0, z: 0, id: 'waterfall_pool', label: '💧 Waterfall Pool' },
+      { type: 'scent_post', x: -7, z: 6, id: 'waterfall_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 8, z: -7, id: 'waterfall_treasure', label: '✨ Hidden Treasure' },
+      { type: 'lure', x: 5, z: 5, id: 'waterfall_lure', label: '🍖 Fish Scent' },
+    ],
+    hint: 'The sound of the waterfall is soothing. You remember playing here with your human.',
+  },
+  park_secret: {
+    id: 'park_secret',
+    name: '🌙 Secret Park',
+    desc: 'A hidden park that only appears at night. Full of magical surprises.',
+    type: 'tp',
+    music: 'park_secret',
+    skyColor: '#191970',
+    groundColor: '#2d5a1e',
+    dogColor: '#1a1a1a',
+    accentColor: '#4a4a4a',
+    companions: ['park_secret_dog'],
+    obstacles: [
+      { type: 'tree', x: -7, z: 5, height: 4, trunkColor: '#5a3a1a', leafColor: '#1a3a0a' },
+      { type: 'tree', x: 8, z: -6, height: 3.5, trunkColor: '#5a3a1a', leafColor: '#2d5a1e' },
+      { type: 'bush', x: -9, z: -7, color: '#2d6a1e' },
+      { type: 'bench', x: 5, z: 7, width: 2, color: '#8B6914' },
+    ],
+    npcs: [
+      {
+        id: 'park_secret_dog_npc',
+        name: 'Shadow',
+        color: '#1a1a1a',
+        accentColor: '#4a4a4a',
+        x: -2,
+        z: 4,
+        dialogue: [
+          'I know all the secret paths in the park.',
+          'There\'s a hidden treasure behind the old oak tree.',
+          'The moon bone only appears at night. Want to wait?',
+          'Follow the shadows — they lead to the lake.',
+        ],
+      },
+    ],
+    features: [
+      { type: 'fountain', x: 0, z: 0, id: 'secret_fountain', label: '🌙 Moon Fountain' },
+      { type: 'scent_post', x: -8, z: 6, id: 'secret_scent', label: '🐾 Scent Post' },
+      { type: 'treasure', x: 9, z: -8, id: 'secret_treasure', label: '✨ Moon Treasure' },
+      { type: 'lure', x: 6, z: 6, id: 'secret_lure', label: '🍖 Moon Treat' },
+    ],
+    hint: 'The park glows under the moonlight. Your human used to bring you here at night.',
   }
 };
 
@@ -340,7 +869,75 @@ export const ITEMS = {
   squirrel_dog: { name: '🐿️ Squirrel Toy', desc: 'A toy squirrel. You love this one.' },
   tennis_ball: { name: '🎾 Tennis Ball', desc: 'A slobbery tennis ball. Classic.' },
   dog_tag: { name: '🏷️ Dog Tag', desc: 'Your dog tag with your name on it.' },
-  treat_bag: { name: '🥡 Treat Bag', desc: 'An open bag of treats. Jackpot!' }
+  treat_bag: { name: '🥡 Treat Bag', desc: 'An open bag of treats. Jackpot!' },
+  // New crafting items
+  puzzle_piece: { name: '🧩 Puzzle Piece', desc: 'Part of a dog show puzzle. Shows a route.' },
+  lake_stone: { name: '🪨 Lake Stone', desc: 'Smooth stone from the lake shore. Shiny.' },
+  pet_shop_ticket: { name: '🎫 Pet Shop Ticket', desc: 'Admits you to the pet shop. Smells like treats.' },
+  dog_show_ribbon: { name: '🎀 Dog Show Ribbon', desc: 'Blue ribbon from the dog show. You earned it!' },
+  compass_fragment: { name: '🧭 Compass Fragment', desc: 'Half a compass. Points toward home.' },
+  magic_bone: { name: '✨ Magic Bone', desc: 'Glows faintly. Smells like adventure.' },
+  treasure_map: { name: '🗺️ Treasure Map', desc: 'Shows where secrets are hidden.' },
+  secret_key: { name: '🔑 Secret Key', desc: 'Opens hidden passages.' },
+  golden_bone: { name: '🦴 Golden Bone', desc: 'The legendary golden bone. Pure magic.' },
+  // New comfort items
+  warm_blanket: { name: '🧶 Warm Blanket', desc: 'Smells like your human. Comforting.' },
+  favorite_toy: { name: '🧸 Favorite Toy', desc: 'Your old stuffed animal. Safe.' },
+  comfort_bell: { name: '🔔 Comfort Bell', desc: 'Rings when near home.' },
+  // New zone items
+  lake_crystal: { name: '💎 Lake Crystal', desc: 'Sparkles in the water. Magical.' },
+  pet_shop_treat: { name: '🍪 Pet Shop Treat', desc: 'Fresh from the bakery. Delicious!' },
+  dog_show_trophy: { name: '🏆 Dog Show Trophy', desc: 'You won first place! Well done.' },
+  // New collectibles
+  shiny_rock: { name: '✨ Shiny Rock', desc: 'Glistens in the sun. Pretty.' },
+  feather: { name: '🪶 Feather', desc: 'Soft and colorful. From a bird.' },
+  pinecone: { name: '🌲 Pinecone', desc: 'From the forest. Smells like trees.' },
+  flower: { name: '🌸 Flower', desc: 'Sweet smelling. Your human loved flowers.' },
+  leaf: { name: '🍂 Leaf', desc: 'Autumn colored. Beautiful.' },
+  shell: { name: '🐚 Shell', desc: 'From the lake shore. Smooth.' },
+  // New quest items
+  home_photo: { name: '📸 Home Photo', desc: 'A photo of your home. You remember this place.' },
+  collar_buckle: { name: '🔗 Collar Buckle', desc: 'Part of your collar. You recognize it.' },
+  dog_license: { name: '📋 Dog License', desc: 'Your official dog license. Real proof of home.' },
+  // New special items
+  rainbow_bone: { name: '🌈 Rainbow Bone', desc: 'Shimmers with all colors. Legendary!' },
+  moon_bone: { name: '🌙 Moon Bone', desc: 'Glows in the dark. Magical.' },
+  star_bone: { name: '⭐ Star Bone', desc: 'Sparkles like a star. Rare!' },
+  // New food items
+  pizza_crust: { name: '🍕 Pizza Crust', desc: 'Found on the sidewalk. Smells good.' },
+  hot_dog: { name: '🌭 Hot Dog', desc: 'A real hot dog! Wait... is that...?' },
+  ice_cream: { name: '🍦 Ice Cream', desc: 'Still frozen! Sweet and cold.' },
+  cookie: { name: '🍪 Cookie', desc: 'Chocolate chip. Perfect.' },
+  cupcake: { name: '🧁 Cupcake', desc: 'With sprinkles. Festive!' },
+  donut: { name: '🍩 Donut', desc: 'Glazed. Simple perfection.' },
+  // New utility items
+  flashlight: { name: '🔦 Flashlight', desc: 'Lights up dark places. Useful.' },
+  rope: { name: '🪢 Rope', desc: 'Tough and long. Can tie things.' },
+  magnet: { name: '🧲 Magnet', desc: 'Attracts metal. Weirdly useful.' },
+  umbrella: { name: '☂️ Umbrella', desc: 'Keeps you dry in rain. Comforting.' },
+  // New story items
+  letter: { name: '✉️ Letter', desc: 'A letter addressed to you. From your human?' },
+  diary_page: { name: '📄 Diary Page', desc: 'Your human wrote about you here. Sweet.' },
+  // New zone-specific items
+  forest_mushroom: { name: '🍄 Forest Mushroom', desc: 'Colorful and strange. Don\'t eat it.' },
+  cave_crystal: { name: '💎 Cave Crystal', desc: 'Glowing from within. Magical.' },
+  beach_shell: { name: '🐚 Beach Shell', desc: 'From the shore. Smooth and pretty.' },
+  mountain_rock: { name: '🪨 Mountain Rock', desc: 'Heavy and ancient. Powerful.' },
+  garden_flower: { name: '🌺 Garden Flower', desc: 'Bright and beautiful. Your human grew these.' },
+  // New rare items
+  golden_treat: { name: '🍖 Golden Treat', desc: 'Shines like gold. Legendary snack!' },
+  diamond_bone: { name: '💎 Diamond Bone', desc: 'Sparkles with diamonds. Incredible!' },
+  rainbow_ribbon: { name: '🌈 Rainbow Ribbon', desc: 'Colors shift and change. Magical.' },
+  // New companion items
+  companion_treat: { name: '🍖 Companion Treat', desc: 'Special treat for friends. They love it.' },
+  companion_toy: { name: '🧸 Companion Toy', desc: 'A toy your friends would enjoy.' },
+  // New crafting recipes (combinations)
+  // bone + magic_bone = golden_bone
+  // puzzle_piece + treasure_map = secret_key
+  // collar_piece + leash = collar
+  // map_fragment + compass_fragment = compass
+  // treat + cookie = cupcake
+  // toy + blanket = favorite_toy
 };
 
 // ===== THREATS =====
@@ -450,6 +1047,263 @@ export const THREATS: Record<string, Threat> = {
     type: 'timing',
     description: 'Rain is filling the storm drain! Your toy might be down there!',
     solve: 'Press SPACE to grab the toy before it washes away',
+    mangaText: 'WHOOSH!',
+    mangaType: 'scare'
+  },
+  // New threats from new zones
+  lake_ripple: {
+    name: 'Lake Ripple',
+    icon: '🌊',
+    type: 'timing',
+    description: 'Ripples in the lake! Something is coming!',
+    solve: 'Press SPACE to jump over the wave',
+    mangaText: 'SPLASH!',
+    mangaType: 'scare'
+  },
+  pet_shop_cat: {
+    name: 'Pet Shop Cat',
+    icon: '🐱',
+    type: 'combat',
+    description: 'A pampered cat guards the treats!',
+    solve: 'Press SPACE in rhythm to distract it',
+    mangaText: 'MEOW!',
+    mangaType: 'fight'
+  },
+  dog_show_judge: {
+    name: 'Dog Show Judge',
+    icon: '👔',
+    type: 'timing',
+    description: 'The judge is watching! Pose correctly!',
+    solve: 'Press SPACE when the pose indicator aligns',
+    mangaText: 'POSE!',
+    mangaType: 'near-miss'
+  },
+  forest_wolf: {
+    name: 'Forest Wolf',
+    icon: '🐺',
+    type: 'combat',
+    description: 'A wild wolf blocks the path!',
+    solve: 'Press SPACE in rhythm to assert dominance',
+    mangaText: 'HOWL!',
+    mangaType: 'fight'
+  },
+  beach_crab: {
+    name: 'Beach Crab',
+    icon: '🦀',
+    type: 'sneak',
+    description: 'A crab with giant claws! Hide!',
+    solve: 'Stay still when the crab approaches, move when safe',
+    mangaText: 'CLICK!',
+    mangaType: 'scare'
+  },
+  mountain_goat: {
+    name: 'Mountain Goat',
+    icon: '🐐',
+    type: 'timing',
+    description: 'A goat charges down the mountain!',
+    solve: 'Press SPACE to dodge at the right moment',
+    mangaText: 'CLACK!',
+    mangaType: 'near-miss'
+  },
+  garden_snake: {
+    name: 'Garden Snake',
+    icon: '🐍',
+    type: 'sneak',
+    description: 'A snake slithers through the flowers!',
+    solve: 'Move away slowly without sudden movements',
+    mangaText: 'HISS!',
+    mangaType: 'scare'
+  },
+  library_silent: {
+    name: 'Library Silence',
+    icon: '🤫',
+    type: 'comfort',
+    description: 'The librarian shushes you! Find quiet comfort.',
+    solve: 'Find a cozy spot and stay quiet',
+    mangaText: 'SHHH!',
+    mangaType: 'scare'
+  },
+  market_chase: {
+    name: 'Market Chase',
+    icon: '🏃',
+    type: 'timing',
+    description: 'Vendors are rushing! Dodge the crowd!',
+    solve: 'Press SPACE to weave through the crowd',
+    mangaText: 'MOVE!',
+    mangaType: 'near-miss'
+  },
+  park_squirrel: {
+    name: 'Park Squirrel Army',
+    icon: '🐿️',
+    type: 'combat',
+    description: 'A horde of squirrels attacks!',
+    solve: 'Press SPACE in rhythm to scare them off',
+    mangaText: 'SQUEAK!',
+    mangaType: 'fight'
+  },
+  // New environmental threats
+  fog: {
+    name: 'Thick Fog',
+    icon: '🌫️',
+    type: 'comfort',
+    description: 'Visibility is zero! Find your way through.',
+    solve: 'Follow the scent trail through the fog',
+    mangaText: 'FOG!',
+    mangaType: 'scare'
+  },
+  lightning: {
+    name: 'Lightning Strike',
+    icon: '⚡',
+    type: 'timing',
+    description: 'Lightning flashes! Find shelter quickly!',
+    solve: 'Press SPACE to run to the nearest shelter',
+    mangaText: 'ZAP!',
+    mangaType: 'scare'
+  },
+  flood: {
+    name: 'Flash Flood',
+    icon: '🌊',
+    type: 'sneak',
+    description: 'Water is rising! Find high ground!',
+    solve: 'Move to elevated areas before the water reaches you',
+    mangaText: 'WHOOSH!',
+    mangaType: 'scare'
+  },
+  earthquake: {
+    name: 'Earthquake',
+    icon: '🌍',
+    type: 'timing',
+    description: 'The ground is shaking! Stay balanced!',
+    solve: 'Press SPACE to stabilize yourself',
+    mangaText: 'RUMBLE!',
+    mangaType: 'scare'
+  },
+  // New animal threats
+  raccoon: {
+    name: 'Raccoon Bandit',
+    icon: '🦝',
+    type: 'combat',
+    description: 'A raccoon steals your items!',
+    solve: 'Press SPACE in rhythm to retrieve your things',
+    mangaText: 'GRAB!',
+    mangaType: 'fight'
+  },
+  owl: {
+    name: 'Night Owl',
+    icon: '🦉',
+    type: 'comfort',
+    description: 'A large owl stares at you in the dark!',
+    solve: 'Stay calm and blink slowly to show friendliness',
+    mangaText: 'HOOT!',
+    mangaType: 'scare'
+  },
+  deer: {
+    name: 'Deer Herd',
+    icon: '🦌',
+    type: 'sneak',
+    description: 'A herd of deer blocks the path!',
+    solve: 'Wait patiently for them to move aside',
+    mangaText: 'PRANCE!',
+    mangaType: 'near-miss'
+  },
+  // New special threats
+  treasure_guardian: {
+    name: 'Treasure Guardian',
+    icon: '🗡️',
+    type: 'combat',
+    description: 'A legendary guardian protects the treasure!',
+    solve: 'Press SPACE in rhythm to prove your worthiness',
+    mangaText: 'CLANG!',
+    mangaType: 'fight'
+  },
+  // New zone-specific threats
+  lake_monster: {
+    name: 'Lake Monster',
+    icon: '🐉',
+    type: 'combat',
+    description: 'Something large stirs beneath the lake!',
+    solve: 'Press SPACE in rhythm to calm the waters',
+    mangaText: 'SPLASH!',
+    mangaType: 'fight'
+  },
+  pet_shop_bell: {
+    name: 'Pet Shop Bell',
+    icon: '🔔',
+    type: 'timing',
+    description: 'The door bell won\'t stop ringing!',
+    solve: 'Press SPACE to silence it before the cat notices',
+    mangaText: 'DING!',
+    mangaType: 'near-miss'
+  },
+  dog_show_roar: {
+    name: 'Dog Show Roar',
+    icon: '🦁',
+    type: 'combat',
+    description: 'The crowd roars! Stand your ground!',
+    solve: 'Press SPACE in rhythm to show confidence',
+    mangaText: 'ROAR!',
+    mangaType: 'fight'
+  },
+  forest_thorn: {
+    name: 'Forest Thorns',
+    icon: '🌿',
+    type: 'sneak',
+    description: 'Thorny vines block the path!',
+    solve: 'Find the safe passage through the thorns',
+    mangaText: 'PRICK!',
+    mangaType: 'scare'
+  },
+  beach_wave: {
+    name: 'Big Wave',
+    icon: '🌊',
+    type: 'timing',
+    description: 'A huge wave approaches the shore!',
+    solve: 'Press SPACE to jump to safety',
+    mangaText: 'CRASH!',
+    mangaType: 'scare'
+  },
+  mountain_rockfall: {
+    name: 'Rockfall',
+    icon: '🪨',
+    type: 'timing',
+    description: 'Rocks are falling from above!',
+    solve: 'Press SPACE to dodge the falling rocks',
+    mangaText: 'CLATTER!',
+    mangaType: 'scare'
+  },
+  garden_insect: {
+    name: 'Giant Insect',
+    icon: '🐛',
+    type: 'sneak',
+    description: 'A giant bug crawls toward you!',
+    solve: 'Stay still and hope it moves on',
+    mangaText: 'BUZZ!',
+    mangaType: 'scare'
+  },
+  library_boo: {
+    name: 'Library Boo',
+    icon: '👻',
+    type: 'comfort',
+    description: 'A ghostly figure appears among the books!',
+    solve: 'Show kindness to the spirit',
+    mangaText: 'BOO!',
+    mangaType: 'scare'
+  },
+  market_fire: {
+    name: 'Market Fire',
+    icon: '🔥',
+    type: 'timing',
+    description: 'A stall catches fire! Help put it out!',
+    solve: 'Press SPACE to grab water buckets',
+    mangaText: 'WHOOSH!',
+    mangaType: 'scare'
+  },
+  park_tornado: {
+    name: 'Park Tornado',
+    icon: '🌪️',
+    type: 'sneak',
+    description: 'A small tornado forms in the park!',
+    solve: 'Find the safest shelter quickly',
     mangaText: 'WHOOSH!',
     mangaType: 'scare'
   }

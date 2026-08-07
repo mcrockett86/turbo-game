@@ -1,6 +1,6 @@
 # Turbo: Lost & Found — Playthrough Simulation Report
 
-**Date:** 2026-08-06T22:37:58.470Z
+**Date:** 2026-08-07T01:43:11.452Z
 **Game:** Turbo: Lost & Found (web-based)
 **Simulation Method:** Playwright browser automation
 **Playthroughs:** 5
@@ -11,7 +11,7 @@
 
 Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
-- **Average playthrough duration:** ~2076ms (automation speed)
+- **Average playthrough duration:** ~2075ms (automation speed)
 - **Average final happiness:** 0% (out of 100)
 - **Total items/events discovered:** 15
 - **Total companions encountered:** 0
@@ -30,7 +30,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Metric | Value |
 |--------|-------|
-| Duration | 2093ms |
+| Duration | 2121ms |
 | Zones Visited | 1 (start) |
 | Rooms Visited | 0 |
 | Items Collected | 3 |
@@ -56,7 +56,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Metric | Value |
 |--------|-------|
-| Duration | 2056ms |
+| Duration | 2064ms |
 | Zones Visited | 1 (start) |
 | Rooms Visited | 0 |
 | Items Collected | 3 |
@@ -82,7 +82,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Metric | Value |
 |--------|-------|
-| Duration | 2070ms |
+| Duration | 2023ms |
 | Zones Visited | 1 (start) |
 | Rooms Visited | 0 |
 | Items Collected | 3 |
@@ -108,7 +108,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Metric | Value |
 |--------|-------|
-| Duration | 2052ms |
+| Duration | 2078ms |
 | Zones Visited | 1 (start) |
 | Rooms Visited | 0 |
 | Items Collected | 3 |
@@ -134,7 +134,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Metric | Value |
 |--------|-------|
-| Duration | 2108ms |
+| Duration | 2087ms |
 | Zones Visited | 1 (start) |
 | Rooms Visited | 0 |
 | Items Collected | 3 |
@@ -163,11 +163,11 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 
 | Dog | Duration | Happiness End | Items | Companions | Threats | Errors |
 |-----|----------|---------------|-------|------------|---------|--------|
-| turbo | 2093ms | 0% | 3 | 0 | 1/0 | 0 |
-| watson | 2056ms | 0% | 3 | 0 | 1/0 | 0 |
-| nova | 2070ms | 0% | 3 | 0 | 1/0 | 0 |
-| walter | 2052ms | 0% | 3 | 0 | 1/0 | 0 |
-| beaux | 2108ms | 0% | 3 | 0 | 1/0 | 0 |
+| turbo | 2121ms | 0% | 3 | 0 | 1/0 | 0 |
+| watson | 2064ms | 0% | 3 | 0 | 1/0 | 0 |
+| nova | 2023ms | 0% | 3 | 0 | 1/0 | 0 |
+| walter | 2078ms | 0% | 3 | 0 | 1/0 | 0 |
+| beaux | 2087ms | 0% | 3 | 0 | 1/0 | 0 |
 
 ### Key Comparisons
 
@@ -222,7 +222,7 @@ Ran **5** automated playthroughs across all 5 dogs. Key findings:
 - Multiple overlapping canvases (HUD, dialogue, inventory, companion, hint, effects, endgame, manga combat) create rendering complexity
 
 ### Performance
-- Average automation duration: 2076ms
+- Average automation duration: 2075ms
 - No significant performance issues detected in automated testing
 
 ### Accessibility

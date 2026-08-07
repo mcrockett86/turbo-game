@@ -22,7 +22,11 @@ export interface Dog {
 // ---- Room ----
 export interface RoomFeature {
   type: 'traffic' | 'hint' | 'food' | 'door' | 'cat' | 'bully' | 'storm' | 'vacuum'
-      | 'tv' | 'dog_friend' | 'person' | 'home' | 'choice' | 'tree_clue';
+      | 'tv' | 'dog_friend' | 'person' | 'home' | 'choice' | 'tree_clue'
+      | 'water' | 'pet_shop' | 'dog_show' | 'locked_door' | 'secret_passage'
+      | 'lure' | 'bridge' | 'trap' | 'treasure_chest' | 'companion_trap'
+      | 'music_box' | 'fountain' | 'mailbox' | 'fire_hydrant' | 'scent_post'
+      | 'treasure' | 'water_bowl' | 'celebration';
   x: number;
   y: number;
   w: number;
