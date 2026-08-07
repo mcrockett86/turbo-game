@@ -69,10 +69,72 @@ let sfxVolume = CONFIG.sfxVolume;
 let muted = false;
 const CROSSFADE_DURATION = 2000; // ms
 
+// ---- Procedural Music Fallback ----
+let musicFallback: {
+  ctx: AudioContext | null;
+  oscillators: OscillatorNode[];
+  gains: GainNode[];
+  running: boolean;
+} = { ctx: null, oscillators: [], gains: [], running: false };
+
+function startProceduralMusic(zoneId: string): void {
+  if (musicFallback.running) stopProceduralMusic();
+
+  const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  musicFallback.ctx = ctx;
+  musicFallback.oscillators = [];
+  musicFallback.gains = [];
+
+  // Create ambient drone based on zone mood
+  const configs: Record<string, { freqs: number[]; type: OscillatorType; vol: number }> = {
+    suburban: { freqs: [110, 165, 220], type: 'sine', vol: 0.06 },
+    dog_park: { freqs: [220, 330, 440], type: 'sine', vol: 0.08 },
+    apartment: { freqs: [90, 135, 180], type: 'triangle', vol: 0.05 },
+    shelter: { freqs: [80, 120, 160], type: 'sine', vol: 0.04 },
+    home: { freqs: [260, 392, 523], type: 'sine', vol: 0.07 },
+    combat: { freqs: [70, 105, 140], type: 'sawtooth', vol: 0.06 },
+    quiet: { freqs: [60, 90, 120], type: 'sine', vol: 0.03 },
+  };
+
+  const cfg = configs[zoneId] || configs.quiet;
+
+  for (const freq of cfg.freqs) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = cfg.type;
+    osc.frequency.value = freq;
+    gain.gain.value = cfg.vol * musicVolume;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    musicFallback.oscillators.push(osc);
+    musicFallback.gains.push(gain);
+  }
+
+  musicFallback.running = true;
+}
+
+function stopProceduralMusic(): void {
+  if (!musicFallback.running || !musicFallback.ctx) return;
+  for (const osc of musicFallback.oscillators) {
+    try { osc.stop(); } catch {}
+  }
+  for (const gain of musicFallback.gains) {
+    try { gain.disconnect(); } catch {}
+  }
+  try { musicFallback.ctx.close(); } catch {}
+  musicFallback = { ctx: null, oscillators: [], gains: [], running: false };
+}
+
 // ---- Music with Crossfade ----
 function playMusic(zoneId: string): void {
   const track = MUSIC_TRACKS[zoneId] || MUSIC_TRACKS.quiet;
   if (currentMusic === track) return;
+
+  // If we have procedural music running, stop it first
+  if (musicFallback.running) {
+    stopProceduralMusic();
+  }
 
   if (musicPlayer) {
     // Crossfade: fade out old while new fades in
@@ -95,6 +157,10 @@ function playMusic(zoneId: string): void {
           oldPlayer.unload();
         }, CROSSFADE_DURATION + 100);
       },
+      onloaderror: () => {
+        // Fallback: procedural music
+        startProceduralMusic(zoneId);
+      },
       onend: () => {
         musicPlayer?.play();
       },
@@ -110,6 +176,10 @@ function playMusic(zoneId: string): void {
     volume: musicVolume,
     onload: () => {
       musicPlayer?.play();
+    },
+    onloaderror: () => {
+      // Fallback: procedural music
+      startProceduralMusic(zoneId);
     },
     onend: () => {
       musicPlayer?.play();
@@ -128,6 +198,10 @@ function stopMusic(): void {
       musicPlayer = null;
     }, 600);
     currentMusic = null;
+  }
+  // Also stop procedural music if running
+  if (musicFallback.running) {
+    stopProceduralMusic();
   }
 }
 
@@ -156,15 +230,31 @@ function playSFX(sfxId: string, pitch: number = 1): void {
       // Fallback: generate tone with Web Audio API
       playFallbackSFX(sfxId);
     },
+    onplayerror: () => {
+      // Fallback: generate tone with Web Audio API
+      playFallbackSFX(sfxId);
+    },
   });
 
   sound.play();
 }
 
 // ---- Web Audio Fallback (no external files) ----
+let sfxAudioContext: AudioContext | null = null;
+
+function getSfxAudioContext(): AudioContext {
+  if (!sfxAudioContext || sfxAudioContext.state === 'closed') {
+    sfxAudioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  }
+  if (sfxAudioContext.state === 'suspended') {
+    sfxAudioContext.resume();
+  }
+  return sfxAudioContext;
+}
+
 function playFallbackSFX(sfxId: string): void {
   if (muted) return;
-  const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const ctx = getSfxAudioContext();
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.connect(gain);
