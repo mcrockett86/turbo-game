@@ -445,6 +445,12 @@ export class FpRoomRenderer {
   private glowTime: number = 0;
   private happinessTimer: number = 0;
   private happinessInterval: number | null = null;
+  // Store bound listeners so dispose() can remove them
+  private boundKeyDown: ((e: KeyboardEvent) => void) | null = null;
+  private boundKeyUp: ((e: KeyboardEvent) => void) | null = null;
+  private boundMouseMove: ((e: MouseEvent) => void) | null = null;
+  private boundClick: ((e: MouseEvent) => void) | null = null;
+  private disposed = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -456,6 +462,8 @@ export class FpRoomRenderer {
   // ---- Initialization ----
 
   init(zoneId: string, zoneData: Zone, roomIndex: number): void {
+    if (this.disposed) return;
+
     this.zoneId = zoneId;
     this.zoneData = zoneData;
     this.roomIndex = roomIndex;
@@ -532,10 +540,15 @@ export class FpRoomRenderer {
   }
 
   private setupEvents(): void {
-    this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    this.canvas.addEventListener('click', (e) => this.onClick(e));
-    window.addEventListener('keydown', (e) => this.onKeyDown(e));
-    window.addEventListener('keyup', (e) => this.onKeyUp(e));
+    this.boundKeyDown = (e: KeyboardEvent) => this.onKeyDown(e);
+    this.boundKeyUp = (e: KeyboardEvent) => this.onKeyUp(e);
+    this.boundMouseMove = (e: MouseEvent) => this.onMouseMove(e);
+    this.boundClick = (e: MouseEvent) => this.onClick(e);
+
+    this.canvas.addEventListener('mousemove', this.boundMouseMove);
+    this.canvas.addEventListener('click', this.boundClick);
+    window.addEventListener('keydown', this.boundKeyDown);
+    window.addEventListener('keyup', this.boundKeyUp);
   }
 
   // ---- Event Handlers ----
@@ -731,16 +744,19 @@ export class FpRoomRenderer {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
 
-    window.removeEventListener('keydown', this.onKeyDown.bind(this));
-    window.removeEventListener('keyup', this.onKeyUp.bind(this));
+    window.removeEventListener('keydown', this.boundKeyDown!);
+    window.removeEventListener('keyup', this.boundKeyUp!);
 
-    this.canvas.removeEventListener('mousemove', this.onMouseMove.bind(this));
-    this.canvas.removeEventListener('click', this.onClick.bind(this));
+    this.canvas.removeEventListener('mousemove', this.boundMouseMove!);
+    this.canvas.removeEventListener('click', this.boundClick!);
 
     this.renderer.dispose();
     this.featureGroups.clear();
