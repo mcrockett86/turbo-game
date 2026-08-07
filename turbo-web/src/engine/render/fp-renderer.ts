@@ -71,7 +71,7 @@ function buildRoomGeometry(room: Room, scaledW?: number, scaledH?: number, scale
   const hd = d / 2;
 
   // Floor
-  const floorGeo = new PlaneGeometry(room.w, room.d, FLOOR_SEGMENTS, FLOOR_SEGMENTS);
+  const floorGeo = new PlaneGeometry(w, d, FLOOR_SEGMENTS, FLOOR_SEGMENTS);
   floorGeo.rotateX(-Math.PI / 2);
   const floorMat = getOrCreateMaterial(0x555555);
   const floor = new Mesh(floorGeo, floorMat);
@@ -80,11 +80,11 @@ function buildRoomGeometry(room: Room, scaledW?: number, scaledH?: number, scale
   group.add(floor);
 
   // Ceiling
-  const ceilGeo = new PlaneGeometry(room.w, room.d, CEILING_SEGMENTS, CEILING_SEGMENTS);
+  const ceilGeo = new PlaneGeometry(w, d, CEILING_SEGMENTS, CEILING_SEGMENTS);
   ceilGeo.rotateX(Math.PI / 2);
   const ceilMat = getOrCreateMaterial(0x333333);
   const ceiling = new Mesh(ceilGeo, ceilMat);
-  ceiling.position.y = room.h;
+  ceiling.position.y = h;
   ceiling.name = 'ceiling';
   group.add(ceiling);
 
@@ -97,15 +97,15 @@ function buildRoomGeometry(room: Room, scaledW?: number, scaledH?: number, scale
   ];
 
   for (const cfg of wallConfigs) {
-    const wallW = cfg.axis === 'x' ? room.d : room.w;
-    const wallH = room.h;
+    const wallW = cfg.axis === 'x' ? d : w;
+    const wallH = h;
 
     const wallGeo = new PlaneGeometry(wallW, wallH, WALL_SEGMENTS, WALL_SEGMENTS);
     const wallColor = parseInt(room.color.replace('#', '0x'), 16);
     const wallMat = getOrCreateMaterial(wallColor);
     const wall = new Mesh(wallGeo, wallMat);
     wall.position[cfg.axis] = cfg.pos;
-    wall.position.y = room.h / 2;
+    wall.position.y = h / 2;
     wall.rotation.y = cfg.rotY;
     wall.name = cfg.label;
     group.add(wall);
