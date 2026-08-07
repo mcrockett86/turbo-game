@@ -526,7 +526,9 @@ export class FpRoomRenderer {
 
     // Start loop
     this.lastFrameTime = performance.now();
+    console.log('[FP] Starting animate loop...');
     this.animate();
+    console.log('[FP] Animate loop started');
 
     // Start happiness decay
     this.startHappinessDecay();
