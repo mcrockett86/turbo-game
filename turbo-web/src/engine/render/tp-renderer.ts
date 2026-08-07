@@ -584,6 +584,9 @@ export class TpEngine {
   private onFeatureClick: ((type: string, data: any) => void) | null = null;
   private onNpcClick: ((npc: NPC) => void) | null = null;
   private canvasEl: HTMLCanvasElement;
+  // Bound click handler so dispose() can remove it
+  private boundClick: ((e: MouseEvent) => void) | null = null;
+  private disposed = false;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
   private isPaused: boolean;
@@ -788,7 +791,8 @@ export class TpEngine {
     this.cameraController.setTarget(new THREE.Vector3(0, 0, 0));
 
     // Setup click handler
-    this.setupClickHandler();
+    this.boundClick = (e: MouseEvent) => this.setupClickHandler(e);
+    this.canvasEl.addEventListener('click', this.boundClick);
   }
 
   /** Create a visual obstacle from data */
@@ -1054,7 +1058,7 @@ export class TpEngine {
   }
 
   /** Setup click handler for features/NPCs */
-  private setupClickHandler(): void {
+  private setupClickHandler(event: MouseEvent): void {
     this.canvasEl.addEventListener('click', (event) => {
       if (this.isPaused) return;
 
@@ -1258,7 +1262,10 @@ export class TpEngine {
 
   /** Dispose */
   dispose(): void {
-    this.canvasEl.removeEventListener('click', this.setupClickHandler.bind(this) as any);
+    if (this.disposed) return;
+    this.disposed = true;
+
+    this.canvasEl.removeEventListener('click', this.boundClick!);
     this.renderer.dispose();
     this.npcManager.clear();
     this.obstacleManager.clear();

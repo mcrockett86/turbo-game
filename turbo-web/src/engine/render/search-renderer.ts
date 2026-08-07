@@ -43,6 +43,10 @@ export class SearchRenderer {
   private onProximityChange: ((proximity: number) => void) | null = null;
   private onHomeFound: (() => void) | null = null;
   private lastTime: number;
+  // Bound listeners for proper cleanup
+  private boundKeydown: ((e: KeyboardEvent) => void) | null = null;
+  private boundMousemove: ((e: MouseEvent) => void) | null = null;
+  private disposed = false;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -410,7 +414,7 @@ export class SearchRenderer {
 
   // ---- Input ----
   private setupInput(): void {
-    this.canvas.addEventListener('keydown', (e: KeyboardEvent) => {
+    this.boundKeydown = (e: KeyboardEvent) => {
       if (!this.state.isSearching) return;
       const speed = PLAYER_SPEED * 0.016;
       switch (e.key.toLowerCase()) {
@@ -431,15 +435,18 @@ export class SearchRenderer {
           this.state.playerX += speed;
           break;
       }
-    });
+    };
 
-    this.canvas.addEventListener('mousemove', (e: MouseEvent) => {
+    this.boundMousemove = (e: MouseEvent) => {
       const rect = this.canvas.getBoundingClientRect();
       const mx = (e.clientX - rect.left - this.canvas.width / 2) / Math.min(this.canvas.width, this.canvas.height);
       const my = (e.clientY - rect.top - this.canvas.height / 2) / Math.min(this.canvas.width, this.canvas.height);
       const angle = Math.atan2(my, mx);
       this.updatePlayerAngle(angle);
-    });
+    };
+
+    this.canvas.addEventListener('keydown', this.boundKeydown);
+    this.canvas.addEventListener('mousemove', this.boundMousemove);
   }
 
   // ---- Callbacks ----
@@ -453,6 +460,11 @@ export class SearchRenderer {
 
   /** Dispose */
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+
     this.stop();
+    this.canvas.removeEventListener('keydown', this.boundKeydown!);
+    this.canvas.removeEventListener('mousemove', this.boundMousemove!);
   }
 }
