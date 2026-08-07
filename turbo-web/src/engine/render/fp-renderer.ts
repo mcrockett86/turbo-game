@@ -59,12 +59,15 @@ function getOrCreateMaterial(color: number): MeshStandardMaterial {
 
 // ---- Room Geometry Builder ----
 
-function buildRoomGeometry(room: Room): Group {
+function buildRoomGeometry(room: Room, scaledW?: number, scaledH?: number, scaledD?: number): Group {
   const group = new Group();
   group.name = `room-${room.id}`;
 
-  const hw = room.w / 2;
-  const hd = room.d / 2;
+  const w = scaledW || room.w;
+  const h = scaledH || room.h;
+  const d = scaledD || room.d;
+  const hw = w / 2;
+  const hd = d / 2;
 
   // Floor
   const floorGeo = new PlaneGeometry(room.w, room.d, FLOOR_SEGMENTS, FLOOR_SEGMENTS);
@@ -181,6 +184,7 @@ function buildExitMarker(
   room: Room,
   roomIndex: number,
   zoneData: Zone,
+  scale: number = 1,
 ): Group {
   const zoneRooms = zoneData.rooms;
   const roomData = zoneRooms?.find(r => r.id === room.id);
@@ -196,16 +200,16 @@ function buildExitMarker(
   group.name = `exit-${exitRoomId}`;
   group.userData = { exitRoomId, roomIndex };
 
-  // Door frame
-  const doorW = 12;
-  const doorH = room.h * 0.7;
+  // Door frame (scaled)
+  const doorW = 12 * scale;
+  const doorH = 4 * scale;
   const doorGeo = new BoxGeometry(doorW, doorH, 1);
   const doorMat = getOrCreateMaterial(0x8a8a8a);
   const door = new Mesh(doorGeo, doorMat);
 
-  // Position exit on the correct wall
-  const hw = room.w / 2;
-  const hd = room.d / 2;
+  // Position exit on the correct wall (scaled)
+  const hw = (room.w * scale) / 2;
+  const hd = (room.d * scale) / 2;
 
   // Simple heuristic: first exit goes up (north), others spread out
   let exitX = 0;
@@ -230,25 +234,25 @@ function buildExitMarker(
     rotY = Math.PI;
   }
 
-  door.position.set(exitX, room.h / 2, exitZ);
+  door.position.set(exitX, doorH / 2, exitZ);
   door.rotation.y = rotY;
   group.add(door);
 
-  // Arrow marker above door
-  const arrowGeo = new ConeGeometry(3, 5, 4);
+  // Arrow marker above door (scaled, positioned relative to door)
+  const arrowGeo = new ConeGeometry(3 * scale, 5 * scale, 4);
   const arrowMat = new MeshStandardMaterial({
     color: 0x4ade80,
     emissive: 0x4ade80,
     emissiveIntensity: 0.6,
   });
   const arrow = new Mesh(arrowGeo, arrowMat);
-  arrow.position.set(exitX, room.h - 2, exitZ);
+  arrow.position.set(exitX, doorH + 3 * scale, exitZ);
   arrow.rotation.z = rotY;
   group.add(arrow);
 
-  // Label
+  // Label (scaled)
   const label = createLabel(`→ ${exitRoomId}`);
-  label.position.set(exitX, room.h + 5, exitZ);
+  label.position.set(exitX, doorH + 6 * scale, exitZ);
   group.add(label);
 
   return group;
@@ -310,9 +314,13 @@ const ZONE_LIGHTING: Record<string, ZoneLighting> = {
   },
 };
 
-function setupLighting(scene: Scene, room: Room, zoneId: string = 'default'): Group {
+function setupLighting(scene: Scene, room: Room, zoneId: string = 'default', scaledW?: number, scaledH?: number, scaledD?: number): Group {
   const lightGroup = new Group();
   lightGroup.name = 'lights';
+
+  const w = scaledW || room.w;
+  const h = scaledH || room.h;
+  const d = scaledD || room.d;
 
   const lighting = ZONE_LIGHTING[zoneId] || ZONE_LIGHTING.default;
 
@@ -328,13 +336,13 @@ function setupLighting(scene: Scene, room: Room, zoneId: string = 'default'): Gr
   const sunIntensity = Math.sin(tod * Math.PI);
   const dirColor = new Color(lighting.directionalColor).multiplyScalar(0.5 + sunIntensity * 0.5);
   const dirLight = new DirectionalLight(dirColor, CONFIG.directionalIntensity * sunIntensity + 0.2);
-  dirLight.position.set(room.w / 3, room.h * sunIntensity + 2, -room.d / 3);
+  dirLight.position.set(w / 3, h * sunIntensity + 2, -d / 3);
   lightGroup.add(dirLight);
 
   // Point light near center (warm glow, intensity varies)
   const pointIntensity = 0.3 + sunIntensity * 0.4;
-  const pointLight = new PointLight(0xf0c040, pointIntensity, room.w * 0.8);
-  pointLight.position.set(0, room.h - 2, 0);
+  const pointLight = new PointLight(0xf0c040, pointIntensity, w * 0.8);
+  pointLight.position.set(0, h * 0.7, 0);
   lightGroup.add(pointLight);
 
   scene.add(lightGroup);
@@ -353,6 +361,8 @@ function setupFog(scene: Scene, zoneId: string = 'default'): void {
 class CameraController {
   private camera: PerspectiveCamera;
   private room: Room;
+  private scaledW: number;
+  private scaledD: number;
   private currentPos: Vector3;
   private targetPos: Vector3;
   private transitioning: boolean;
@@ -360,9 +370,11 @@ class CameraController {
   private startPos: Vector3;
   private endPos: Vector3;
 
-  constructor(camera: PerspectiveCamera, room: Room, initialPos: Vector3) {
+  constructor(camera: PerspectiveCamera, room: Room, initialPos: Vector3, scaledW: number, scaledD: number) {
     this.camera = camera;
     this.room = room;
+    this.scaledW = scaledW;
+    this.scaledD = scaledD;
     this.currentPos = initialPos.clone();
     this.targetPos = initialPos.clone();
     this.transitioning = false;
@@ -382,11 +394,11 @@ class CameraController {
   }
 
   clampPosition(x: number, z: number): { x: number; z: number } {
-    const margin = 5;
-    const minX = -this.room.w / 2 + margin;
-    const maxX = this.room.w / 2 - margin;
-    const minZ = -this.room.d / 2 + margin;
-    const maxZ = this.room.d / 2 - margin;
+    const margin = 2;
+    const minX = -this.scaledW / 2 + margin;
+    const maxX = this.scaledW / 2 - margin;
+    const minZ = -this.scaledD / 2 + margin;
+    const maxZ = this.scaledD / 2 - margin;
     return {
       x: Math.max(minX, Math.min(maxX, x)),
       z: Math.max(minZ, Math.min(maxZ, z)),
@@ -434,6 +446,7 @@ export class FpRoomRenderer {
   private lightGroup: Group | null = null;
   private keys: Set<string> = new Set();
   private moveSpeed: number;
+  private roomScale: number = 0.1; // Data units -> world units (room data is ~10x too large)
   private raycaster: Raycaster;
   private mouse: Vector2;
   private hoveredFeature: RoomFeature | null = null;
@@ -492,9 +505,14 @@ export class FpRoomRenderer {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = false;
 
-    // Camera controller
-    const startPos = new Vector3(0, CONFIG.fpCameraHeight, 0);
-    this.cameraController = new CameraController(this.camera, this.room, startPos);
+    // Camera controller (use scaled room dimensions for clamping)
+    const s = this.roomScale;
+    const sw = this.room.w * s;
+    const sh = this.room.h * s;
+    const sd = this.room.d * s;
+    const cameraHeight = CONFIG.fpCameraHeight * s;
+    const startPos = new Vector3(0, cameraHeight, 0);
+    this.cameraController = new CameraController(this.camera, this.room, startPos, sw, sd);
     this.camera.position.copy(startPos);
 
     // Build room
@@ -512,28 +530,41 @@ export class FpRoomRenderer {
   }
 
   private buildRoom(): void {
-    // Room geometry
-    this.roomGroup = buildRoomGeometry(this.room);
+    // Scale room geometry from data units to world units
+    const s = this.roomScale;
+    const sw = this.room.w * s;
+    const sh = this.room.h * s;
+    const sd = this.room.d * s;
+
+    // Room geometry (scaled)
+    this.roomGroup = buildRoomGeometry(this.room, sw, sh, sd);
     this.scene.add(this.roomGroup);
 
     // Lighting
-    this.lightGroup = setupLighting(this.scene, this.room, this.zoneId);
+    this.lightGroup = setupLighting(this.scene, this.room, this.zoneId, sw, sh, sd);
 
     // Fog
     setupFog(this.scene, this.zoneId);
 
-    // Features
+    // Features (positions scaled)
     const features = this.room.features || [];
     for (const feature of features) {
-      const group = buildFeatureMarker(feature);
+      const scaledFeature = {
+        ...feature,
+        x: feature.x * s,
+        y: feature.y * s,
+        w: feature.w * s,
+        h: feature.h * s,
+      };
+      const group = buildFeatureMarker(scaledFeature);
       this.featureGroups.set(feature.type, group);
       this.scene.add(group);
     }
 
-    // Exits
+    // Exits (positions scaled)
     const exits = this.room.exits || [];
     for (const exitId of exits) {
-      const group = buildExitMarker(exitId, this.room, this.roomIndex, this.zoneData);
+      const group = buildExitMarker(exitId, this.room, this.roomIndex, this.zoneData, s);
       this.exitGroups.set(exitId, group);
       this.scene.add(group);
     }
