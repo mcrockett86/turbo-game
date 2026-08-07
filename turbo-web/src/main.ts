@@ -72,7 +72,12 @@ function stopRenderLoop(): void {
   isRunning = false;
 }
 
-function renderOverlays(_time: number): void {
+function renderOverlays(time: number): void {
+  // Track frame timing for delta calculations
+  if (!(renderOverlays as any)._lastTime) (renderOverlays as any)._lastTime = time;
+  const delta = Math.min((time - (renderOverlays as any)._lastTime) / 1000, 1 / 30);
+  (renderOverlays as any)._lastTime = time;
+
   // Sync HUD state from current game state
   if (hudRenderer) {
     const s = State.state;
@@ -111,15 +116,14 @@ function renderOverlays(_time: number): void {
     companionRenderer.setCompanions(met, active);
   }
 
-  // Update TP engine if active
+  // Update TP engine if active (with proper delta time)
   if (tpEngine && activeZoneType === 'tp') {
-    const delta = 1 / 60; // ~60fps
     tpEngine.update(delta, time);
   }
 
-  // Update search renderer if active
+  // Update search renderer if active (with proper delta time)
   if (searchRenderer && activeZoneType === 'search') {
-    searchRenderer.update(1 / 60);
+    searchRenderer.update(delta);
   }
 
   // Effects overlay — update particles in the unified loop
@@ -522,7 +526,7 @@ function setupUI(): void {
 }
 
 function onWindowResize(): void {
-  // Resize all canvases
+  // Size ALL canvases to current window dimensions
   const canvasIds = [
     'fp-canvas', 'tp-canvas', 'human-canvas',
     'hud-canvas', 'dialogue-canvas', 'inventory-canvas',
@@ -537,7 +541,7 @@ function onWindowResize(): void {
     }
   }
 
-  // Resize renderers
+  // Resize overlay renderers
   if (hudRenderer) hudRenderer.resize(window.innerWidth, window.innerHeight);
   if (dialogueRenderer) dialogueRenderer.resize(window.innerWidth, window.innerHeight);
   if (inventoryRenderer) inventoryRenderer.resize(window.innerWidth, window.innerHeight);
@@ -546,6 +550,9 @@ function onWindowResize(): void {
   if (effectsRenderer) effectsRenderer.resize(window.innerWidth, window.innerHeight);
   if (endgameRenderer) endgameRenderer.resize(window.innerWidth, window.innerHeight);
   if (mangaRenderer) mangaRenderer.resize(window.innerWidth, window.innerHeight);
+
+  // Resize game world renderers
+  if (tpEngine) tpEngine.resize(window.innerWidth, window.innerHeight);
 }
 
 function togglePanel(name: string): void {
@@ -681,6 +688,9 @@ function startFPView(): void {
   const canvas = canvasEl;
 
   canvas.style.display = 'block';
+
+  // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
+  sizeCanvasToWindow(canvas);
 
   // Dispose previous renderer if switching rooms
   fpRenderer?.dispose();
@@ -935,6 +945,9 @@ function startTPView(zoneId: string, zoneData: Zone): void {
   const canvas = canvasEl;
 
   canvas.style.display = 'block';
+
+  // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
+  sizeCanvasToWindow(canvas);
 
   // Dispose previous engine
   tpEngine?.dispose();
@@ -1329,6 +1342,10 @@ function handleKeyUp(e: KeyboardEvent): void {
 setInterval(() => {
   State.save();
 }, 30000);
+
+// ---- Expose for automation ----
+(window as any).__turboSelectDog = selectDog;
+(window as any).__turboStartAdventure = startAdventure;
 
 // ---- Boot ----
 window.addEventListener('DOMContentLoaded', init);

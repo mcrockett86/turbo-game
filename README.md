@@ -75,6 +75,7 @@ turbo-game/
 
 - **Node.js** ≥ 18 (with npm or npx)
 - A modern browser (Chrome, Firefox, Edge, or Safari)
+- **xvfb** (for analysis test automation) — see below
 
 ### Install Dependencies
 
@@ -86,6 +87,33 @@ npm install
 This installs:
 - **Runtime:** `three` (3D rendering), `howler` (audio)
 - **Dev tools:** `vite` (build), `typescript` (compilation), `vitest` (testing), `jsdom` (test environment)
+
+### System Requirements for Analysis Test Automation
+
+The automated analysis scripts (`analyze`, `analyze:sim`, `test:analysis`, `test:all`) use Playwright with WebGL rendering, which requires a virtual display server. Install xvfb before running these commands:
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install xvfb
+
+# RHEL/CentOS/Fedora
+sudo yum install xorg-x11-server-Xvfb
+
+# macOS (via Homebrew)
+brew install --cask xquartz
+# Then use: xvfb-run is not available on macOS; use XQuartz + X11 forwarding
+```
+
+**Important:** The analysis tests require a running Vite dev server on port 3000 and xvfb installed. Start the dev server first:
+
+```bash
+cd turbo-game/turbo-web
+npm run dev
+# Wait for "VITE v6.x.x ready in XXX ms"
+# Then in another terminal:
+npm run test:analysis    # or
+npm run test:all
+```
 
 ### Run Tests
 
@@ -105,6 +133,27 @@ npm test
 | `hints.test.ts` | 19 | Hint unlocking, route display |
 | `threats.test.ts` | 17 | Threat spawning, mini-game logic |
 | `endgame.test.ts` | 17 | Win/lose conditions, scoring |
+
+### Automated Analysis Scripts
+
+These scripts automate game playthroughs with browser automation (Playwright + xvfb) and generate reports. They require a running Vite dev server and xvfb installed.
+
+```bash
+cd turbo-game/turbo-web
+npm run analyze          # Run deep analysis (all 5 dogs)
+npm run analyze:sim      # Run playthrough simulation
+npm run test:analysis    # Run analysis as vitest tests
+npm run test:all         # Run unit tests + analysis tests
+```
+
+| Script | Command | What it does |
+|--------|---------|-------------|
+| `analyze` | `xvfb-run npx tsx deep-analysis.ts` | Runs full deep-analysis across all 5 dogs — DOM inspection, canvas rendering checks, UI panel testing, keyboard interaction, and generates `deep-analysis-report.md` |
+| `analyze:sim` | `xvfb-run npx tsx playthrough-sim.ts` | Runs playthrough simulation across all 5 dogs — tracks zones visited, items collected, companions met, happiness timelines, and generates `playthrough-report.md` |
+| `test:analysis` | `node scripts/run-analysis.mjs` | Runs 6 vitest smoke tests that verify both analysis scripts complete successfully and produce valid output files (reports + screenshots). **~10 min runtime** (5 dogs × 2 min each) |
+| `test:all` | `vitest run && node scripts/run-analysis.mjs` | Runs the full suite: unit tests first, then analysis integration tests (chained — analysis only runs if unit tests pass). **~10 min runtime** |
+
+> **Note:** Each analysis script runs all 5 dogs sequentially (~2 min per dog). The `test:analysis` and `test:all` scripts take ~10 minutes total. Consider running them in CI only, not during local development.
 
 ### Build
 

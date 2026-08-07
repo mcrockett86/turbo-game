@@ -1,6 +1,7 @@
 // ===== Audio Manager =====
 // Howler.js wrapper for music and SFX
 
+import { Howl } from 'howler';
 import { CONFIG } from '@/config';
 
 // ---- Music Tracks ----

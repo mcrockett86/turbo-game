@@ -7,10 +7,16 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:all": "vitest run && node scripts/run-analysis.mjs",
+    "test:xvfb": "xvfb-run npx vitest run",
+    "test:analysis": "node scripts/run-analysis.mjs",
+    "analyze": "xvfb-run npx tsx deep-analysis.ts",
+    "analyze:sim": "xvfb-run npx tsx playthrough-sim.ts"
   },
   "dependencies": {
     "howler": "^2.2.4",
+    "playwright": "^1.62.1",
     "three": "^0.170.0"
   },
   "devDependencies": {
