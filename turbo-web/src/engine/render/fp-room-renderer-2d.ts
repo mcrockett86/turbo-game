@@ -315,10 +315,6 @@ function drawFeatureShape(ctx: CanvasRenderingContext2D, feature: RoomFeature): 
       ctx.fill();
       break;
 
-    case 'locked_door':
-    case 'door':
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
-      break;
 
     case 'bridge':
       // Horizontal bar
