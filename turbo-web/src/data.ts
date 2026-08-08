@@ -342,6 +342,8 @@ export const ZONES: Record<string, Zone> = {
     name: '🏘️ Suburban Streets',
     desc: 'Wide sidewalks, unfamiliar houses. The world is so big.',
     type: 'fp', // first-person
+    fogNear: 50,
+    fogFar: 500,
     rooms: [
       { id: 'start', name: 'Front Yard', w: 200, h: 150, d: 200, color: '#4a7a3a', exits: ['street_north', 'street_east'] },
       { id: 'street_north', name: 'North Street', w: 300, h: 120, d: 400, color: '#6a6a6a', exits: ['start', 'intersection'], features: [{type:'traffic', x:150, y:60, w:80, h:20, label:'🚗 Traffic'}] },

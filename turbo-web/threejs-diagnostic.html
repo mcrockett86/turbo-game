@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three.js Diagnostic — Camera Sweep Test</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+  canvas { display: block; }
+  #hud {
+    position: fixed; top: 10px; left: 10px; z-index: 10;
+    background: rgba(0,0,0,0.85); color: #0f0; padding: 12px 16px;
+    border-radius: 6px; font-size: 13px; line-height: 1.6;
+    pointer-events: none; min-width: 320px;
+    border: 1px solid #0a0;
+  }
+  #hud .label { color: #888; }
+  #hud .val { color: #0f0; }
+  #hud .warn { color: #ff0; }
+  #hud .err { color: #f44; }
+  #hud .ok { color: #4f4; }
+  #controls {
+    position: fixed; bottom: 10px; left: 10px; z-index: 10;
+    background: rgba(0,0,0,0.85); color: #ccc; padding: 12px 16px;
+    border-radius: 6px; font-size: 12px; line-height: 1.8;
+    pointer-events: none;
+    border: 1px solid #333;
+  }
+  #controls kbd {
+    background: #333; padding: 2px 6px; border-radius: 3px;
+    border: 1px solid #555; color: #fff;
+  }
+  #status-bar {
+    position: fixed; top: 10px; right: 10px; z-index: 10;
+    background: rgba(0,0,0,0.85); color: #fff; padding: 10px 16px;
+    border-radius: 6px; font-size: 13px;
+    border: 1px solid #0a0;
+  }
+  .phase-indicator { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="phase-indicator" id="phase">PHASE: INITIALIZING</div>
+  <div><span class="label">Renderer: </span><span class="val" id="r-renderer">—</span></div>
+  <div><span class="label">GL Context: </span><span class="val" id="r-gl">—</span></div>
+  <div><span class="label">FPS: </span><span class="val" id="r-fps">—</span></div>
+  <div><span class="label">Camera Pos: </span><span class="val" id="r-cam">—</span></div>
+  <div><span class="label">Camera Look: </span><span class="val" id="r-look">—</span></div>
+  <div><span class="label">Lights: </span><span class="val" id="r-lights">—</span></div>
+  <div><span class="label">Objects: </span><span class="val" id="r-objects">—</span></div>
+  <div><span class="label">Fog: </span><span class="val" id="r-fog">—</span></div>
+  <div><span class="label">BG Color: </span><span class="val" id="r-bg">—</span></div>
+  <div><span class="label">Errors: </span><span class="val err" id="r-errors">0</span></div>
+</div>
+
+<div id="status-bar">
+  <div id="status-text">⏳ Starting diagnostic...</div>
+</div>
+
+<div id="controls">
+  <strong>Controls:</strong><br>
+  <kbd>Space</kbd> Pause/Resume &nbsp; <kbd>R</kbd> Reset &nbsp; <kbd>1</kbd>-<kbd>6</kbd> Jump to phases<br>
+  <kbd>Esc</kbd> Exit full diagnostic mode
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ─── State ───────────────────────────────────────────────────────────────
+let scene, camera, renderer;
+let errorCount = 0;
+let paused = false;
+let phase = 0; // 0-5
+let phaseStartTime = 0;
+let frameCount = 0;
+let lastFpsTime = performance.now();
+let currentFps = 0;
+
+const phases = [
+  { name: 'PHASE 1: Basic Scene Test', duration: 6000 },
+  { name: 'PHASE 2: Camera Orbit (Yaw)', duration: 6000 },
+  { name: 'PHASE 3: Camera Orbit (Pitch)', duration: 6000 },
+  { name: 'PHASE 4: Light Sweep Test', duration: 6000 },
+  { name: 'PHASE 5: Geometry Proximity', duration: 6000 },
+  { name: 'PHASE 6: Full Diagnostic Sweep', duration: 8000 },
+];
+
+// ─── Init ────────────────────────────────────────────────────────────────
+function init() {
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1a1a2e);
+  scene.fog = new THREE.Fog(0x1a1a2e, 50, 200);
+
+  // Camera — start at a safe position
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 10, 30);
+  camera.lookAt(0, 0, 0);
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: false,
+    powerPreference: 'high-performance',
+  });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+
+  document.body.appendChild(renderer.domElement);
+
+  // ─── Build Scene Content ───
+  buildScene();
+
+  // ─── Start ───
+  phaseStartTime = performance.now();
+  requestAnimationFrame(animate);
+
+  // ─── Keyboard Controls ───
+  window.addEventListener('keydown', onKeyDown);
+  window.addEventListener('resize', onResize);
+
+  // Log WebGL info
+  const gl = renderer.getContext();
+  console.log('🔧 WebGL Renderer:', gl.getParameter(gl.RENDERER));
+  console.log('🔧 WebGL Version:', gl.getParameter(gl.VERSION));
+  console.log('🔧 GLSL Version:', gl.getParameter(gl.SHADING_LANGUAGE_VERSION));
+  console.log('🔧 Max Texture Size:', gl.getParameter(gl.MAX_TEXTURE_SIZE));
+  console.log('🔧 Max Viewport Dims:', gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+}
+
+function buildScene() {
+  // ── Ground plane (bright checkerboard) ──
+  const groundGeo = new THREE.PlaneGeometry(100, 100, 20, 20);
+  const groundMat = new THREE.MeshStandardMaterial({
+    color: 0x4a7a3a,
+    roughness: 0.8,
+    metalness: 0.1,
+  });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // Checkerboard overlay
+  const checkerCanvas = document.createElement('canvas');
+  checkerCanvas.width = 256;
+  checkerCanvas.height = 256;
+  const ctx = checkerCanvas.getContext('2d');
+  const size = 32;
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      ctx.fillStyle = (x + y) % 2 === 0 ? '#3a6a2a' : '#5a8a4a';
+      ctx.fillRect(x * size, y * size, size, size);
+    }
+  }
+  const checkerTex = new THREE.CanvasTexture(checkerCanvas);
+  checkerTex.wrapS = checkerTex.wrapT = THREE.RepeatWrapping;
+  checkerTex.repeat.set(12, 12);
+  groundMat.map = checkerTex;
+  groundMat.needsUpdate = true;
+
+  // ── Bright colored reference objects ──
+  const objects = [];
+
+  // Red box at center
+  const redBox = new THREE.Mesh(
+    new THREE.BoxGeometry(4, 4, 4),
+    new THREE.MeshStandardMaterial({ color: 0xff2222, roughness: 0.3, metalness: 0.5 })
+  );
+  redBox.position.set(0, 0, 0);
+  redBox.castShadow = true;
+  redBox.receiveShadow = true;
+  scene.add(redBox);
+  objects.push(redBox);
+
+  // Green sphere
+  const greenSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(2.5, 32, 32),
+    new THREE.MeshStandardMaterial({ color: 0x22ff22, roughness: 0.2, metalness: 0.3 })
+  );
+  greenSphere.position.set(12, 0, 8);
+  greenSphere.castShadow = true;
+  scene.add(greenSphere);
+  objects.push(greenSphere);
+
+  // Blue cylinder
+  const blueCyl = new THREE.Mesh(
+    new THREE.CylinderGeometry(2, 2, 6, 32),
+    new THREE.MeshStandardMaterial({ color: 0x2244ff, roughness: 0.3, metalness: 0.6 })
+  );
+  blueCyl.position.set(-10, 1, -5);
+  blueCyl.castShadow = true;
+  scene.add(blueCyl);
+  objects.push(blueCyl);
+
+  // Yellow torus
+  const yellowTorus = new THREE.Mesh(
+    new THREE.TorusGeometry(3, 1, 16, 48),
+    new THREE.MeshStandardMaterial({ color: 0xffff22, roughness: 0.2, metalness: 0.7 })
+  );
+  yellowTorus.position.set(5, 3, -12);
+  yellowTorus.castShadow = true;
+  scene.add(yellowTorus);
+  objects.push(yellowTorus);
+
+  // Purple octahedron
+  const purpleOct = new THREE.Mesh(
+    new THREE.OctahedronGeometry(2.5),
+    new THREE.MeshStandardMaterial({ color: 0xaa22ff, roughness: 0.1, metalness: 0.8 })
+  );
+  purpleOct.position.set(-8, 4, 10);
+  purpleOct.castShadow = true;
+  scene.add(purpleOct);
+  objects.push(purpleOct);
+
+  // Orange cone
+  const orangeCone = new THREE.Mesh(
+    new THREE.ConeGeometry(2, 5, 32),
+    new THREE.MeshStandardMaterial({ color: 0xff8800, roughness: 0.4, metalness: 0.2 })
+  );
+  orangeCone.position.set(15, 0.5, -10);
+  orangeCone.castShadow = true;
+  scene.add(orangeCone);
+  objects.push(orangeCone);
+
+  // ── Wireframe grid helper ──
+  const grid = new THREE.GridHelper(100, 50, 0x444444, 0x222222);
+  grid.position.y = -1.9;
+  scene.add(grid);
+
+  // ── Axis indicator ──
+  const axisHelper = new THREE.AxesHelper(10);
+  axisHelper.position.set(-20, -2, -20);
+  scene.add(axisHelper);
+
+  // ── Lighting ──
+  // Ambient
+  const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambient);
+
+  // Hemisphere
+  const hemi = new THREE.HemisphereLight(0x87CEEB, 0x4a7a3a, 0.6);
+  scene.add(hemi);
+
+  // Directional (sun)
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(20, 30, 10);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 2048;
+  dirLight.shadow.mapSize.height = 2048;
+  dirLight.shadow.camera.near = 0.5;
+  dirLight.shadow.camera.far = 100;
+  dirLight.shadow.camera.left = -30;
+  dirLight.shadow.camera.right = 30;
+  dirLight.shadow.camera.top = 30;
+  dirLight.shadow.camera.bottom = -30;
+  scene.add(dirLight);
+
+  // Point lights (colored for testing)
+  const pointRed = new THREE.PointLight(0xff0000, 2, 30);
+  pointRed.position.set(5, 8, 5);
+  scene.add(pointRed);
+
+  const pointBlue = new THREE.PointLight(0x0044ff, 2, 30);
+  pointBlue.position.set(-5, 8, -5);
+  scene.add(pointBlue);
+
+  const pointGreen = new THREE.PointLight(0x00ff44, 1.5, 25);
+  pointGreen.position.set(0, 12, 0);
+  scene.add(pointGreen);
+
+  // ── Floor grid color overlay ──
+  const floorPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshBasicMaterial({ color: 0x111122, side: THREE.DoubleSide })
+  );
+  floorPlane.rotation.x = -Math.PI / 2;
+  floorPlane.position.y = -2.1;
+  scene.add(floorPlane);
+
+  // Store refs for animation
+  scene.userData.objects = objects;
+  scene.userData.pointLights = [pointRed, pointBlue, pointGreen];
+  scene.userData.dirLight = dirLight;
+}
+
+// ─── Animate ─────────────────────────────────────────────────────────────
+function animate(time) {
+  requestAnimationFrame(animate);
+
+  if (paused) return;
+
+  const elapsed = time - phaseStartTime;
+  const currentPhase = phases[phase];
+
+  // Check if phase is done
+  if (elapsed >= currentPhase.duration) {
+    phase++;
+    if (phase >= phases.length) {
+      // Diagnostic complete — enter free roam
+      document.getElementById('phase').textContent = 'PHASE: FREE ROAM (diagnostic complete)';
+      document.getElementById('phase').style.color = '#0f0';
+      document.getElementById('status-text').textContent = '✅ Diagnostic sweep complete!';
+      return;
+    }
+    phaseStartTime = time;
+    document.getElementById('phase').textContent = currentPhase.name;
+    document.getElementById('phase').style.color = '#ff0';
+    document.getElementById('status-text').textContent = `▶ ${currentPhase.name}`;
+  }
+
+  // ── Phase-specific camera behavior ──
+  const t = (elapsed / currentPhase.duration); // 0..1 within phase
+
+  switch (phase) {
+    case 0: {
+      // Phase 1: Static wide shot — is anything rendering?
+      camera.position.set(0, 15, 35);
+      camera.lookAt(0, 0, 0);
+      break;
+    }
+    case 1: {
+      // Phase 2: Horizontal orbit around center
+      const angle = t * Math.PI * 2;
+      camera.position.set(Math.cos(angle) * 25, 12, Math.sin(angle) * 25);
+      camera.lookAt(0, 0, 0);
+      break;
+    }
+    case 2: {
+      // Phase 3: Vertical arc (top-down to ground level)
+      const angle = t * Math.PI;
+      camera.position.set(
+        Math.cos(t * Math.PI * 2) * 20,
+        Math.cos(angle) * 15 + 15,
+        Math.sin(t * Math.PI * 2) * 20
+      );
+      camera.lookAt(0, 0, 0);
+      break;
+    }
+    case 3: {
+      // Phase 4: Close-up sweep past each object
+      const objects = scene.userData.objects;
+      const objCount = objects.length;
+      const objIndex = Math.floor(t * objCount);
+      const objT = (t * objCount) - objIndex;
+      const obj = objects[objIndex % objCount];
+      const nextObj = objects[(objIndex + 1) % objCount];
+
+      camera.position.lerpVectors(
+        new THREE.Vector3(obj.position.x + 8, obj.position.y + 8, obj.position.z + 8),
+        new THREE.Vector3(nextObj.position.x + 8, nextObj.position.y + 8, nextObj.position.z + 8),
+        objT
+      );
+      camera.lookAt(obj.position);
+      break;
+    }
+    case 4: {
+      // Phase 5: Camera inside geometry test — approach center slowly
+      const dist = 30 * (1 - t);
+      camera.position.set(
+        Math.cos(t * Math.PI) * dist,
+        5 + Math.sin(t * Math.PI * 2) * 3,
+        Math.sin(t * Math.PI) * dist
+      );
+      camera.lookAt(0, 0, 0);
+      break;
+    }
+    case 5: {
+      // Phase 6: Full diagnostic sweep — figure-8 with elevation changes
+      const angle = t * Math.PI * 4;
+      const radius = 20 + Math.sin(t * Math.PI * 2) * 10;
+      camera.position.set(
+        Math.cos(angle) * radius,
+        8 + Math.sin(t * Math.PI * 3) * 12,
+        Math.sin(angle) * radius
+      );
+      camera.lookAt(0, 2, 0);
+      break;
+    }
+  }
+
+  // ── Animate objects ──
+  const objects = scene.userData.objects;
+  if (objects) {
+    objects.forEach((obj, i) => {
+      obj.rotation.y += 0.01;
+      obj.rotation.x += 0.005;
+      // Gentle float
+      obj.position.y += Math.sin(time * 0.002 + i) * 0.002;
+    });
+  }
+
+  // ── Animate point lights ──
+  const lights = scene.userData.pointLights;
+  if (lights) {
+    lights.forEach((light, i) => {
+      light.position.x = Math.sin(time * 0.001 + i * 2) * 15;
+      light.position.z = Math.cos(time * 0.001 + i * 2) * 15;
+    });
+  }
+
+  // ── Update HUD ──
+  updateHUD();
+
+  // ── Render ──
+  renderer.render(scene, camera);
+}
+
+function updateHUD() {
+  frameCount++;
+  const now = performance.now();
+  if (now - lastFpsTime >= 500) {
+    currentFps = Math.round(frameCount / ((now - lastFpsTime) / 1000));
+    frameCount = 0;
+    lastFpsTime = now;
+  }
+
+  document.getElementById('r-renderer').textContent = renderer?.domElement?.className || '—';
+  document.getElementById('r-gl').textContent = renderer?.getContext()?.getContextType?.() || '—';
+  document.getElementById('r-fps').textContent = currentFps;
+  document.getElementById('r-fps').style.color = currentFps >= 30 ? '#0f0' : currentFps >= 15 ? '#ff0' : '#f44';
+  document.getElementById('r-cam').textContent = camera?.position?.toArray().map(v => v.toFixed(1)).join(', ');
+  const lookDir = new THREE.Vector3();
+  camera?.getWorldDirection(lookDir);
+  document.getElementById('r-look').textContent = lookDir.toArray().map(v => v.toFixed(2)).join(', ');
+  document.getElementById('r-lights').textContent = scene?.children?.filter(c => c.isLight).length.toString() || '0';
+  document.getElementById('r-objects').textContent = scene?.children?.filter(c => c.isMesh).length.toString() || '0';
+  document.getElementById('r-fog').textContent = scene?.fog ? `near=${scene.fog.near.toFixed(0)} far=${scene.fog.far.toFixed(0)}` : 'none';
+  document.getElementById('r-bg').textContent = '#' + (scene?.background?.getHexString?.() || '000000');
+  document.getElementById('r-errors').textContent = errorCount;
+  document.getElementById('r-errors').style.color = errorCount > 0 ? '#f44' : '#0f0';
+
+  // Check for WebGL errors
+  if (renderer) {
+    const gl = renderer.getContext();
+    const err = gl?.getError?.();
+    if (err && err !== 0) {
+      errorCount++;
+      document.getElementById('r-errors').textContent = errorCount;
+    }
+  }
+}
+
+// ─── Controls ────────────────────────────────────────────────────────────
+function onKeyDown(e) {
+  switch (e.code) {
+    case 'Space':
+      e.preventDefault();
+      paused = !paused;
+      if (!paused) phaseStartTime = performance.now() - (performance.now() - phaseStartTime);
+      document.getElementById('status-text').textContent = paused ? '⏸ Paused' : '▶ Resumed';
+      break;
+    case 'KeyR':
+      phase = 0;
+      phaseStartTime = performance.now();
+      camera.position.set(0, 10, 30);
+      camera.lookAt(0, 0, 0);
+      document.getElementById('status-text').textContent = '🔄 Reset to Phase 1';
+      break;
+    case 'Digit1': case 'Digit2': case 'Digit3':
+    case 'Digit4': case 'Digit5': case 'Digit6':
+      const p = parseInt(e.code.replace('Digit', '')) - 1;
+      if (p < phases.length) {
+        phase = p;
+        phaseStartTime = performance.now();
+        document.getElementById('status-text').textContent = `⏭ Jumped to ${phases[p].name}`;
+      }
+      break;
+    case 'Escape':
+      // Stop diagnostic, go to free camera
+      paused = true;
+      document.getElementById('phase').textContent = 'FREE CAMERA MODE';
+      document.getElementById('status-text').textContent = '📷 Use WASD + mouse to explore freely';
+      break;
+  }
+}
+
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// ─── Start ───────────────────────────────────────────────────────────────
+init();
+
+// ─── Post-init diagnostics ───────────────────────────────────────────────
+setTimeout(() => {
+  console.log('═══════════════════════════════════════════');
+  console.log('  Three.js Diagnostic — Post-Init Report');
+  console.log('═══════════════════════════════════════════');
+  console.log(`Renderer type: ${renderer?.domElement?.tagName}`);
+  console.log(`Canvas size: ${renderer?.domElement?.width} × ${renderer?.domElement?.height}`);
+  console.log(`Pixel ratio: ${renderer?.getPixelRatio?.()}`);
+  console.log(`Tone mapping: ${renderer?.toneMapping}`);
+  console.log(`Shadow maps: ${renderer?.shadowMap?.enabled}`);
+  console.log(`Scene background: ${scene?.background}`);
+  console.log(`Scene fog: ${scene?.fog}`);
+  console.log(`Camera: ${camera?.type}, FOV=${camera?.fov}, near=${camera?.near}, far=${camera?.far}`);
+  console.log(`Camera position: ${camera?.position?.x.toFixed(1)}, ${camera?.position?.y.toFixed(1)}, ${camera?.position?.z.toFixed(1)}`);
+  console.log(`Lights in scene: ${scene?.children?.filter(c => c.isLight).length}`);
+  console.log(`Meshes in scene: ${scene?.children?.filter(c => c.isMesh).length}`);
+  console.log('═══════════════════════════════════════════');
+}, 1000);
+
+</script>
+</body>
+</html>

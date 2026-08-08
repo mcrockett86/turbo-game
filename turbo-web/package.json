@@ -17,6 +17,7 @@
   "dependencies": {
     "howler": "^2.2.4",
     "playwright": "^1.62.1",
+    "pngjs": "^7.0.0",
     "three": "^0.170.0"
   },
   "devDependencies": {

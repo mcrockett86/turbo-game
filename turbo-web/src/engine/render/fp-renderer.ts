@@ -279,8 +279,8 @@ const ZONE_LIGHTING: Record<string, ZoneLighting> = {
     directionalColor: '#4466aa',
     directionalIntensity: 0.6,
     fogColor: '#1a1a2e',
-    fogNear: 8,
-    fogFar: 25,
+    fogNear: 3,
+    fogFar: 35,
     timeOfDay: 0.2, // Night
   },
   shelter: {
@@ -309,8 +309,8 @@ const ZONE_LIGHTING: Record<string, ZoneLighting> = {
     directionalColor: '#8888aa',
     directionalIntensity: 0.65,
     fogColor: '#1a1a2e',
-    fogNear: 10,
-    fogFar: 28,
+    fogNear: 15,
+    fogFar: 50,
     timeOfDay: 0.4,
   },
 };
@@ -352,9 +352,14 @@ function setupLighting(scene: Scene, room: Room, zoneId: string = 'default', sca
 
 // ---- Fog Setup ----
 
-function setupFog(scene: Scene, zoneId: string = 'default'): void {
+function setupFog(scene: Scene, zoneId: string = 'default', roomW?: number, roomD?: number): void {
   const lighting = ZONE_LIGHTING[zoneId] || ZONE_LIGHTING.default;
-  scene.fog = new Fog(new Color(lighting.fogColor), lighting.fogNear, lighting.fogFar);
+  // Scale fog to room dimensions so visibility covers the playable area
+  const baseFogFar = lighting.fogFar;
+  const roomScale = (roomW && roomD) ? Math.max(roomW, roomD) / 200 : 1;
+  const fogFar = baseFogFar * roomScale;
+  const fogNear = lighting.fogNear * roomScale;
+  scene.fog = new Fog(new Color(lighting.fogColor), fogNear, fogFar);
 }
 
 // ---- Camera Controller ----
@@ -447,7 +452,7 @@ export class FpRoomRenderer {
   private lightGroup: Group | null = null;
   private keys: Set<string> = new Set();
   private moveSpeed: number;
-  private roomScale: number = 0.1; // Data units -> world units (room data is ~10x too large)
+  private roomScale: number = 1.0; // Data units -> world units
   private raycaster: Raycaster;
   private mouse: Vector2;
   private hoveredFeature: RoomFeature | null = null;
@@ -504,6 +509,27 @@ export class FpRoomRenderer {
       antialias: true,
       alpha: false,
     });
+
+    // Verify WebGL context was created successfully
+    const gl = (this.renderer as any).getContext();
+    if (!gl) {
+      console.error('[FP] WebGL context creation failed — canvas may not support WebGL');
+      this.canvas.style.background = '#ff6b6b';
+      this.canvas.style.display = 'flex';
+      this.canvas.style.alignItems = 'center';
+      this.canvas.style.justifyContent = 'center';
+      // Create overlay text
+      const overlay = document.createElement('div');
+      overlay.style.color = '#fff';
+      overlay.style.fontFamily = 'monospace';
+      overlay.style.fontSize = '18px';
+      overlay.style.textAlign = 'center';
+      overlay.style.padding = '20px';
+      overlay.innerHTML = '<strong>WebGL not available</strong><br>This browser does not support WebGL rendering.';
+      this.canvas.parentElement?.appendChild(overlay);
+      return;
+    }
+
     this.renderer.setSize(this.canvas.width, this.canvas.height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = false;
@@ -513,7 +539,7 @@ export class FpRoomRenderer {
     const sw = this.room.w * s;
     const sh = this.room.h * s;
     const sd = this.room.d * s;
-    const cameraHeight = CONFIG.fpCameraHeight * s;
+    const cameraHeight = CONFIG.fpCameraHeight;
     const startPos = new Vector3(0, cameraHeight, 0);
     this.cameraController = new CameraController(this.camera, this.room, startPos, sw, sd);
     this.camera.position.copy(startPos);
@@ -550,8 +576,8 @@ export class FpRoomRenderer {
     // Lighting
     this.lightGroup = setupLighting(this.scene, this.room, this.zoneId, sw, sh, sd);
 
-    // Fog
-    setupFog(this.scene, this.zoneId);
+    // Fog (scale to room dimensions)
+    setupFog(this.scene, this.zoneId, sw, sd);
 
     // Features (positions scaled)
     const features = this.room.features || [];
