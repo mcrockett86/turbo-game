@@ -674,13 +674,14 @@ export class FpRoomRenderer2D {
 
     for (const [key, state] of this.featureStates) {
       const f = state.feature;
+      const fZ = 'z' in f ? (f as any).z : f.y;
       const dx = worldX - f.x;
-      const dz = worldZ - f.z;
+      const dz = worldZ - fZ;
       const dist = Math.sqrt(dx * dx + dz * dz);
 
       // Check if within feature bounds
-      const halfW = f.w / 2 + 10;
-      const halfH = f.h / 2 + 10;
+      const halfW = (f.w || 30) / 2 + 10;
+      const halfH = (f.h || 30) / 2 + 10;
       if (
         Math.abs(dx) < halfW &&
         Math.abs(dz) < halfH &&
@@ -837,13 +838,14 @@ export class FpRoomRenderer2D {
 
     for (const [key, state] of this.featureStates) {
       const f = state.feature;
+      const fZ = 'z' in f ? (f as any).z : f.y; // room features use y as depth
       const glowPulse = 0.2 + 0.15 * Math.sin(this.glowTime * GLOW_PULSE_SPEED + state.glowPhase);
 
       // Glow ring for non-locked features
       if (!f.locked) {
-        const ringRadius = Math.max(f.w, f.h) / 2 + 8 + (state.isHovered ? 4 : 0) + Math.sin(this.glowTime * 2) * 3;
+        const ringRadius = Math.max(f.w || 30, f.h || 30) / 2 + 8 + (state.isHovered ? 4 : 0) + Math.sin(this.glowTime * 2) * 3;
         ctx.beginPath();
-        ctx.arc(f.x, f.z, ringRadius, 0, Math.PI * 2);
+        ctx.arc(f.x, fZ, ringRadius, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(240, 192, 64, ${glowPulse})`;
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -854,10 +856,10 @@ export class FpRoomRenderer2D {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.strokeRect(
-          f.x - f.w / 2 - 4,
-          f.z - f.h / 2 - 4,
-          f.w + 8,
-          f.h + 8,
+          f.x - (f.w || 30) / 2 - 4,
+          fZ - (f.h || 30) / 2 - 4,
+          (f.w || 30) + 8,
+          (f.h || 30) + 8,
         );
       }
 
@@ -865,7 +867,7 @@ export class FpRoomRenderer2D {
       drawFeatureShape(ctx, f);
 
       // Label
-      const labelY = f.z - Math.max(f.w, f.h) / 2 - 16;
+      const labelY = fZ - Math.max(f.w || 30, f.h || 30) / 2 - 16;
       drawLabel(ctx, f.label, f.x, labelY, 11, f.locked ? '#ff4444' : '#f0c040');
     }
 
@@ -892,7 +894,7 @@ export class FpRoomRenderer2D {
       }
 
       // Arrow marker above door
-      exit.arrowAngle += delta * EXIT_ARROW_ROTATION_SPEED;
+      exit.arrowAngle += 0.5 * ((performance.now() - this.lastFrameTime) / 1000);
       const arrowDist = 20;
       let ax = ex, az = ez;
       switch (exit.wallSide) {

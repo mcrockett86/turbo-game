@@ -121,7 +121,22 @@ export interface ScentPoint {
 }
 
 // ---- RoomFeature (extended) ----
-export interface RoomFeatureExtended extends RoomFeature {
+// Used for TP zone features which may use z instead of y and omit w/h.
+// We re-declare y/w/h as optional to allow TP zone feature literals.
+export interface RoomFeatureExtended {
+  type: 'traffic' | 'hint' | 'food' | 'door' | 'cat' | 'bully' | 'storm' | 'vacuum'
+      | 'tv' | 'dog_friend' | 'person' | 'home' | 'choice' | 'tree_clue'
+      | 'water' | 'pet_shop' | 'dog_show' | 'locked_door' | 'secret_passage'
+      | 'lure' | 'bridge' | 'trap' | 'treasure_chest' | 'companion_trap'
+      | 'music_box' | 'fountain' | 'mailbox' | 'fire_hydrant' | 'scent_post'
+      | 'treasure' | 'water_bowl' | 'celebration' | 'return_gate' | 'cave_entrance';
+  x: number;
+  y?: number; // optional — TP zones may use z instead
+  w?: number; // optional — TP zones may omit
+  h?: number; // optional — TP zones may omit
+  z?: number; // TP zones use z instead of y
+  label: string;
+  id?: string;
   item?: string;
   locked?: boolean;
 }

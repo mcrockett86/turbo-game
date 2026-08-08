@@ -364,8 +364,12 @@ export class TpEngine2D {
     this.canvas.addEventListener('click', this.boundClick);
 
     // Key handlers
-    this.boundKeydown = (e: KeyboardEvent) => this.onKeyDown(e);
-    this.boundKeyup = (e: KeyboardEvent) => this.onKeyUp(e);
+    this.boundKeydown = (e: KeyboardEvent) => {
+      this.onKeyDown(e.key);
+    };
+    this.boundKeyup = (e: KeyboardEvent) => {
+      this.onKeyUp(e.key);
+    };
     this.canvas.addEventListener('keydown', this.boundKeydown);
     this.canvas.addEventListener('keyup', this.boundKeyup);
 
@@ -391,9 +395,10 @@ export class TpEngine2D {
     // Check feature clicks (distance-based)
     if (this.hoveredFeature) {
       const f = this.hoveredFeature;
+      const fZ = (f as any).z ?? f.y;
       const dx = worldX - f.x;
-      const dz = worldZ - f.z;
-      if (Math.sqrt(dx * dx + dz * dz) < Math.max(f.w, f.h) / 2 + 10) {
+      const dz = worldZ - fZ;
+      if (Math.sqrt(dx * dx + dz * dz) < Math.max(f.w || 30, f.h || 30) / 2 + 10) {
         this.onFeatureClick?.(f.type, f);
         return;
       }
@@ -643,13 +648,14 @@ export class TpEngine2D {
     // ---- Draw Features ----
     for (const [key, fInfo] of this.featureDraws) {
       const f = fInfo.feature;
+      const fZ = (f as any).z ?? f.y;
       const glowPulse = 0.2 + 0.15 * Math.sin(this.glowTime * 3 + fInfo.glowPhase);
 
       // Glow ring for non-locked features
       if (!f.locked) {
-        const ringRadius = Math.max(f.w, f.h) / 2 + 6 + (fInfo.isHovered ? 3 : 0) + Math.sin(this.glowTime * 2) * 2;
+        const ringRadius = Math.max(f.w || 30, f.h || 30) / 2 + 6 + (fInfo.isHovered ? 3 : 0) + Math.sin(this.glowTime * 2) * 2;
         ctx.beginPath();
-        ctx.arc(f.x, f.z, ringRadius, 0, Math.PI * 2);
+        ctx.arc(f.x, fZ, ringRadius, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(240, 192, 64, ${glowPulse})`;
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -660,10 +666,10 @@ export class TpEngine2D {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.strokeRect(
-          f.x - f.w / 2 - 4,
-          f.z - f.h / 2 - 4,
-          f.w + 8,
-          f.h + 8,
+          f.x - (f.w || 30) / 2 - 4,
+          fZ - (f.h || 30) / 2 - 4,
+          (f.w || 30) + 8,
+          (f.h || 30) + 8,
         );
       }
 
@@ -671,7 +677,7 @@ export class TpEngine2D {
       this.drawFeatureShape2D(ctx, f);
 
       // Label
-      const labelY = f.z - Math.max(f.w, f.h) / 2 - 16;
+      const labelY = fZ - Math.max(f.w || 30, f.h || 30) / 2 - 16;
       drawLabel(ctx, f.label, f.x, labelY, 11, f.locked ? '#ff4444' : '#f0c040');
     }
 
@@ -729,7 +735,12 @@ export class TpEngine2D {
 
   /** Draw a feature shape (shared with FP renderer) */
   private drawFeatureShape2D(ctx: CanvasRenderingContext2D, feature: RoomFeatureExtended): void {
-    const { x, z, w, h, type, locked } = feature;
+    const x = feature.x;
+    const z = (feature as any).z ?? feature.y;
+    const w = feature.w ?? 30;
+    const h = feature.h ?? 30;
+    const type = feature.type;
+    const locked = feature.locked ?? false;
     const color = locked ? '#ff4444' : '#f0c040';
     const opacity = locked ? 0.6 : 0.85;
 
@@ -739,23 +750,23 @@ export class TpEngine2D {
     switch (type) {
       case 'water_bowl':
         ctx.beginPath();
-        ctx.arc(x, z, Math.max(w, h) / 2, 0, Math.PI * 2);
+        ctx.arc(x, z, Math.max(w || 30, h || 30) / 2, 0, Math.PI * 2);
         ctx.fill();
         break;
       case 'fire_hydrant':
         ctx.beginPath();
-        ctx.arc(x, z, Math.min(w, h) / 3, 0, Math.PI * 2);
+        ctx.arc(x, z, Math.min(w || 30, h || 30) / 3, 0, Math.PI * 2);
         ctx.fill();
         break;
       case 'scent_post':
-        ctx.fillRect(x - 0.05, z - h / 2, 0.1, h);
+        ctx.fillRect(x - 0.05, z - (h || 30) / 2, 0.1, h || 30);
         ctx.beginPath();
-        ctx.arc(x, z - h / 2, 0.12, 0, Math.PI * 2);
+        ctx.arc(x, z - (h || 30) / 2, 0.12, 0, Math.PI * 2);
         ctx.fill();
         break;
       case 'treasure':
         ctx.beginPath();
-        ctx.arc(x, z, Math.max(w, h) / 2, 0, Math.PI * 2);
+        ctx.arc(x, z, Math.max(w || 30, h || 30) / 2, 0, Math.PI * 2);
         ctx.fill();
         break;
       case 'return_gate':
@@ -903,11 +914,12 @@ export class TpEngine2D {
     let closestDist = 50;
     for (const [key, fInfo] of this.featureDraws) {
       const f = fInfo.feature;
+      const fZ = (f as any).z ?? f.y;
       const dx = worldX - f.x;
-      const dz = worldZ - f.z;
+      const dz = worldZ - fZ;
       const dist = Math.sqrt(dx * dx + dz * dz);
-      const halfW = f.w / 2 + 10;
-      const halfH = f.h / 2 + 10;
+      const halfW = (f.w || 30) / 2 + 10;
+      const halfH = (f.h || 30) / 2 + 10;
       if (
         Math.abs(dx) < halfW &&
         Math.abs(dz) < halfH &&

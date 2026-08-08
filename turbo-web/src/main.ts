@@ -5,8 +5,8 @@ import { DOGS, ZONES, ITEMS, THREATS } from './data';
 import { State } from '@/engine/state';
 import { Audio } from '@/engine/audio';
 import { CONFIG } from '@/config';
-import { FpRoomRenderer } from '@/engine/render/fp-renderer';
-import { TpEngine } from '@/engine/render/tp-renderer';
+import { FpRoomRenderer2D } from '@/engine/render/fp-room-renderer-2d';
+import { TpEngine2D } from '@/engine/render/tp-engine-2d';
 import { SearchRenderer } from '@/engine/render/search-renderer';
 import { HUDRenderer } from '@/engine/hud';
 import { DialogueRenderer } from '@/engine/dialogue';
@@ -20,12 +20,12 @@ import { ThreatManager } from '@/engine/threats';
 import type { GameState, GameEvent, Dog, Zone, Room, RoomFeature, Companion, NPC } from '@/types';
 
 // ---- Active renderer instances ----
-let fpRenderer: FpRoomRenderer | null = null;
-let tpEngine: TpEngine | null = null;
+let fpRenderer: FpRoomRenderer2D | null = null;
+let tpEngine: TpEngine2D | null = null;
 let searchRenderer: SearchRenderer | null = null;
 
 // ---- Active zone type tracking ----
-let activeZoneType: 'fp' | 'tp' | 'search' | null = null;
+let activeZoneType: 'fp' | 'tp' | 'search' | 'human' | null = null;
 
 // ---- Transition renderer ----
 import { ZoneTransitionRenderer } from '@/engine/transitions';
@@ -121,10 +121,8 @@ function renderOverlays(time: number): void {
     tpEngine.update(delta, time);
   }
 
-  // Update search renderer if active (with proper delta time)
-  if (searchRenderer && activeZoneType === 'search') {
-    searchRenderer.update(delta);
-  }
+  // Search renderer manages its own update loop via start()/stop()
+  // No external update call needed
 
   // Effects overlay — update particles in the unified loop
   if (effectsRenderer && !document.getElementById('effects-canvas')?.classList.contains('hidden')) {
@@ -551,8 +549,8 @@ function onWindowResize(): void {
   if (endgameRenderer) endgameRenderer.resize(window.innerWidth, window.innerHeight);
   if (mangaRenderer) mangaRenderer.resize(window.innerWidth, window.innerHeight);
 
-  // Resize game world renderers
-  if (tpEngine) tpEngine.resize(window.innerWidth, window.innerHeight);
+  // Resize game world renderers (2D renderers handle resize internally)
+  // No resize call needed — canvas sizing is handled in startFPView/startTPView
 }
 
 function togglePanel(name: string): void {
@@ -703,17 +701,15 @@ function startFPView(): void {
   const fpViewEl = document.getElementById('fp-view');
   if (fpViewEl) fpViewEl.classList.add('active');
 
-  // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
-  console.log('[Turbo] Window size:', window.innerWidth, 'x', window.innerHeight);
+  // Size canvas
   sizeCanvasToWindow(canvas);
-  console.log('[Turbo] Canvas after sizing:', canvas.width, 'x', canvas.height);
 
   // Dispose previous renderer if switching rooms
   fpRenderer?.dispose();
 
-  // Initialize renderer
-  console.log('[Turbo] Creating FpRoomRenderer...');
-  fpRenderer = new FpRoomRenderer(canvas);
+  // Initialize 2D renderer
+  console.log('[Turbo] Creating FpRoomRenderer2D...');
+  fpRenderer = new FpRoomRenderer2D(canvas);
   console.log('[Turbo] FpRoomRenderer created:', !!fpRenderer);
 
   // Get current zone and room
@@ -747,9 +743,7 @@ function startFPView(): void {
   });
 
   // Start happiness decay timer
-  if (!fpRenderer.happinessInterval) {
-    fpRenderer.startHappinessDecay();
-  }
+  fpRenderer.startHappinessDecay();
 
   // Show HUD
   document.getElementById('hud')!.classList.remove('hidden');
@@ -874,7 +868,7 @@ function transitionToZone(zoneId: string): void {
   const zoneData = ZONES[zoneId as keyof typeof ZONES];
   if (!zoneData) return;
 
-  const zoneType = zoneData.type;
+  const zoneType = zoneData.type === 'human' ? 'search' : zoneData.type;
   const zoneWithRooms = zoneData as Zone & { rooms: Room[] };
 
   // Dispose inactive renderers
@@ -979,14 +973,14 @@ function startTPView(zoneId: string, zoneData: Zone): void {
   const tpViewEl = document.getElementById('tp-view');
   if (tpViewEl) tpViewEl.classList.add('active');
 
-  // Size canvas BEFORE creating WebGL renderer so the buffer matches display size
+  // Size canvas
   sizeCanvasToWindow(canvas);
 
   // Dispose previous engine
   tpEngine?.dispose();
 
-  // Initialize engine
-  tpEngine = new TpEngine(canvas);
+  // Initialize 2D engine
+  tpEngine = new TpEngine2D(canvas);
   tpEngine.init(zoneId, zoneData);
 
   // Wire up callbacks
