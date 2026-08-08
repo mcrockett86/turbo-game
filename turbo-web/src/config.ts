@@ -97,83 +97,50 @@ export const CONFIG = {
   canvasWidth: 1280,
   canvasHeight: 720,
 
-  // FP camera
-  fpFOV: 60,
-  fpNear: 0.1,
-  fpFar: 500,
-  fpCameraHeight: 30, // dog eye height
-
   // FP movement
   fpMoveSpeed: 2.5,
-  fpMaxRoomMove: 0.8, // fraction of room width/depth
+  fpMaxRoomMove: 0.8,
 
-  // TP camera
-  tpCameraOffset: { x: 0, y: 45, z: 35 },
-  tpCameraAngle: 0,
-  tpCameraDist: 50,
+  // TP movement
   tpMoveSpeed: 3,
   tpTurnSpeed: 0.04,
 
-  // Dog model
-  dogBodyWidth: 8,
-  dogBodyHeight: 6,
-  dogBodyDepth: 12,
-  dogHeadSize: 5,
-  dogTailLength: 6,
-  dogEarSize: 3,
-
-  // Happiness — defaults (overridden by difficulty preset at runtime)
+  // Happiness
   happinessMax: 100,
   happinessMin: 0,
   happinessDecayPerRoom: 2,
   happinessDecayPerSecond: 0.05,
-  // threat resolution bonuses/penalties (multiplied by difficulty preset)
   happinessThreatFail: -15,
   happinessThreatSuccess: 5,
-  // item happiness bonuses (multiplied by comfortItemBonus from difficulty)
   happinessItemTreat: 10,
   happinessItemToy: 5,
   happinessItemFriend: 8,
-  happinessItemComfort: 12, // warm_blanket, favorite_toy, blanket
-  happinessItemRare: 20, // golden_treat, diamond_bone, magic_bone
-  happinessItemStory: 15, // home_photo, letter, diary_page
+  happinessItemComfort: 12,
+  happinessItemRare: 20,
+  happinessItemStory: 15,
 
   // Inventory
   inventorySlots: 16,
 
-  // Manga cutaway
-  mangaTimer: 5, // seconds for combo mini-game
-  mangaComboLength: 4, // number of button presses needed
+  // Manga
+  mangaTimer: 5,
+  mangaComboLength: 4,
 
   // Audio
   masterVolume: 1.0,
   musicVolume: 0.7,
   sfxVolume: 0.8,
 
-  // Lighting
-  ambientIntensity: 0.4,
-  directionalIntensity: 0.8,
-
-  // Fog
-  fpFogNear: 100,
-  fpFogFar: 400,
-  tpFogNear: 150,
-  tpFogFar: 500,
-
-  // Zone progression
-  zones: ['suburban_streets', 'dog_park', 'apartment', 'shelter', 'neighborhood'],
-  homes: ['neighborhood'],
-
-  // Colors
+  // Colors (hex strings for Canvas 2D)
   colors: {
-    sky: 0x1a1a2e,
-    ground: 0x4a7a3a,
-    wall: 0x8a8a9a,
-    floor: 0x6a6a6a,
-    highlight: 0xf0c040,
-    success: 0x4ade80,
-    danger: 0xff4444,
-    ui: 0x2a2a4a,
+    sky: '#1a1a2e',
+    ground: '#4a7a3a',
+    wall: '#8a8a9a',
+    floor: '#6a6a6a',
+    highlight: '#f0c040',
+    success: '#4ade80',
+    danger: '#ff4444',
+    ui: '#2a2a4a',
   },
 
   // Debug

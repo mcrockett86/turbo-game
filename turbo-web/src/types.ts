@@ -121,7 +121,22 @@ export interface ScentPoint {
 }
 
 // ---- RoomFeature (extended) ----
-export interface RoomFeatureExtended extends RoomFeature {
+// Used for TP zone features which may use z instead of y and omit w/h.
+// We re-declare y/w/h as optional to allow TP zone feature literals.
+export interface RoomFeatureExtended {
+  type: 'traffic' | 'hint' | 'food' | 'door' | 'cat' | 'bully' | 'storm' | 'vacuum'
+      | 'tv' | 'dog_friend' | 'person' | 'home' | 'choice' | 'tree_clue'
+      | 'water' | 'pet_shop' | 'dog_show' | 'locked_door' | 'secret_passage'
+      | 'lure' | 'bridge' | 'trap' | 'treasure_chest' | 'companion_trap'
+      | 'music_box' | 'fountain' | 'mailbox' | 'fire_hydrant' | 'scent_post'
+      | 'treasure' | 'water_bowl' | 'celebration' | 'return_gate' | 'cave_entrance';
+  x: number;
+  y?: number; // optional — TP zones may use z instead
+  w?: number; // optional — TP zones may omit
+  h?: number; // optional — TP zones may omit
+  z?: number; // TP zones use z instead of y
+  label: string;
+  id?: string;
   item?: string;
   locked?: boolean;
 }
@@ -233,53 +248,6 @@ export interface MangaState {
   timer: number; // countdown seconds
 }
 
-// ---- Three.js Scene State ----
-export interface SceneState {
-  scene: any; // THREE.Scene
-  camera: any; // THREE.PerspectiveCamera or THREE.OrthographicCamera
-  renderer: any; // THREE.WebGLRenderer
-  clock: any; // THREE.Clock
-  controls: any;
-}
-
-// ---- Room 3D State ----
-export interface Room3DState {
-  scene: any;
-  camera: any;
-  renderer: any;
-  walls: any[];
-  floor: any;
-  ceiling: any;
-  exits: any[]; // exit markers
-  features: any[]; // interactive feature markers
-  lights: any[];
-  currentRoomId: string;
-  playerPos: { x: number; z: number };
-  moveSpeed: number;
-  keys: Set<string>;
-  raycaster: any; // THREE.Raycaster
-  mouse: any; // { x: number; y: number }
-  hoveredFeature: RoomFeature | null;
-}
-
-// ---- TP Zone State ----
-export interface TPZoneState {
-  scene: any;
-  camera: any;
-  renderer: any;
-  clock: any;
-  dog: any; // THREE.Group (dog model)
-  obstacles: any[]; // THREE.Mesh[]
-  npcs: any[]; // THREE.Group[] (companion NPCs)
-  items: any[]; // THREE.Group[] (ground items)
-  playerPos: { x: number; z: number };
-  playerVel: { x: number; z: number };
-  moveSpeed: number;
-  keys: Set<string>;
-  cameraOffset: { x: number; y: number; z: number };
-  cameraAngle: number;
-  cameraDist: number;
-}
 
 // ---- Human View State ----
 export interface HumanViewState {
