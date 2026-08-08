@@ -615,6 +615,16 @@ export class FpRoomRenderer {
     window.addEventListener('keyup', this.boundKeyUp);
   }
 
+  // ---- Keyboard event routing (called from main.ts) ----
+
+  handleKeyDown(event: KeyboardEvent): void {
+    this.onKeyDown(event);
+  }
+
+  handleKeyUp(event: KeyboardEvent): void {
+    this.onKeyUp(event);
+  }
+
   // ---- Event Handlers ----
 
   private onMouseMove(event: MouseEvent): void {
