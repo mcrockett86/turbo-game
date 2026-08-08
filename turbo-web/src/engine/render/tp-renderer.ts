@@ -790,7 +790,10 @@ export class TpEngine {
     // Camera target
     this.cameraController.setTarget(new THREE.Vector3(0, 0, 0));
 
-    // Setup click handler
+    // Setup click handler (remove previous listener to prevent duplicates on re-init)
+    if (this.boundClick) {
+      this.canvasEl.removeEventListener('click', this.boundClick);
+    }
     this.boundClick = (e: MouseEvent) => this.setupClickHandler(e);
     this.canvasEl.addEventListener('click', this.boundClick);
   }
@@ -1105,55 +1108,53 @@ export class TpEngine {
 
   /** Setup click handler for features/NPCs */
   private setupClickHandler(event: MouseEvent): void {
-    this.canvasEl.addEventListener('click', (event) => {
-      if (this.isPaused) return;
+    if (this.isPaused) return;
 
-      const rect = this.canvasEl.getBoundingClientRect();
-      this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const rect = this.canvasEl.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      this.raycaster.setFromCamera(this.mouse, this.camera);
+    this.raycaster.setFromCamera(this.mouse, this.camera);
 
-      // Check feature clicks
-      const featureGroups: THREE.Object3D[] = [];
-      this.scene.traverse((obj) => {
-        if (obj instanceof THREE.Group && obj.userData.type === 'feature') {
-          featureGroups.push(obj);
-        }
-      });
-
-      const featureIntersects = this.raycaster.intersectObjects(featureGroups, true);
-      if (featureIntersects.length > 0) {
-        let target = featureIntersects[0].object;
-        while (target && target.userData.type !== 'feature') {
-          target = target.parent as any;
-        }
-        if (target && target.userData.featureId) {
-          const featureId = target.userData.featureId;
-          const feature = this.zoneData.features?.find((f: any) => f.id === featureId);
-          if (feature) {
-            this.onFeatureClick?.(feature.type, feature);
-          }
-        }
-        return;
-      }
-
-      // Check NPC clicks
-      const npcGroups = this.npcManager.getAllGroups();
-      const npcIntersects = this.raycaster.intersectObjects(npcGroups, true);
-      if (npcIntersects.length > 0) {
-        let target = npcIntersects[0].object;
-        while (target && !target.userData?.npcId) {
-          target = target.parent as any;
-        }
-        if (target?.userData?.npcId) {
-          const npc = this.npcManager.getById(target.userData.npcId);
-          if (npc) {
-            this.onNpcClick?.(npc);
-          }
-        }
+    // Check feature clicks
+    const featureGroups: THREE.Object3D[] = [];
+    this.scene.traverse((obj) => {
+      if (obj instanceof THREE.Group && obj.userData.type === 'feature') {
+        featureGroups.push(obj);
       }
     });
+
+    const featureIntersects = this.raycaster.intersectObjects(featureGroups, true);
+    if (featureIntersects.length > 0) {
+      let target = featureIntersects[0].object;
+      while (target && target.userData.type !== 'feature') {
+        target = target.parent as any;
+      }
+      if (target && target.userData.featureId) {
+        const featureId = target.userData.featureId;
+        const feature = this.zoneData.features?.find((f: any) => f.id === featureId);
+        if (feature) {
+          this.onFeatureClick?.(feature.type, feature);
+        }
+      }
+      return;
+    }
+
+    // Check NPC clicks
+    const npcGroups = this.npcManager.getAllGroups();
+    const npcIntersects = this.raycaster.intersectObjects(npcGroups, true);
+    if (npcIntersects.length > 0) {
+      let target = npcIntersects[0].object;
+      while (target && !target.userData?.npcId) {
+        target = target.parent as any;
+      }
+      if (target?.userData?.npcId) {
+        const npc = this.npcManager.getById(target.userData.npcId);
+        if (npc) {
+          this.onNpcClick?.(npc);
+        }
+      }
+    }
   }
 
   /** Handle keyboard input */
